@@ -34,7 +34,6 @@ public class GUI extends JPanel{
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		System.out.println(SCREENHEIGHT);
 
 		//Image background
 		try {
