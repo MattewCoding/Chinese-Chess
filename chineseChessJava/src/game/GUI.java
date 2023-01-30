@@ -129,7 +129,7 @@ public class GUI extends JPanel{
 				int topLeftX = leftMostPixel + col * squareLength;
 				int topLeftY = margin + row * squareLength;
 				Piece[][] pieceList = board.getCoords();
-				Piece piece = pieceList[row][col];
+				Piece piece = pieceList[row][col]; //This breaks the order in Board but it works so...
 				if (piece != null) {
 					String fileName = piece.getImageName();
 					Image scaledImage = new ImageIcon("pictures/chinese_"+fileName).getImage();
