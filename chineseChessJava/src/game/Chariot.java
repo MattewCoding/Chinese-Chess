@@ -1,5 +1,7 @@
 package game;
 
+import game1.Move;
+
 /**
  * Chariot Piece
  */

@@ -1,5 +1,7 @@
 package game;
 
+import game1.Move;
+
 /**
  * Abstract class for Piece. Each piece is unaware of it's location. They contain little member data and are stored on points, which are managed by boards.
  *

@@ -1,4 +1,6 @@
-package game;
+package game1;
+
+import game.Piece;
 
 /**
  * Class to generate the move object, which handles moves on the board

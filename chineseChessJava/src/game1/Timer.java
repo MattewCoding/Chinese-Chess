@@ -1,9 +1,14 @@
-package game;
+package game1;
+/**
+ * Timer to keep track of time elapsed and update timer GUI (*going to be modified*)
+ * @author e-iabdelba
+ *
+ */
 
 public class Timer {
 	  private long startTime;
-	    private long stopTime;
-	    private boolean stillRunning;
+	  private long stopTime;
+	  private boolean stillRunning;
 
 	    /**
 	     * Constructor that initiate the start and stop time.

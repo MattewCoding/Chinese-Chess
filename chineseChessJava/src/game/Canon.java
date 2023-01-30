@@ -1,5 +1,7 @@
 package game;
 
+import game1.Move;
+
 /**
  * Cannon Piece
  */
