@@ -158,7 +158,7 @@ public class Move {
     }
 
     /**
-     * Accesed by the Piece object to set wheter or not a move follows the appropriate move pattern.
+     * Accessed by the Piece object to set whether or not a move follows the appropriate move pattern.
      *
      * @param v true = good to go, false = that isn't even normally allowed, go read the rules.
      */

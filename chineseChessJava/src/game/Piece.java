@@ -38,7 +38,7 @@ public abstract class Piece {
 
     /**
      * Sets the current piece to a captured state, not capturing a different piece.
-     * If this piece was captured by another, than you would use capture on this peice.
+     * If this piece was captured by another, than you would use capture on this piece.
      */
     
     public void Capture() {

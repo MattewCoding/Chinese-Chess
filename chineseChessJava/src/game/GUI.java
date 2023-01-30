@@ -36,7 +36,6 @@ public class GUI extends JPanel{
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		System.out.println(SCREENHEIGHT);
 
 		//Image background
 		try {
@@ -114,12 +113,12 @@ public class GUI extends JPanel{
 			}
 			board= new Board();
 
-			setPieceImages(g2, board);
+			setPieceImages(g2);
 		}
 
 	}
 
-	void setPieceImages(Graphics2D g2, Board board) {
+	void setPieceImages(Graphics2D g2) {
 		int margin = SCREENHEIGHT/18;
 		int squareLength = (SCREENHEIGHT-margin*3)/11; // x3 to leave more space at bottom of screen
 		int center = SCREENWIDTH/2;
