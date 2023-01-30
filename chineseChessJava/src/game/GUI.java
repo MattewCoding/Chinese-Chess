@@ -16,8 +16,6 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
-import chess.piece.Piece;
-
 /**
  * 
  * @author YANG Mattew, Nasro Rona
