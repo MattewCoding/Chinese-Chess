@@ -36,7 +36,6 @@ public class GUI extends JPanel{
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		System.out.println(SCREENHEIGHT);
 
 		//Image background
 		try {
@@ -45,7 +44,7 @@ public class GUI extends JPanel{
 			int bgHeight = background.getHeight(null);
 
 			if(bgHeight != SCREENHEIGHT) {
-				// Resize image if necessaryk
+				// Resize image if necessary
 				String imgOut = "images\\test1.png";
 				ImageResizer.resize(imgLocation, imgOut, ((double)SCREENHEIGHT) / ((double)bgHeight));
 				File fileOut = new File(imgOut);
@@ -110,38 +109,34 @@ public class GUI extends JPanel{
 					g2.setColor(new Color(244,227,166));
 				}
 				g2.fill(rFill);
-				
+
 			}
 			board= new Board();
-			
-			setPieceImages(g2, board);
+
+			setPieceImages(g2);
 		}
-	
+
 	}
-	
-	void setPieceImages(Graphics2D g2, Board board) {
+
+	void setPieceImages(Graphics2D g2) {
 		int margin = SCREENHEIGHT/18;
 		int squareLength = (SCREENHEIGHT-margin*3)/11; // x3 to leave more space at bottom of screen
 		int center = SCREENWIDTH/2;
 		int leftMostPixel = (int) (center-squareLength*(5.5));
-		try {
+		for(int col = 0; col<11; col++) {
 			for(int row = 0; row<11; row++) {
-				for(int col = 0; col<11; col++) {
-					int topLeftX = leftMostPixel + col * squareLength;
-					int topLeftY = margin + row * squareLength;
-					Piece[][] pieceList = board.getCoords();
-					Piece piece = pieceList[col][row];
-					if (piece != null) {
-						String fileName = piece.getImageName();
-						Image scaledImage = new ImageIcon("pictures/chinese_"+fileName).getImage();
-						// figure out why is the y instead of x (i think it's because of the board's order)
-						g2.drawImage(scaledImage, topLeftX, topLeftY, 55, 55, null);
-						
-					}
+				int topLeftX = leftMostPixel + col * squareLength;
+				int topLeftY = margin + row * squareLength;
+				Piece[][] pieceList = board.getCoords();
+				Piece piece = pieceList[row][col]; //This breaks the order in Board but it works so...
+				if (piece != null) {
+					String fileName = piece.getImageName();
+					Image scaledImage = new ImageIcon("pictures/chinese_"+fileName).getImage();
+					// figure out why is the y instead of x (i think it's because of the board's order)
+					g2.drawImage(scaledImage, topLeftX+5, topLeftY+5, squareLength-10, squareLength-10, null);
+
 				}
 			}
-		} catch (Exception e) {
-			System.out.print(e);
 		}
 	}
 }
