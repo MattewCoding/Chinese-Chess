@@ -1,7 +1,6 @@
 package outOfGameScreens;
 
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;

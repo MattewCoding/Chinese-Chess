@@ -29,7 +29,7 @@ public class MainMenu extends JPanel {
 		
 		//Frame settings
 		JFrame frame = new JFrame("Chinese Chess");
-		frame.add(new SubMenu("src\\outOfGameScreens\\testMenu.txt"));
+		frame.add(new SubMenu("src/outOfGameScreens/testMenu.txt"));
 		//frame.getContentPane().add(chessBoard);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
