@@ -39,14 +39,14 @@ public class GUI extends JPanel{
 
 		//Image background
 		try {
-			String imgLocation = "images\\test.png";
+			String imgLocation = "images\\wood-background.jpg";
 			Image background = ImageIO.read(new File(imgLocation));
-			int bgHeight = background.getHeight(null);
+			int bgWidth = background.getWidth(null);
 
-			if(bgHeight != SCREENHEIGHT) {
+			if(bgWidth != SCREENWIDTH) {
 				// Resize image if necessary
 				String imgOut = "images\\test1.png";
-				ImageResizer.resize(imgLocation, imgOut, ((double)SCREENHEIGHT) / ((double)bgHeight));
+				ImageResizer.resize(imgLocation, imgOut, ((double)SCREENWIDTH) / ((double)bgWidth));
 				File fileOut = new File(imgOut);
 				background = ImageIO.read(fileOut);
 				g.drawImage(background,0,0,null);
