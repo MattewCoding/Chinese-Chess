@@ -1,9 +1,8 @@
 package outOfGameScreens;
 
-import java.awt.ComponentOrientation;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -21,7 +20,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -35,6 +33,7 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 	//Screen size
 	private final int SCREENWIDTH, SCREENHEIGHT;
 
+	//Text file contents
 	private String title;
 	private ArrayList<String> optionArrayList = new ArrayList<String>();
 	private ArrayList<String> contentArrayList = new ArrayList<String>();
@@ -95,18 +94,26 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 			System.err.println(e.getMessage());
 		}
 
+		Color boardColor = new Color(244,227,166);
+		
 		//Menu name is file name
 		JLabel menuName = new JLabel(title);
-		menuName.setHorizontalAlignment(JLabel.CENTER);
+		menuName.setBackground(boardColor);
 		menuName.setFont(new Font(menuName.getFont().toString(), Font.BOLD, (int)(55*generalReduce) ));
+		menuName.setHorizontalAlignment(JLabel.CENTER);
+		menuName.setOpaque(true);
 
 		//JList doesn't work with ArrayLists, so convert into regular list
 		JList<String> optionList = new JList<String>(optionArrayList.toArray(new String[optionArrayList.size()]));
 		optionList.setBorder(new EmptyBorder(0, 5, 0, 10)); //order is: top, left, bottom, right
+		optionList.setBackground(boardColor);
+		optionList.setFont(new Font(optionList.getFont().toString(), Font.ITALIC, (int)(36*generalReduce) ));
+		
 		optionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		optionList.setSelectedIndex(0);
+		optionList.setSelectionBackground(new Color(226,192,106));
+		
 		optionList.addListSelectionListener(this);
-		optionList.setFont(new Font(optionList.getFont().toString(), Font.ITALIC, (int)(36*generalReduce) ));
 
 		//TODO: Figure out wrap around
 		// For some reason JLabel doesn't have word wrap so we have
@@ -114,26 +121,29 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 		contentLabel = new JTextArea(contentArrayList.get(0));
 		contentLabel.setAlignmentY(JTextArea.TOP_ALIGNMENT);
 		contentLabel.setBorder(new EmptyBorder(20, (int)(50*generalReduce), 10, 50)); //order is: top, left, bottom, right
+		contentLabel.setBackground(boardColor);
 		contentLabel.setEditable(false);
 		contentLabel.setFont(new Font(contentLabel.getFont().toString(), Font.PLAIN, (int)(28*generalReduce) ));
 		contentLabel.setLineWrap(true);
 		contentLabel.setWrapStyleWord(true);
-		
+
+		//TODO: Change from quitting to just sending back to main menu
+		JButton backButton = new JButton("Back to main menu");
+		backButton.addActionListener(new backButtonListener());
+		backButton.setFont(new Font(backButton.getFont().toString(), Font.PLAIN, (int)(24*generalReduce) ));
+		//backButton.setOpaque(true);
+		backButton.setBackground(boardColor);
 
 		//Create menu parts
 		JScrollPane optionScroll = new JScrollPane(optionList);
 		JScrollPane contentScroll = new JScrollPane(contentLabel);
 		JSplitPane menuNameAndOptionsScroll = new JSplitPane(JSplitPane.VERTICAL_SPLIT, menuName, optionScroll);
 		menuNameAndOptionsScroll.setDividerLocation(SCREENHEIGHT/8);
-
-		JButton backButton = new JButton("Back to main menu");
-		backButton.addActionListener(new backButtonListener());
-		backButton.setFont(new Font(backButton.getFont().toString(), Font.PLAIN, (int)(24*generalReduce) ));
 		
 		JSplitPane leftSideOfMenu = new JSplitPane(JSplitPane.VERTICAL_SPLIT, menuNameAndOptionsScroll, backButton);
 		int autoAdjust = SCREENHEIGHT - SCREENHEIGHT/7;
 		int minSize = SCREENHEIGHT - 100;
-		int buttonDivider = autoAdjust < minSize? autoAdjust : minSize;
+		int buttonDivider = autoAdjust < minSize ? autoAdjust : minSize;
 		leftSideOfMenu.setDividerLocation(buttonDivider);
 
 		//Regrouping to create the general menu screen

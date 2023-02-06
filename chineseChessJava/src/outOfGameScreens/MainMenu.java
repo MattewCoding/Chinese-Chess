@@ -26,7 +26,7 @@ public class MainMenu extends JPanel {
 	 */
 	public MainMenu() {
 		frame = new JFrame("Chinese Chess");
-		GUI chessBoard = new GUI();
+		GUI chessBoard = new GUI(this);
 		
 		/*  This part is for testing the various screens bc we dont have the main menu screen */
 		//  This code is for creating the board
