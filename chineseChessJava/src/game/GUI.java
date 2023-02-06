@@ -20,18 +20,26 @@ import javax.swing.JPanel;
  * @author YANG Mattew, Nasro Rona
  *
  */
-public class GUI extends JPanel{
+public class GUI extends JPanel implements Runnable{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
+	
+	//Have the menu fill up the whole screen.
 	private Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
 	private final int SCREENWIDTH = (int)size.getWidth();
 	private final int SCREENHEIGHT = (int)size.getHeight();
+	
+	//Game elements
 	private int strokeWidth = 1;
 	private Board board;
+	
+	//FPS attributes
+	private boolean stop = true;
+	private static final int UPDATE_SPEED = 1000;
 
 	@Override
 	protected void paintComponent(Graphics g) {
@@ -137,6 +145,18 @@ public class GUI extends JPanel{
 
 				}
 			}
+		}
+	}
+	
+	@Override
+	public void run() {
+		while (!stop) {
+			try {
+				Thread.sleep(UPDATE_SPEED);
+			} catch (InterruptedException e) {
+				System.out.println(e.getMessage());
+			}
+			//TODO: update here
 		}
 	}
 }
