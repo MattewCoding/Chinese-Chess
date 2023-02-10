@@ -1,0 +1,8 @@
+Pieces
+Each player starts with sixteen circular pieces. Player one's pieces are completely black, whilst player two's pieces are red on the inside. The chess pieces are each named after chinese military rankings, with their chinese character displayed on their respective chess pieces.
+
+Chariot
+So this
+
+Pawn
+Welcome

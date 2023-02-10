@@ -17,28 +17,53 @@ public class MainMenu extends JPanel {
 	private Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
 	private final int SCREENWIDTH = (int)size.getWidth();
 	private final int SCREENHEIGHT = (int)size.getHeight();
+	
+	private JFrame frame;
 
 	/**
-	 * Creates the first scrren you see upon launching the program.
+	 * Creates the first screen you see upon launching the program.
 	 * TODO: Create the actual menu screen w/ buttons to play, go to options/records, quit
 	 */
 	public MainMenu() {
+		frame = new JFrame("Chinese Chess");
+		GUI chessBoard = new GUI(this);
 		
+<<<<<<< HEAD
 		//Board creation
 		//GUI chessBoard = new GUI();
 		
 		//Frame settings
 		JFrame frame = new JFrame("Chinese Chess");
 		frame.add(new SubMenu("src/outOfGameScreens/testMenu.txt"));
+=======
+		/*  This part is for testing the various screens bc we dont have the main menu screen */
+		//  This code is for creating the board
+>>>>>>> branch 'main' of https://github.com/OffKinterCoding/Chinese-Chess.git
 		//frame.getContentPane().add(chessBoard);
+		
+		//  This code tests the sub-menus
+		frame.getContentPane().add(new SubMenu("menu\\How to Play.txt", this).getSplitPane());
+		
+		
+		/* This part is to make sure the frame shows up */
+		//Frame settings
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		frame.pack();
 		
 		// Have program fill up screen
 		frame.setMinimumSize(new Dimension(SCREENWIDTH, SCREENHEIGHT));
-
-		//Make frame actually show up
 		frame.setVisible(true);
+	}
+
+	public JFrame getFrame() {
+		return frame;
+	}
+	
+	public int getScreenWidth() {
+		return SCREENWIDTH;
+	}
+	public int getScreenHeight() {
+		return SCREENHEIGHT;
 	}
 }
