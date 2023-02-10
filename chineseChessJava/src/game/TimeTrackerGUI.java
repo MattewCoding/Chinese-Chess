@@ -42,7 +42,7 @@ public class TimeTrackerGUI {
     JPanel timePanel = new JPanel();
     timePanel.add(new JLabel("Time (minutes):"));
     timeField = new JTextField(10);
-    if(timeField.getText().isBlank(){
+    if(timeField.getText().isBlank()){
     }
     timePanel.add(timeField);
     

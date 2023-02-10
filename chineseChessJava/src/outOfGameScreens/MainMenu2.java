@@ -82,7 +82,7 @@ public class MainMenu2 extends JPanel implements ListSelectionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			GUI chessBoard = new GUI(mainScreen);
+			GUI chessBoard = new GUI();
 			menuFrame.setContentPane(chessBoard);
 			menuFrame.revalidate();
 		}
