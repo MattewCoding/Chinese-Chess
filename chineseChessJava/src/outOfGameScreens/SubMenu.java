@@ -38,6 +38,7 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 	//Swing attributes
 	private JTextArea contentLabel;
 	private JSplitPane menuSideBar;
+	private MainMenu mainMenuObject;
 	private JFrame mainScreen;
 
 	//Listens to the list
@@ -64,6 +65,7 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 	public SubMenu(String pathName, MainMenu menuScreen) {
 		int SCREENWIDTH = ScreenParameters.SCREENWIDTH;
 		int SCREENHEIGHT = ScreenParameters.SCREENHEIGHT;
+		mainMenuObject = menuScreen;
 		mainScreen = menuScreen.getFrame();
 		double xReduce = SCREENWIDTH/1600.0;
 
@@ -159,7 +161,8 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			mainScreen.dispose();
+			mainScreen.setContentPane(new MainMenu2(mainMenuObject));
+			mainScreen.revalidate();
 		}
 
 	}
