@@ -2,12 +2,9 @@ package outOfGameScreens;
 
 import java.awt.Color;
 import java.awt.Dimension;
-<<<<<<< HEAD
-=======
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
->>>>>>> branch 'main' of https://github.com/OffKinterCoding/Chinese-Chess.git
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,9 +29,6 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	//Screen size
-	private final int SCREENWIDTH, SCREENHEIGHT;
 
 	//Text file contents
 	private String title;
@@ -68,11 +62,10 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 	 * @param menuFrame The screen that shows all of the menus
 	 */
 	public SubMenu(String pathName, MainMenu menuScreen) {
-		SCREENWIDTH = menuScreen.getScreenWidth();
-		SCREENHEIGHT = menuScreen.getScreenHeight();
+		int SCREENWIDTH = ScreenParameters.SCREENWIDTH;
+		int SCREENHEIGHT = ScreenParameters.SCREENHEIGHT;
 		mainScreen = menuScreen.getFrame();
-		double xReduce = SCREENWIDTH/1600.0, yReduce = SCREENHEIGHT/900.0;
-		double generalReduce = xReduce < yReduce? yReduce : xReduce;
+		double xReduce = SCREENWIDTH/1600.0;
 
 		//Extract data from file
 		File contentFile = new File(pathName);
@@ -97,12 +90,12 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 			System.err.println(e.getMessage());
 		}
 
-		Color boardColor = new Color(244,227,166);
+		Color boardColor = ScreenParameters.BOARDCOLOR;
 		
 		//Menu name is file name
 		JLabel menuName = new JLabel(title);
 		menuName.setBackground(boardColor);
-		menuName.setFont(new Font(menuName.getFont().toString(), Font.BOLD, (int)(55*generalReduce) ));
+		menuName.setFont(new Font(menuName.getFont().toString(), Font.BOLD, (int)(55*xReduce) ));
 		menuName.setHorizontalAlignment(JLabel.CENTER);
 		menuName.setOpaque(true);
 
@@ -110,7 +103,7 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 		JList<String> optionList = new JList<String>(optionArrayList.toArray(new String[optionArrayList.size()]));
 		optionList.setBorder(new EmptyBorder(0, 5, 0, 10)); //order is: top, left, bottom, right
 		optionList.setBackground(boardColor);
-		optionList.setFont(new Font(optionList.getFont().toString(), Font.ITALIC, (int)(36*generalReduce) ));
+		optionList.setFont(new Font(optionList.getFont().toString(), Font.ITALIC, (int)(36*xReduce) ));
 		
 		optionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		optionList.setSelectedIndex(0);
@@ -123,17 +116,17 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 		// To use TextArea, which can word wrap
 		contentLabel = new JTextArea(contentArrayList.get(0));
 		contentLabel.setAlignmentY(JTextArea.TOP_ALIGNMENT);
-		contentLabel.setBorder(new EmptyBorder(20, (int)(50*generalReduce), 10, 50)); //order is: top, left, bottom, right
+		contentLabel.setBorder(new EmptyBorder(20, (int)(50*xReduce), 10, 50)); //order is: top, left, bottom, right
 		contentLabel.setBackground(boardColor);
 		contentLabel.setEditable(false);
-		contentLabel.setFont(new Font(contentLabel.getFont().toString(), Font.PLAIN, (int)(28*generalReduce) ));
+		contentLabel.setFont(new Font(contentLabel.getFont().toString(), Font.PLAIN, (int)(28*xReduce) ));
 		contentLabel.setLineWrap(true);
 		contentLabel.setWrapStyleWord(true);
 
 		//TODO: Change from quitting to just sending back to main menu
 		JButton backButton = new JButton("Back to main menu");
 		backButton.addActionListener(new backButtonListener());
-		backButton.setFont(new Font(backButton.getFont().toString(), Font.PLAIN, (int)(24*generalReduce) ));
+		backButton.setFont(new Font(backButton.getFont().toString(), Font.PLAIN, (int)(24*xReduce) ));
 		//backButton.setOpaque(true);
 		backButton.setBackground(boardColor);
 

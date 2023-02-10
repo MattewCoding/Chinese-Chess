@@ -16,6 +16,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import outOfGameScreens.MainMenu;
+import outOfGameScreens.ScreenParameters;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -48,8 +49,8 @@ public class GUI extends JPanel implements Runnable{
 	private boolean run = false;
 	
 	public GUI(MainMenu menuInstance) {
-		SCREENWIDTH = menuInstance.getScreenWidth();
-		SCREENHEIGHT = menuInstance.getScreenHeight();
+		SCREENWIDTH = ScreenParameters.SCREENWIDTH;
+		SCREENHEIGHT = ScreenParameters.SCREENHEIGHT;
 	}
 
 	@Override
