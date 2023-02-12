@@ -15,10 +15,11 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import game1.Move;
-import game1.Moving;
+import logic.Move;
+import logic.Moving;
 import outOfGameScreens.ScreenParameters;
 
 /**
@@ -35,9 +36,9 @@ public class GUI extends JPanel implements MouseListener{
 	
 	private int strokeWidth = 1;
 	private Board board;
-	private int mouseX,mouseY,mouseFinalX,mouseFinalY;
-	private Piece Pieces[][];
-	private Piece thePiece;
+	private NotationHistory pastMoves;
+	private JLabel pastMovesLabel;
+	private int mouseCol,mouseRow;
 	
 
 	// Looks visually pleasing if the board is centered
@@ -49,7 +50,9 @@ public class GUI extends JPanel implements MouseListener{
 	int leftMostPixel = (int) (center-squareLength*(5.5));
 	
 	public GUI(){
-		board= new Board();
+		board = new Board();
+		pastMoves = new NotationHistory();
+		pastMovesLabel = new JLabel("");
 		repaint();
 	}
 	
@@ -124,15 +127,15 @@ public class GUI extends JPanel implements MouseListener{
 
 			}
 			
-			addMouseListener(this);
-
-			setPieceImages(g2);
-			
 		}
+		
+		addMouseListener(this);
+		setPieceImages(g2);
+		
 
 	}
 
-	void setPieceImages(Graphics2D g2) {
+	public void setPieceImages(Graphics2D g2) {
 		for(int col = 0; col<11; col++) {
 			for(int row = 0; row<11; row++) {
 				int topLeftX = leftMostPixel + col * squareLength;
@@ -150,18 +153,30 @@ public class GUI extends JPanel implements MouseListener{
 			}
 		}
 	}
+	
+	public void updateNotation(Move mostRecentMove, Piece pieceMoved) {
+		pastMoves.updateNotation(mostRecentMove, pieceMoved);
+		String recentMove = pastMoves.getPastMoves().get(pastMoves.getPastMovesSize()-1);
+		pastMovesLabel.setText(pastMovesLabel.getText() + "\n" + recentMove);
+	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		int x = ((e.getX()-leftMostPixel)/squareLength) ;
-		int y = ((e.getY()-margin)/squareLength);
-		if(board.getCoords(x,y) != null){
-			mouseX = x;
-			mouseY = y;
+		int col = ((e.getX()-leftMostPixel)/squareLength) ;
+		int row = ((e.getY()-margin)/squareLength);
+		Piece movingPiece = board.getCoords(col,row);
+		
+		//Taking advantage of the fact that when a new cell is clicked the piece hasn't moved there
+		if(movingPiece != null){
+			mouseCol = col;
+			mouseRow = row;
+			repaint();
 		}
-		Move move = new Move(mouseX, mouseY, x, y);
-		Moving moving = new Moving(board,move);
-		repaint();
+		else {
+			Move move = new Move(mouseCol, mouseRow, col, row);
+			new Moving(board,move);
+			//updateNotation(move,movingPiece);
+		}
 		
 	}
 

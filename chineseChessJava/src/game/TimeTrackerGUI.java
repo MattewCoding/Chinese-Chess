@@ -11,8 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import game.GUI;
-import game1.TimeTrackingLogic;
-import game1.TimeTracker;
+import logic.TimeTracker;
+import logic.TimeTrackingLogic;
 import outOfGameScreens.Profile;
 import outOfGameScreens.ScreenParameters;
 

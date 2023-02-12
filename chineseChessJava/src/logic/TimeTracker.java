@@ -1,4 +1,4 @@
-package game1;
+package logic;
 
 public class TimeTracker implements Runnable {
   private String player1, player2;

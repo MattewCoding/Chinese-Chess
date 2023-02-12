@@ -1,6 +1,6 @@
 package game;
 
-import game1.Move;
+import logic.Move;
 
 /**
  * General Piece

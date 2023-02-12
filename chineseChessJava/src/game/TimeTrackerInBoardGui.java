@@ -1,7 +1,4 @@
 package game;
-import game1.TimeTracker;
-import game1.TimeTrackingLogic;
-
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -13,6 +10,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+
+import logic.TimeTracker;
+import logic.TimeTrackingLogic;
 
 public class TimeTrackerInBoardGui extends JFrame {
   private JLabel timeLabel;

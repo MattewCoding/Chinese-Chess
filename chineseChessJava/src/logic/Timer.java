@@ -1,4 +1,4 @@
-package game1;
+package logic;
 /**
  * Timer to keep track of time elapsed and update timer GUI (*going to be modified*)
  * @author e-iabdelba

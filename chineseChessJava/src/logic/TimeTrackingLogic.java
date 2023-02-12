@@ -1,4 +1,4 @@
-package game1;
+package logic;
 
 import java.util.concurrent.TimeUnit;
 

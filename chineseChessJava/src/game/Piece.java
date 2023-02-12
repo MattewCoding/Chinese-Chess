@@ -1,6 +1,6 @@
 package game;
 
-import game1.Move;
+import logic.Move;
 
 /**
  * Abstract class for Piece. Each piece is unaware of it's location. They contain little member data and are stored on points, which are managed by boards.
@@ -69,21 +69,8 @@ public abstract class Piece {
             fileName += "black_";
         else
             fileName += "red_";
-
-        if (type.equals("Soldier"))
-            fileName += "soldier";
-        else if (type.equals("General"))
-            fileName += "general";
-        else if (type.equals("Cannon"))
-            fileName += "cannon";
-        else if (type.equals("Horse"))
-            fileName += "horse";
-        else if (type.equals("Elephant"))
-            fileName += "elephant";
-        else if (type.equals("Guard"))
-            fileName += "guard";
-        else if (type.equals("Chariot"))
-            fileName += "chariot";
+        
+        fileName += type.toLowerCase();
 
         fileName += ".png";
         return fileName;

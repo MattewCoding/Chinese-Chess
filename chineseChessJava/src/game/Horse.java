@@ -6,7 +6,7 @@ public class Horse extends Piece {
         this.type = "Horse";
     }
 
-    public void checkPattern(game1.Move move) {
+    public void checkPattern(logic.Move move) {
         super.checkPattern(move);
 
         if (!((Math.abs(move.getDx()) == 1 && Math.abs(move.getDy()) == 2) || (Math.abs(move.getDx()) == 2 && Math.abs(move.getDy()) == 1))) {
