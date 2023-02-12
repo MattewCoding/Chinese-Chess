@@ -20,7 +20,6 @@ public class MainMenu extends JPanel implements Runnable{
 	
 	@Override
 	public void run() {
-		new MainMenu();
 	}
 
 	/**

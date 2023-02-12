@@ -53,10 +53,8 @@ public class MainMenu2 extends JPanel implements ListSelectionListener {
 		tutorialButton.setMnemonic(KeyEvent.VK_T);
 		notationButton.setMnemonic(KeyEvent.VK_N);
 
-		double xReduce = ScreenParameters.SCREENWIDTH/1600.0;
-
 		for(JButton button : menuButtons) {
-			button.setFont(new Font(button.getFont().toString(), Font.PLAIN, (int)(24*xReduce) ));
+			button.setFont(new Font(button.getFont().toString(), Font.PLAIN, (int)(24*ScreenParameters.xReduce) ));
 			button.setPreferredSize(new Dimension(300,100));
 			buttonPanel.add(button);
 			button.setBackground(new Color(226,192,106));

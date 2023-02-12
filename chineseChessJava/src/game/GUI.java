@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 
 import game1.Move;
 import game1.Moving;
+import outOfGameScreens.ScreenParameters;
 
 /**
  * 
@@ -31,10 +32,7 @@ public class GUI extends JPanel implements MouseListener{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
-	private Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
-	private final int SCREENWIDTH = (int)size.getWidth();
-	private final int SCREENHEIGHT = (int)size.getHeight();
+	
 	private int strokeWidth = 1;
 	private Board board;
 	private int mouseX,mouseY,mouseFinalX,mouseFinalY;
@@ -45,9 +43,9 @@ public class GUI extends JPanel implements MouseListener{
 	// Looks visually pleasing if the board is centered
 	// and tall enough to fit most of the screen
 	// but not too big to take up all of the screen
-	int margin = SCREENHEIGHT/18;
-	int squareLength = (SCREENHEIGHT-margin*3)/11; // x3 to leave more space at bottom of screen
-	int center = SCREENWIDTH/2;
+	int margin = ScreenParameters.SCREENHEIGHT/18;
+	int squareLength = (ScreenParameters.SCREENHEIGHT-margin*3)/11; // x3 to leave more space at bottom of screen
+	int center = ScreenParameters.SCREENWIDTH/2;
 	int leftMostPixel = (int) (center-squareLength*(5.5));
 	
 	public GUI(){
@@ -65,10 +63,10 @@ public class GUI extends JPanel implements MouseListener{
 			Image background = ImageIO.read(new File(imgLocation));
 			int bgWidth = background.getWidth(null);
 
-			if(bgWidth != SCREENWIDTH) {
+			if(bgWidth != ScreenParameters.SCREENWIDTH) {
 				// Resize image if necessary
 				String imgOut = "images/test1.png";
-				ImageResizer.resize(imgLocation, imgOut, ((double)SCREENWIDTH) / ((double)bgWidth));
+				ImageResizer.resize(imgLocation, imgOut, ((double)ScreenParameters.SCREENWIDTH) / ((double)bgWidth));
 				File fileOut = new File(imgOut);
 				background = ImageIO.read(fileOut);
 				g.drawImage(background,0,0,null);
@@ -87,10 +85,10 @@ public class GUI extends JPanel implements MouseListener{
 		// Graphics class doesn't have method to thicken stroke width
 		// Small screen sizes do not need thick lines to distinguish squares
 		Graphics2D g2 = (Graphics2D) g;
-		if(SCREENWIDTH >= 1920) {
+		if(ScreenParameters.SCREENWIDTH >= 1920) {
 			strokeWidth = 4;
 		} else {
-			if(SCREENWIDTH >= 1080){
+			if(ScreenParameters.SCREENWIDTH >= 1080){
 				strokeWidth = 2;
 			}
 		}
@@ -140,7 +138,7 @@ public class GUI extends JPanel implements MouseListener{
 				int topLeftX = leftMostPixel + col * squareLength;
 				int topLeftY = margin + row * squareLength;
 				Piece[][] pieceList = board.getCoords();
-				Piece piece = pieceList[row][col];
+				Piece piece = pieceList[col][row];
 				//This breaks the order in Board but it works so...
 				if (piece != null) {
 					String fileName = piece.getImageName();
@@ -155,34 +153,25 @@ public class GUI extends JPanel implements MouseListener{
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		
+		int x = ((e.getX()-leftMostPixel)/squareLength) ;
+		int y = ((e.getY()-margin)/squareLength);
+		if(board.getCoords(x,y) != null){
+			mouseX = x;
+			mouseY = y;
+		}
+		Move move = new Move(mouseX, mouseY, x, y);
+		Moving moving = new Moving(board,move);
+		repaint();
 		
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		int y = ((e.getX()-leftMostPixel)/squareLength) ;
-		int x = ((e.getY()-margin)/squareLength);
-		if(board.getCoords(x,y) != null){
-			mouseX = x;
-			mouseY = y;
-		}
 
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		
-		int y = ((e.getX()-leftMostPixel)/squareLength) ;
-		int x = ((e.getY()-margin)/squareLength);
-		//if(board.getCoords(x, y) == null) {
-		Move move = new Move(mouseX, mouseY, x, y);
-		System.out.print("\n"+ mouseX + "\n" +mouseY+ "\n");
-		System.out.print(board.getCoords(mouseX, mouseY).toString());
-		Moving moving = new Moving(board,move);
-		repaint();
-		
-		//}
 		
 	}
 

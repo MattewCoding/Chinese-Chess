@@ -67,7 +67,6 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 		int SCREENHEIGHT = ScreenParameters.SCREENHEIGHT;
 		mainMenuObject = menuScreen;
 		mainScreen = menuScreen.getFrame();
-		double xReduce = SCREENWIDTH/1600.0;
 
 		//Extract data from file
 		File contentFile = new File(pathName);
@@ -97,7 +96,7 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 		//Menu name is file name
 		JLabel menuName = new JLabel(title);
 		menuName.setBackground(boardColor);
-		menuName.setFont(new Font(menuName.getFont().toString(), Font.BOLD, (int)(55*xReduce) ));
+		menuName.setFont(new Font(menuName.getFont().toString(), Font.BOLD, (int)(55*ScreenParameters.xReduce) ));
 		menuName.setHorizontalAlignment(JLabel.CENTER);
 		menuName.setOpaque(true);
 
@@ -105,7 +104,7 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 		JList<String> optionList = new JList<String>(optionArrayList.toArray(new String[optionArrayList.size()]));
 		optionList.setBorder(new EmptyBorder(0, 5, 0, 10)); //order is: top, left, bottom, right
 		optionList.setBackground(boardColor);
-		optionList.setFont(new Font(optionList.getFont().toString(), Font.ITALIC, (int)(36*xReduce) ));
+		optionList.setFont(new Font(optionList.getFont().toString(), Font.ITALIC, (int)(36*ScreenParameters.xReduce) ));
 		
 		optionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		optionList.setSelectedIndex(0);
@@ -118,18 +117,16 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 		// To use TextArea, which can word wrap
 		contentLabel = new JTextArea(contentArrayList.get(0));
 		contentLabel.setAlignmentY(JTextArea.TOP_ALIGNMENT);
-		contentLabel.setBorder(new EmptyBorder(20, (int)(50*xReduce), 10, 50)); //order is: top, left, bottom, right
+		contentLabel.setBorder(new EmptyBorder(20, (int)(50*ScreenParameters.xReduce), 10, 50)); //order is: top, left, bottom, right
 		contentLabel.setBackground(boardColor);
 		contentLabel.setEditable(false);
-		contentLabel.setFont(new Font(contentLabel.getFont().toString(), Font.PLAIN, (int)(28*xReduce) ));
+		contentLabel.setFont(new Font(contentLabel.getFont().toString(), Font.PLAIN, (int)(28*ScreenParameters.xReduce) ));
 		contentLabel.setLineWrap(true);
 		contentLabel.setWrapStyleWord(true);
 
-		//TODO: Change from quitting to just sending back to main menu
 		JButton backButton = new JButton("Back to main menu");
 		backButton.addActionListener(new backButtonListener());
-		backButton.setFont(new Font(backButton.getFont().toString(), Font.PLAIN, (int)(24*xReduce) ));
-		//backButton.setOpaque(true);
+		backButton.setFont(new Font(backButton.getFont().toString(), Font.PLAIN, (int)(24*ScreenParameters.xReduce) ));
 		backButton.setBackground(boardColor);
 
 		//Create menu parts
@@ -141,8 +138,9 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 		JSplitPane leftSideOfMenu = new JSplitPane(JSplitPane.VERTICAL_SPLIT, menuNameAndOptionsScroll, backButton);
 		int autoAdjust = SCREENHEIGHT - SCREENHEIGHT/7;
 		int minSize = SCREENHEIGHT - 100;
-		int buttonDivider = autoAdjust < minSize ? autoAdjust : minSize;
+		int buttonDivider = autoAdjust < minSize ? minSize : autoAdjust;
 		leftSideOfMenu.setDividerLocation(buttonDivider);
+		System.out.println(SCREENHEIGHT+"");
 
 		//Regrouping to create the general menu screen
 		menuSideBar = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftSideOfMenu, contentScroll);

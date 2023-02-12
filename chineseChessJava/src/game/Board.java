@@ -30,18 +30,18 @@ public class Board {
 				// Only needs to be created once for each side
 				// Since this if-statement is only true once for both side
 				// Why NOT put it here?
-				coords[5+side*(2)][5] = new Soldier(creatingBlack);
-				coords[5+side*(5)][5] = new General(creatingBlack);
+				coords[5][5+side*(2)] = new Soldier(creatingBlack);
+				coords[5][5+side*(5)] = new General(creatingBlack);
 			}
 			
-			coords[5+side*(2)][5+mirror*(5)] = new Soldier(creatingBlack);
-			coords[5+side*(2)][5+mirror*(3)] = new Soldier(creatingBlack);
-			coords[5+side*(3)][5+mirror*(4)] = new Canon(creatingBlack);
+			coords[5+mirror*(5)][5+side*(2)] = new Soldier(creatingBlack);
+			coords[5+mirror*(3)][5+side*(2)] = new Soldier(creatingBlack);
+			coords[5+mirror*(4)][5+side*(3)] = new Canon(creatingBlack);
 
-			coords[5+side*(5)][5+mirror*(5)] = new Chariot(creatingBlack);
-			coords[5+side*(5)][5+mirror*(4)] = new Horse(creatingBlack);
-			coords[5+side*(5)][5+mirror*(3)] = new Elephant(creatingBlack);
-			coords[5+side*(5)][5+mirror*(1)] = new Guard(creatingBlack);
+			coords[5+mirror*(5)][5+side*(5)] = new Chariot(creatingBlack);
+			coords[5+mirror*(4)][5+side*(5)] = new Horse(creatingBlack);
+			coords[5+mirror*(3)][5+side*(5)] = new Elephant(creatingBlack);
+			coords[5+mirror*(1)][5+side*(5)] = new Guard(creatingBlack);
 		}
 	}
 
