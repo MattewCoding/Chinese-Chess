@@ -25,7 +25,7 @@ public class Soldier extends Piece {
      */
     public void checkPattern(Move move) {
         super.checkPattern(move);
-
+        
         //finds which side of river it's on, and sets it as member data, maybe scope could just be method?
         boolean curSide;
         if (move.getOriginY() <= 4) {

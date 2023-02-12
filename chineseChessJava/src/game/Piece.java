@@ -16,7 +16,7 @@ public abstract class Piece {
     /**
      * Constructor for creating a Piece. All that is needed is which side of the board the piece is on. The side is provided as an enum.
      *
-     * for the place if black it is true if red it is 0.
+     * for the place if black it is true if red it is false.
      */
     public Piece(boolean place) {
         this.place = place;
@@ -52,6 +52,13 @@ public abstract class Piece {
         return this.type;
     }
 
+    public String getType() {
+    	return this.type;
+    }
+    
+    public void setType(String type) {
+    	this.type = type;
+    }
     /**
      * returns the matching file name of a piece
      *

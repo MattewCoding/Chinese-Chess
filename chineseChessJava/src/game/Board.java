@@ -39,7 +39,7 @@ public class Board {
 			coords[5+side*(3)][5+mirror*(4)] = new Canon(creatingBlack);
 
 			coords[5+side*(5)][5+mirror*(5)] = new Chariot(creatingBlack);
-			//coords[5+side*(5)][5+mirror*(4)] = new Horse(creatingBlack);
+			coords[5+side*(5)][5+mirror*(4)] = new Horse(creatingBlack);
 			coords[5+side*(5)][5+mirror*(3)] = new Elephant(creatingBlack);
 			coords[5+side*(5)][5+mirror*(1)] = new Guard(creatingBlack);
 		}
@@ -60,10 +60,10 @@ public class Board {
 	
 	
 	public void doMove(Move move) {
-        Piece curr = this.coords[move.getOriginY()][move.getOriginX()];
+        Piece curr = this.coords[move.getOriginX()][move.getOriginY()];
         
-        this.coords[move.getFinalY()][move.getFinalX()] = curr;
-        this.coords[move.getOriginY()][move.getOriginX()]= null;
+        this.coords[move.getFinalX()][move.getFinalY()] = curr;
+        this.coords[move.getOriginX()][move.getOriginY()]= null;
     }
 
 

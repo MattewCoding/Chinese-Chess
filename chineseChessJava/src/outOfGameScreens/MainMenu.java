@@ -4,10 +4,24 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import game.GUI;
 
-public class MainMenu extends JPanel {
+public class MainMenu extends JPanel implements Runnable{
+
+	/**
+	 * Launches the game
+	 * @param args Parameters one can input from the console
+	 */
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(new MainMenu());
+	}
+	
+	@Override
+	public void run() {
+		new MainMenu();
+	}
 
 	/**
 	 * 

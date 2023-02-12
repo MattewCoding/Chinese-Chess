@@ -18,6 +18,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import game1.Move;
+import game1.Moving;
 
 /**
  * 
@@ -142,7 +143,6 @@ public class GUI extends JPanel implements MouseListener{
 				Piece piece = pieceList[row][col];
 				//This breaks the order in Board but it works so...
 				if (piece != null) {
-					System.out.print(row+"\n"+col);
 					String fileName = piece.getImageName();
 					Image scaledImage = new ImageIcon("pictures/chinese_"+fileName).getImage();
 					// figure out why is the y instead of x (i think it's because of the board's order)
@@ -155,12 +155,7 @@ public class GUI extends JPanel implements MouseListener{
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		int y = ((e.getX()-leftMostPixel)/squareLength) ;
-		int x = ((e.getY()-margin)/squareLength);
-		if(board.getCoords(x,y) != null){
-			mouseX = x;
-			mouseY = y;
-		}
+		
 		
 	}
 
@@ -177,33 +172,17 @@ public class GUI extends JPanel implements MouseListener{
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
+		
 		int y = ((e.getX()-leftMostPixel)/squareLength) ;
 		int x = ((e.getY()-margin)/squareLength);
-		//Move move = new Move(mouseX, mouseY, x, y);
-		//board.doMove(move);
+		//if(board.getCoords(x, y) == null) {
+		Move move = new Move(mouseX, mouseY, x, y);
+		System.out.print("\n"+ mouseX + "\n" +mouseY+ "\n");
+		System.out.print(board.getCoords(mouseX, mouseY).toString());
+		Moving moving = new Moving(board,move);
+		repaint();
 		
-		/*Piece piece = board.getCoords(mouseX,mouseY);
-		if(piece != null) {
-		String fileName = piece.getImageName();
-		Image scaledImage = new ImageIcon("pictures/chinese_"+fileName).getImage();
-		
-		g2.drawImage(scaledImage, x+5, y+5, squareLength-10, squareLength-10, null);}*/
-		if(board.getCoords(x, y) == null) {
-			Pieces = board.getCoords();
-			Piece piece = board.getCoords(mouseX,mouseY);
-			Pieces[x][y] = Pieces[mouseX][mouseY];
-			Pieces[mouseX][mouseY] = null;
-			board.setCoords(Pieces);
-			
-			/*if(piece != null) {
-			String fileName = piece.getImageName();
-			Image scaledImage = new ImageIcon("pictures/chinese_"+fileName).getImage();
-			g2.drawImage(scaledImage, x+5, y+5, squareLength-10, squareLength-10, null);}*/
-			
-			repaint();
-			System.out.print(x +"\n" +y);
-			System.out.print("----------------------\n");
-		}
+		//}
 		
 	}
 
