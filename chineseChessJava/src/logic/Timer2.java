@@ -5,7 +5,7 @@ package logic;
  *
  */
 
-public class Timer {
+public class Timer2 {
 	private long startTime;
 	private long stopTime;
 	private boolean stillRunning;
@@ -13,7 +13,7 @@ public class Timer {
 	/**
 	 * Constructor that initiate the start and stop time.
 	 */
-	public Timer() {
+	public Timer2() {
 		this.startTime = 0;
 		this.stopTime = 0;
 		this.stillRunning = false;

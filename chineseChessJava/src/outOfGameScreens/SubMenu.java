@@ -138,7 +138,7 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 		JSplitPane leftSideOfMenu = new JSplitPane(JSplitPane.VERTICAL_SPLIT, menuNameAndOptionsScroll, backButton);
 		int autoAdjust = SCREENHEIGHT - SCREENHEIGHT/7;
 		int minSize = SCREENHEIGHT - 100;
-		int buttonDivider = autoAdjust < minSize ? minSize : autoAdjust;
+		int buttonDivider = autoAdjust > minSize ? minSize : autoAdjust;
 		leftSideOfMenu.setDividerLocation(buttonDivider);
 		System.out.println(SCREENHEIGHT+"");
 

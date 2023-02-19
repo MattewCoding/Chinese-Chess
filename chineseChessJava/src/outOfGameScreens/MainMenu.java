@@ -40,18 +40,21 @@ public class MainMenu extends JPanel implements ListSelectionListener {
 		JButton tutorialButton = new JButton("Apprendre");
 		JButton stratsButton = new JButton("Strategies");
 		JButton notationButton = new JButton("Notation");
-		JButton[] menuButtons = {playButton, optionButton, tutorialButton, stratsButton, notationButton};
+		JButton quitButton = new JButton("Quit");
+		JButton[] menuButtons = {playButton, optionButton, tutorialButton, stratsButton, notationButton, quitButton};
 
 		playButton.addActionListener(new PlayButtonListener());
 		optionButton.addActionListener(new OptionButtonListener());
 		tutorialButton.addActionListener(new TutorialButtonListener());
-		tutorialButton.addActionListener(new StrategyButtonListener());
+		stratsButton.addActionListener(new StrategyButtonListener());
 		notationButton.addActionListener(new NotationButtonListener());
+		quitButton.addActionListener(new QuitButtonListener());
 		
 		playButton.setMnemonic(KeyEvent.VK_P);
 		optionButton.setMnemonic(KeyEvent.VK_O);
 		tutorialButton.setMnemonic(KeyEvent.VK_T);
 		notationButton.setMnemonic(KeyEvent.VK_N);
+		quitButton.setMnemonic(KeyEvent.VK_Q);
 
 		for(JButton button : menuButtons) {
 			button.setFont(new Font(button.getFont().toString(), Font.PLAIN, (int)(24*ScreenParameters.xReduce) ));
@@ -126,6 +129,16 @@ public class MainMenu extends JPanel implements ListSelectionListener {
 			SubMenu notationMenu = new SubMenu("menu/Notation.txt", mainScreen);
 			menuFrame.setContentPane(notationMenu.getSplitPane());
 			menuFrame.revalidate();
+
+		}
+
+	}
+
+	public class QuitButtonListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			menuFrame.dispose();
 
 		}
 
