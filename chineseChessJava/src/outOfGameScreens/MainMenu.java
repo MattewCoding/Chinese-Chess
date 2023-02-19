@@ -1,64 +1,134 @@
 package outOfGameScreens;
 
+import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import game.GUI;
 
-public class MainMenu extends JPanel implements Runnable{
-
-	/**
-	 * Launches the game
-	 * @param args Parameters one can input from the console
-	 */
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new MainMenu());
-	}
-	
-	@Override
-	public void run() {
-	}
-
+public class MainMenu extends JPanel implements ListSelectionListener {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
-	private JFrame frame;
 
-	/**
-	 * Creates the first screen you see upon launching the program.
-	 * TODO: Create the actual menu screen w/ buttons to play, go to options/records, quit
-	 */
-	public MainMenu() {
-		frame = new JFrame("Chinese Chess");
-		GUI chessBoard = new GUI();
+	private GameLauncher mainScreen;
+	private JFrame menuFrame;
+
+	public MainMenu(GameLauncher menuScreen) {
+		JPanel buttonPanel = new JPanel(new GridLayout(0,1,0,20));
+		buttonPanel.setBackground(ScreenParameters.BOARDCOLOR);
+
+		mainScreen=menuScreen;
+		menuFrame=mainScreen.getFrame();
+
+		mainScreen.getFrame().setBackground(ScreenParameters.BOARDCOLOR);
+
+		JButton playButton = new JButton("Jouer");
+		JButton optionButton = new JButton("Options");
+		JButton tutorialButton = new JButton("Apprendre");
+		JButton stratsButton = new JButton("Strategies");
+		JButton notationButton = new JButton("Notation");
+		JButton[] menuButtons = {playButton, optionButton, tutorialButton, stratsButton, notationButton};
+
+		playButton.addActionListener(new PlayButtonListener());
+		optionButton.addActionListener(new OptionButtonListener());
+		tutorialButton.addActionListener(new TutorialButtonListener());
+		tutorialButton.addActionListener(new StrategyButtonListener());
+		notationButton.addActionListener(new NotationButtonListener());
 		
-		/*  This part is for testing the various screens bc we dont have the main menu screen */
-		//  This code is for creating the board
-		//frame.getContentPane().add(chessBoard);
+		playButton.setMnemonic(KeyEvent.VK_P);
+		optionButton.setMnemonic(KeyEvent.VK_O);
+		tutorialButton.setMnemonic(KeyEvent.VK_T);
+		notationButton.setMnemonic(KeyEvent.VK_N);
+
+		for(JButton button : menuButtons) {
+			button.setFont(new Font(button.getFont().toString(), Font.PLAIN, (int)(24*ScreenParameters.xReduce) ));
+			button.setPreferredSize(new Dimension(300,100));
+			buttonPanel.add(button);
+			button.setBackground(new Color(226,192,106));
+			button.setBorderPainted(false);
+		}
+		setBackground(ScreenParameters.BOARDCOLOR);
+		add(buttonPanel);
 		
-		//  This code tests the sub-menus
-		//frame.getContentPane().add(new SubMenu("menu/How to Play.txt", this).getSplitPane());
-		
-		//This code tests the menu
-		frame.getContentPane().add(new MainMenu2(this));
-		
-		/* This part is to make sure the frame shows up */
-		//Frame settings
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		frame.pack();
-		
-		// Have program fill up screen
-		frame.setMinimumSize(new Dimension(ScreenParameters.SCREENWIDTH, ScreenParameters.SCREENHEIGHT));
-		frame.setVisible(true);
+        int top = 60;
+        int left = top;
+        int bottom = 2 * top;
+        int right = left;
+		setBorder(BorderFactory.createEmptyBorder(top, left, bottom, right));
 	}
-	
-	public JFrame getFrame() {
-		return frame;
+
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		// TODO Auto-generated method stub
+
 	}
+
+	public class PlayButtonListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			GUI chessBoard = new GUI();
+			menuFrame.setContentPane(chessBoard);
+			menuFrame.revalidate();
+		}
+
+	}
+
+	public class OptionButtonListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+		}
+
+	}
+
+	public class TutorialButtonListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			SubMenu tutorialMenu = new SubMenu("menu/How to Play.txt", mainScreen);
+			menuFrame.setContentPane(tutorialMenu.getSplitPane());
+			menuFrame.revalidate();
+
+		}
+
+	}
+
+	public class StrategyButtonListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			SubMenu strategyMenu = new SubMenu("menu/Strategies.txt", mainScreen);
+			menuFrame.setContentPane(strategyMenu.getSplitPane());
+			menuFrame.revalidate();
+
+		}
+
+	}
+
+	public class NotationButtonListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			SubMenu notationMenu = new SubMenu("menu/Notation.txt", mainScreen);
+			menuFrame.setContentPane(notationMenu.getSplitPane());
+			menuFrame.revalidate();
+
+		}
+
+	}
+
 }

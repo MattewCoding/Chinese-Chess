@@ -39,6 +39,7 @@ public class NotationHistory {
 		}
 		String movesThisTurnWXF = pieceName + fileLocation + movement + fileTarget;
 		addNotation(movesThisTurnWXF);
+		System.out.println(movesThisTurnWXF);
 	}
 	
 	public ArrayList<String> getPastMoves() {

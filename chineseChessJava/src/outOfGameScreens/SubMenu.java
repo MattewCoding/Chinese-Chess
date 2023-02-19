@@ -38,7 +38,7 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 	//Swing attributes
 	private JTextArea contentLabel;
 	private JSplitPane menuSideBar;
-	private MainMenu mainMenuObject;
+	private GameLauncher mainMenuObject;
 	private JFrame mainScreen;
 
 	//Listens to the list
@@ -62,7 +62,7 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 	 * @param pathName The location of a file named the menu name and containing the various options of that menu
 	 * @param menuFrame The screen that shows all of the menus
 	 */
-	public SubMenu(String pathName, MainMenu menuScreen) {
+	public SubMenu(String pathName, GameLauncher menuScreen) {
 		int SCREENWIDTH = ScreenParameters.SCREENWIDTH;
 		int SCREENHEIGHT = ScreenParameters.SCREENHEIGHT;
 		mainMenuObject = menuScreen;
@@ -159,7 +159,7 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			mainScreen.setContentPane(new MainMenu2(mainMenuObject));
+			mainScreen.setContentPane(new MainMenu(mainMenuObject));
 			mainScreen.revalidate();
 		}
 

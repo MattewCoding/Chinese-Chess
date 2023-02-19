@@ -62,16 +62,6 @@ public class Moving {
 			}
 		}
 
-		//###########postmove checking##################
-		if (legal) {
-			board.doMove(move);
-			/*if (!approveGenerals()) {
-	                legal = false;
-	            }*/
-			//board.undoMove(move, captured);
-			//board.updateGenerals();
-		}
-
 
 	}
 

@@ -3,6 +3,7 @@ package game;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -27,7 +28,7 @@ import outOfGameScreens.ScreenParameters;
  * @author YANG Mattew, Nasro Rona
  *
  */
-public class GUI extends JPanel implements MouseListener{
+public class GUI extends JPanel implements MouseListener, Runnable{
 
 	/**
 	 * 
@@ -36,10 +37,16 @@ public class GUI extends JPanel implements MouseListener{
 	
 	private int strokeWidth = 1;
 	private Board board;
+	
 	private NotationHistory pastMoves;
 	private JLabel pastMovesLabel;
-	private int mouseCol,mouseRow;
+	private int mouseX = 0,mouseY = 0, pieceX = 0, pieceY = 0;
 	
+	private boolean mouseClickedPiece = false;
+	private boolean mouseMovingPiece = false;
+	private Piece movingPiece = null;
+	
+	private boolean run = false;
 
 	// Looks visually pleasing if the board is centered
 	// and tall enough to fit most of the screen
@@ -48,11 +55,15 @@ public class GUI extends JPanel implements MouseListener{
 	int squareLength = (ScreenParameters.SCREENHEIGHT-margin*3)/11; // x3 to leave more space at bottom of screen
 	int center = ScreenParameters.SCREENWIDTH/2;
 	int leftMostPixel = (int) (center-squareLength*(5.5));
+
+	int notationMargin = 30;
+	int fontMarginY = 75;
 	
 	public GUI(){
 		board = new Board();
 		pastMoves = new NotationHistory();
 		pastMovesLabel = new JLabel("");
+		addMouseListener(this);
 		repaint();
 	}
 	
@@ -96,43 +107,95 @@ public class GUI extends JPanel implements MouseListener{
 			}
 		}
 		g2.setStroke(new BasicStroke(strokeWidth));
-		Rectangle rOutline, rFill;
 		for(int row = 0; row<11; row++) {
 			for(int col = 0; col<11; col++) {
 				// Fill creates rectangle overlapping outline, so it needs to be smaller
 				// to avoid overlapping
 				int topLeftX = leftMostPixel + col * squareLength;
 				int topLeftY = margin + row * squareLength;
-				rOutline = new Rectangle(topLeftX,topLeftY,squareLength, squareLength);
-				rFill = new Rectangle(topLeftX+strokeWidth/2,topLeftY+strokeWidth/2, squareLength-strokeWidth, squareLength-strokeWidth);
+				
 				if(row == 5) {
 					// River needs different draw method
-					int fullLength = squareLength*11;
-					rOutline = new Rectangle(topLeftX,topLeftY,fullLength,squareLength);
-					rFill = new Rectangle(topLeftX+strokeWidth/2,topLeftY+strokeWidth/2, fullLength-strokeWidth, squareLength-strokeWidth);
+					drawFilledRectangle(g2, topLeftX, topLeftY, squareLength*11, squareLength);
 					row++; col--;
 				}
-
-				//TODO: This will cause problems for variants
-				//Make the square appear on the screen
-				g2.setColor(new Color(158,79,34));
-				g2.draw(rOutline);
-				if((row<3 || row > 7) && (col>=3 && col<= 7)) {
-					g2.setColor(new Color(226,192,106));
-				}
 				else {
-					g2.setColor(new Color(244,227,166));
+					if((row<3 || row > 7) && (col>=3 && col<= 7)) { // Palace
+						drawFilledRectangle(g2, ScreenParameters.OUTLINEBOARDCOLOR, ScreenParameters.DARKBOARDCOLOR, topLeftX, topLeftY, squareLength);
+					}
+					else {
+						drawFilledRectangle(g2, topLeftX, topLeftY, squareLength);
+					}
 				}
-				g2.fill(rFill);
 
 			}
 			
 		}
 		
-		addMouseListener(this);
 		setPieceImages(g2);
-		
+		setNotation(g2);
 
+		if(!run) {
+			Thread chronoThread = new Thread(this);
+			chronoThread.start();
+			run = true;
+		}
+	}
+	
+	/**
+	 * Draws a filled square using default board color (i.e. not the palace color)
+	 * @param g2 The graphics class that draws on the board
+	 * @param topX The top left x-position of the rectangle
+	 * @param topY The top left y-position of the rectangle
+	 * @param length The amount of pixels the rectangle extends positively over the x and y axis
+	 */
+	public void drawFilledRectangle(Graphics2D g2, int topX, int topY, int length) {
+		drawFilledRectangle(g2, ScreenParameters.OUTLINEBOARDCOLOR, ScreenParameters.BOARDCOLOR, topX, topY, length, length);
+	}
+	
+	/**
+	 * Draws a filled rectangle using default board color (i.e. not the palace color)
+	 * @param g2 The graphics class that draws on the board
+	 * @param topX The top left x-position of the rectangle
+	 * @param topY The top left y-position of the rectangle
+	 * @param length The amount of pixels the rectangle extends positively over the x-axis
+	 * @param height The amount of pixels the rectangle extends positively over the y-axis
+	 */
+	public void drawFilledRectangle(Graphics2D g2, int topX, int topY, int length, int height) {
+		drawFilledRectangle(g2, ScreenParameters.OUTLINEBOARDCOLOR, ScreenParameters.BOARDCOLOR, topX, topY, length, height);
+	}
+	
+	/**
+	 * Draws a filled square, where the outline does not overlap with the fill region
+	 * @param g2 The graphics class that draws on the board
+	 * @param outlineColor The color of the rectangle's outline
+	 * @param fillColor The color of the rectangle's interior
+	 * @param topX The top left x-position of the rectangle
+	 * @param topY The top left y-position of the rectangle
+	 * @param length The amount of pixels the rectangle extends positively over the x and y axis
+	 */
+	public void drawFilledRectangle(Graphics2D g2, Color outlineColor, Color fillColor, int topX, int topY, int length) {
+		drawFilledRectangle(g2, outlineColor, fillColor, topX, topY, length, length);
+	}
+	
+	/**
+	 * Draws a filled rectangle, where the outline does not overlap with the fill region
+	 * @param g2 The graphics class that draws on the board
+	 * @param outlineColor The color of the rectangle's outline
+	 * @param fillColor The color of the rectangle's interior
+	 * @param topX The top left x-position of the rectangle
+	 * @param topY The top left y-position of the rectangle
+	 * @param length The amount of pixels the rectangle extends positively over the x-axis
+	 * @param height The amount of pixels the rectangle extends positively over the y-axis
+	 */
+	public void drawFilledRectangle(Graphics2D g2, Color outlineColor, Color fillColor, int topX, int topY, int length, int height) {
+		Rectangle rOutline, rFill;
+		rOutline = new Rectangle(topX, topY, length, height);
+		rFill = new Rectangle(topX+strokeWidth/2,topY+strokeWidth/2, length-strokeWidth, height-strokeWidth);
+		g2.setColor(outlineColor);
+		g2.draw(rOutline);
+		g2.setColor(fillColor);
+		g2.fill(rFill);
 	}
 
 	public void setPieceImages(Graphics2D g2) {
@@ -154,35 +217,93 @@ public class GUI extends JPanel implements MouseListener{
 		}
 	}
 	
+	/**
+	 * Places the notation history onto the board on the left
+	 * @param g2 The graphics class that draws on the board
+	 */
+	public void setNotation(Graphics2D g2) {
+		int chessboardEdge = leftMostPixel + 11 * squareLength;
+		int rightMostX = ScreenParameters.SCREENWIDTH - notationMargin;
+		
+		int leftNotationBoxX = chessboardEdge + notationMargin;
+		int topNotationY = 2*ScreenParameters.SCREENHEIGHT/5;;
+		drawFilledRectangle(g2, leftNotationBoxX, topNotationY, rightMostX - chessboardEdge - 2*notationMargin, ScreenParameters.SCREENHEIGHT/2);
+		
+		g2.setFont(new Font(getFont().getFontName(), Font.PLAIN, (int)(36*ScreenParameters.xReduce)));
+		g2.drawString(pastMovesLabel.getText(), leftNotationBoxX + notationMargin, topNotationY + fontMarginY);
+	}
+	
+	/**
+	 * Updates the notation history list with the most recenely played move
+	 * @param mostRecentMove The squares from which the piece was and moved to
+	 * @param pieceMoved The piece in question that moved
+	 */
 	public void updateNotation(Move mostRecentMove, Piece pieceMoved) {
 		pastMoves.updateNotation(mostRecentMove, pieceMoved);
 		String recentMove = pastMoves.getPastMoves().get(pastMoves.getPastMovesSize()-1);
 		pastMovesLabel.setText(pastMovesLabel.getText() + "\n" + recentMove);
+		repaint();
 	}
-
+	
 	@Override
-	public void mouseClicked(MouseEvent e) {
-		int col = ((e.getX()-leftMostPixel)/squareLength) ;
-		int row = ((e.getY()-margin)/squareLength);
-		Piece movingPiece = board.getCoords(col,row);
-		
-		//Taking advantage of the fact that when a new cell is clicked the piece hasn't moved there
-		if(movingPiece != null){
-			mouseCol = col;
-			mouseRow = row;
+	public void run() {
+		// Every 40ms, check if anything has been clicked
+		while(run) {
+			try {
+				Thread.sleep(ScreenParameters.SLEEPAMOUNT);
+			} catch (InterruptedException e) {
+				System.out.println(e.getMessage());
+			}
+			//System.out.println(mouseClickedPiece + " " + mouseMovingPiece);
+			
+			// Ensure that the game is not stopped during the iteration.
+			if (run && mouseClickedPiece) {
+				if(mouseMovingPiece) {
+					Move move = new Move(pieceX, pieceY, mouseX, mouseY);
+					Moving moving = new Moving(board,move);
+					if(moving.isLegal()) {
+						board.doMove(move);
+						mouseClickedPiece = false;
+					}
+					
+					mouseMovingPiece = false;
+				}
+			}
 			repaint();
 		}
-		else {
-			Move move = new Move(mouseCol, mouseRow, col, row);
-			new Moving(board,move);
-			//updateNotation(move,movingPiece);
-		}
-		
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
 
+		// floorDiv makes sure that negative numbers between -1 and 0 get rounded down to -1 and not 0
+		mouseX = Math.floorDiv((e.getX()-leftMostPixel), squareLength);
+		mouseY = Math.floorDiv((e.getY()-margin), squareLength);
+		System.out.println(mouseX+"; "+mouseY);
+		
+		boolean xInRange = (mouseX >= 0) && (mouseX <= 10);
+		boolean yInRange = (mouseY >= 0) && (mouseY <= 10);
+		
+		if(xInRange && yInRange) {
+			if(mouseClickedPiece) {
+				mouseMovingPiece = true;
+			}
+			else {
+				movingPiece = board.getCoords(mouseX,mouseY);
+				pieceX = mouseX;
+				pieceY = mouseY;
+				mouseClickedPiece = movingPiece != null;
+			}
+		}
+		// We want to click off the piece
+		else {
+			mouseClickedPiece = false;
+		}
+		
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
 	}
 
 	@Override
@@ -192,13 +313,12 @@ public class GUI extends JPanel implements MouseListener{
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
+
 }
