@@ -37,7 +37,7 @@ public class NotationHistory {
 		}
 		else {
 			movement = ".";
-			fileTarget = Integer.toString(finalX);
+			fileTarget = Integer.toString(11-finalX);
 		}
 		String movesThisTurnWXF = pieceName + fileLocation + movement + fileTarget;
 		//System.out.println(movesThisTurnWXF);
