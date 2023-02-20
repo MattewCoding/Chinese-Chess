@@ -1,0 +1,23 @@
+Pieces
+Each player starts with sixteen circular pieces. Player one's pieces are completely black, whilst player two's pieces are red on the inside. The chess pieces are each named after chinese military rankings, with their chinese character displayed on their respective chess pieces.
+
+Soldat
+Le soldat ne peut avancer que d'un point, jusqu'à ce qu'il ait traversé la rivière, où il pourra ensuite se déplacer horizontalement ou avancer d'une case. Le soldat, contrairement à son équivalent international, n'est pas promu lorsqu'il atteint la fin du tableau.
+
+Cheval
+Le cheval se déplace d'abord d'un point verticalement ou horizontalement, puis d'un point en diagonale, dans cette ordre précis, tant que sa trajectoire est libre. Les chevaux deviennent plus forts en fin de partie car il y a moins de pièces sur le plateau, ce qui leur permet de se déplacer plus librement.
+
+Chariot
+Le chariot peut se déplacer verticalement et horizontalement de n'importe quel nombre de points, tant que leur chemin est libre, c'est-à-dire qu'aucune pièce ne bloque leur mouvement vertical ou horizontal vers leur destination.
+
+Éléphant
+Les éléphants doivent se déplacer de deux points en diagonale, et ne se déplacent que tant que leur chemin est libre, c'est-à-dire qu'ils ne peuvent pas sauter par-dessus une pièce. En outre, ils ne peuvent pas non plus sauter par-dessus la rivière, et sont donc confinés sur leur côté. Les éléphants sont généralement utilisés pour protéger le général et les autres éléphants.
+
+Garde
+Les gardes sont limités au palais, sauf qu'ils ne peuvent se déplacer en diagonale que d'un point.
+
+Artillerie
+Les artilleries se déplacent de manière identique au char, c'est-à-dire qu'ils peuvent se déplacer verticalement et horizontalement de n'importe quel nombre de points, tant que leur chemin est libre, c'est-à-dire qu'aucune pièce ne bloque leur mouvement vertical ou horizontal vers leur destination. Leur différence réside dans la manière dont ils capturent les pièces. L'artillerie ne peut capturer des pièces de couleur opposée que verticalement ou horizontalement à partir de lui, mais seulement s'il est derrière une autre pièce de n'importe quelle couleur.
+
+Commandant
+Les commandants sont confinés au palais, et ne peuvent se déplacer verticalement ou horizontalement que d'un point. Les commandants ne peuvent pas non plus se "voir", c'est-à-dire qu'ils ne doivent pas avoir de chemin vertical libre entre eux.
