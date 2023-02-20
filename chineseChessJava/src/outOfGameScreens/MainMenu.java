@@ -53,11 +53,12 @@ public class MainMenu extends JPanel implements ListSelectionListener {
 		playButton.setMnemonic(KeyEvent.VK_P);
 		optionButton.setMnemonic(KeyEvent.VK_O);
 		tutorialButton.setMnemonic(KeyEvent.VK_T);
+		stratsButton.setMnemonic(KeyEvent.VK_S);
 		notationButton.setMnemonic(KeyEvent.VK_N);
 		quitButton.setMnemonic(KeyEvent.VK_Q);
 
 		for(JButton button : menuButtons) {
-			button.setFont(new Font(button.getFont().toString(), Font.PLAIN, (int)(24*ScreenParameters.xReduce) ));
+			button.setFont(new Font(button.getFont().toString(), Font.PLAIN, (int)(24*ScreenParameters.XREDUCE) ));
 			button.setPreferredSize(new Dimension(300,100));
 			buttonPanel.add(button);
 			button.setBackground(new Color(226,192,106));

@@ -10,10 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import game.GUI;
 import logic.TimeTracker;
-import logic.TimeTrackingLogic;
-import outOfGameScreens.Profile;
 import outOfGameScreens.ScreenParameters;
 
 public class TimeTrackerGUI {

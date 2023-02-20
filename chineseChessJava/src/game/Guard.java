@@ -21,17 +21,17 @@ public class Guard extends Piece {
         if (!move.isDiagonal() || Math.abs(move.getDx()) != 1) {
             move.setValid(false);
         }
-        else if (move.getFinalY() < 3 || move.getFinalY() > 8) {
+        else if (move.getFinalX() < 3 || move.getFinalX() > 8) {
             move.setValid(false);
         }
 
         if (place) {
-            if (move.getFinalX() > 2) {
+            if (move.getFinalY() > 2) {
                 move.setValid(false);
             }
         }
         else{
-            if (move.getFinalX() < 8) {
+            if (move.getFinalY() < 8) {
                 move.setValid(false);
             }
         }

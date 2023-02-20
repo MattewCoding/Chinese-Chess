@@ -41,24 +41,33 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 	private GameLauncher mainMenuObject;
 	private JFrame mainScreen;
 
-	//Listens to the list
+	/**
+	 * Listens to the list
+	 */
 	public void valueChanged(ListSelectionEvent e) {
 		@SuppressWarnings("unchecked")
 		JList<String> contentList = (JList<String>) e.getSource();
 		updateLabel(contentArrayList.get(contentList.getSelectedIndex()));
 	}
 
-	//Renders the selected image
+	/**
+	 * Renders the selected image
+	 * @param name The updated text for the content
+	 */
 	protected void updateLabel (String name) {
 		contentLabel.setText(name);
 	}
 
+	/**
+	 * Get the left side of the menu
+	 * @return The left side of the menu
+	 */
 	public JSplitPane getSplitPane() {
 		return menuSideBar;
 	}
 
 	/**
-	 * Creates the sub-menu layout
+	 * Creates the sub menu layout
 	 * @param pathName The location of a file named the menu name and containing the various options of that menu
 	 * @param menuFrame The screen that shows all of the menus
 	 */
@@ -96,7 +105,7 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 		//Menu name is file name
 		JLabel menuName = new JLabel(title);
 		menuName.setBackground(boardColor);
-		menuName.setFont(new Font(menuName.getFont().toString(), Font.BOLD, (int)(55*ScreenParameters.xReduce) ));
+		menuName.setFont(new Font(menuName.getFont().toString(), Font.BOLD, (int)(55*ScreenParameters.XREDUCE) ));
 		menuName.setHorizontalAlignment(JLabel.CENTER);
 		menuName.setOpaque(true);
 
@@ -104,7 +113,7 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 		JList<String> optionList = new JList<String>(optionArrayList.toArray(new String[optionArrayList.size()]));
 		optionList.setBorder(new EmptyBorder(0, 5, 0, 10)); //order is: top, left, bottom, right
 		optionList.setBackground(boardColor);
-		optionList.setFont(new Font(optionList.getFont().toString(), Font.ITALIC, (int)(36*ScreenParameters.xReduce) ));
+		optionList.setFont(new Font(optionList.getFont().toString(), Font.ITALIC, (int)(36*ScreenParameters.XREDUCE) ));
 		
 		optionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		optionList.setSelectedIndex(0);
@@ -112,21 +121,20 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 		
 		optionList.addListSelectionListener(this);
 
-		//TODO: Figure out wrap around
 		// For some reason JLabel doesn't have word wrap so we have
 		// To use TextArea, which can word wrap
 		contentLabel = new JTextArea(contentArrayList.get(0));
 		contentLabel.setAlignmentY(JTextArea.TOP_ALIGNMENT);
-		contentLabel.setBorder(new EmptyBorder(20, (int)(50*ScreenParameters.xReduce), 10, 50)); //order is: top, left, bottom, right
+		contentLabel.setBorder(new EmptyBorder(20, (int)(50*ScreenParameters.XREDUCE), 10, 50)); //order is: top, left, bottom, right
 		contentLabel.setBackground(boardColor);
 		contentLabel.setEditable(false);
-		contentLabel.setFont(new Font(contentLabel.getFont().toString(), Font.PLAIN, (int)(28*ScreenParameters.xReduce) ));
+		contentLabel.setFont(new Font(contentLabel.getFont().toString(), Font.PLAIN, (int)(28*ScreenParameters.XREDUCE) ));
 		contentLabel.setLineWrap(true);
 		contentLabel.setWrapStyleWord(true);
 
 		JButton backButton = new JButton("Back to main menu");
 		backButton.addActionListener(new backButtonListener());
-		backButton.setFont(new Font(backButton.getFont().toString(), Font.PLAIN, (int)(24*ScreenParameters.xReduce) ));
+		backButton.setFont(new Font(backButton.getFont().toString(), Font.PLAIN, (int)(24*ScreenParameters.XREDUCE) ));
 		backButton.setBackground(boardColor);
 
 		//Create menu parts
@@ -140,7 +148,6 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 		int minSize = SCREENHEIGHT - 100;
 		int buttonDivider = autoAdjust > minSize ? minSize : autoAdjust;
 		leftSideOfMenu.setDividerLocation(buttonDivider);
-		System.out.println(SCREENHEIGHT+"");
 
 		//Regrouping to create the general menu screen
 		menuSideBar = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftSideOfMenu, contentScroll);

@@ -34,7 +34,7 @@ public abstract class Piece {
      * Are we up river or down river? Determines the player
      **/
     
-    public boolean getSide() {
+    public boolean getPlace() {
         return place;
     }
 

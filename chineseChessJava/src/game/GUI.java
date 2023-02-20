@@ -14,12 +14,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.Timer;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import logic.Move;
 import logic.Moving;
@@ -37,14 +40,30 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	// Looks visually pleasing if the board is centered
+	// and tall enough to fit most of the screen
+	// but not too big to take up all of the screen
+	int center = ScreenParameters.SCREENWIDTH/2;
+	int margin = ScreenParameters.SCREENHEIGHT/18;
+	int squareLength = (ScreenParameters.SCREENHEIGHT-margin*3)/11; // x3 to leave more space at bottom of screen
+	
+	int leftMostPixel = (int) (center-squareLength*(5.5));
+	int chessboardEdge = leftMostPixel + 11 * squareLength;
+
+	int fontMarginY = 75;
+	
 	// Board creation
 	private int strokeWidth = 1;
 	private Board board;
 	private Graphics2D g2;
 	
 	// Notation history
+	private int notationMargin = (int) (15 * ScreenParameters.XREDUCE);
 	private NotationHistory pastMoves;
-	private JLabel pastMovesLabel;
+	private JTextArea pastMovesTextArea;
+	private int leftNotationBoxX = chessboardEdge + notationMargin;
+	private int rightMostX = ScreenParameters.SCREENWIDTH - notationMargin;
+	private int topNotationY = 2*ScreenParameters.SCREENHEIGHT/5;
 	
 	// Mouse stuff
 	private int mouseX = 0,mouseY = 0, pieceX = 0, pieceY = 0;
@@ -60,22 +79,11 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	
 	private boolean run = false;
 	
-
-	// Looks visually pleasing if the board is centered
-	// and tall enough to fit most of the screen
-	// but not too big to take up all of the screen
-	int margin = ScreenParameters.SCREENHEIGHT/18;
-	int squareLength = (ScreenParameters.SCREENHEIGHT-margin*3)/11; // x3 to leave more space at bottom of screen
-	int center = ScreenParameters.SCREENWIDTH/2;
-	int leftMostPixel = (int) (center-squareLength*(5.5));
-
-	int notationMargin = 30;
-	int fontMarginY = 75;
-	
 	public GUI(){
 		board = new Board();
 		pastMoves = new NotationHistory();
-		pastMovesLabel = new JLabel("");
+		
+		pastMovesTextArea = new JTextArea("");
 		
 		addMouseListener(this);
 		repaint();
@@ -89,23 +97,9 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 		try {
 			String imgLocation = "images/wood-background.jpg";
 			Image background = ImageIO.read(new File(imgLocation));
-			int bgWidth = background.getWidth(null);
-
-			if(bgWidth != ScreenParameters.SCREENWIDTH) {
-				// Resize image if necessary
-				String imgOut = "images/test1.png";
-				ImageResizer.resize(imgLocation, imgOut, ((double)ScreenParameters.SCREENWIDTH) / ((double)bgWidth));
-				File fileOut = new File(imgOut);
-				background = ImageIO.read(fileOut);
-				g.drawImage(background,0,0,null);
-				fileOut.delete();
-			}
-
-			else {
-				g.drawImage(background,0,0,null);
-			}
+			g.drawImage(background,0,0,null);
+			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -113,6 +107,7 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 		// Graphics class doesn't have method to thicken stroke width
 		// Small screen sizes do not need thick lines to distinguish squares
 		g2 = (Graphics2D) g;
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		if(ScreenParameters.SCREENWIDTH >= 1920) {
 			strokeWidth = 4;
 		} else {
@@ -123,8 +118,8 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 		g2.setStroke(new BasicStroke(strokeWidth));
 		for(int row = 0; row<11; row++) {
 			for(int col = 0; col<11; col++) {
-				// Fill creates rectangle overlapping outline, so it needs to be smaller
-				// to avoid overlapping
+				// Fill creates rectangle overlapping outline
+				// So it needs to be smaller to avoid overlapping
 				int topLeftX = leftMostPixel + col * squareLength;
 				int topLeftY = margin + row * squareLength;
 				
@@ -135,7 +130,7 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 				}
 				else {
 					if((row<3 || row > 7) && (col>=3 && col<= 7)) { // Palace
-						drawFilledRectangle(ScreenParameters.OUTLINEBOARDCOLOR, ScreenParameters.DARKBOARDCOLOR, topLeftX, topLeftY, squareLength);
+						drawFilledRectangle(ScreenParameters.OUTLINECOLOR, ScreenParameters.PALACECOLOR, topLeftX, topLeftY, squareLength);
 					}
 					else {
 						drawFilledRectangle(topLeftX, topLeftY, squareLength);
@@ -156,6 +151,10 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 			chronoThread.start();
 			run = true;
 		}
+		
+		//Testing code
+		g2.drawLine(30, 30, 30, 3000);
+		g2.drawLine(30, 400, 500, 3000);
 	}
 
 	public void turnTimerPanel(){
@@ -203,6 +202,166 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	}
 
 	/**
+	 * Places the different pieces on the board
+	 */
+	public void setPieceImages() {
+		for(int col = 0; col<11; col++) {
+			for(int row = 0; row<11; row++) {
+				int topLeftX = leftMostPixel + col * squareLength;
+				int topLeftY = margin + row * squareLength;
+				Piece[][] pieceList = board.getCoords();
+				Piece piece = pieceList[col][row];
+				if (piece != null) {
+					String fileName = piece.getImageName();
+					Image scaledImage = new ImageIcon("pictures/chinese_"+fileName).getImage();
+					g2.drawImage(scaledImage, topLeftX+5, topLeftY+5, squareLength-10, squareLength-10, null);
+
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Places the notation history onto the board on the left
+	 */
+	public void setNotation() {
+		drawFilledRectangle(leftNotationBoxX, topNotationY, rightMostX - chessboardEdge - 2*notationMargin, ScreenParameters.SCREENHEIGHT/2);
+		
+		g2.setFont(new Font(getFont().getFontName(), Font.PLAIN, (int)(36*ScreenParameters.XREDUCE)));
+		g2.setColor(ScreenParameters.OUTLINECOLOR);
+		drawString(pastMovesTextArea.getText(), leftNotationBoxX + notationMargin, topNotationY);
+	}
+
+    private void drawString(String text, int x, int y) {
+        for (String line : text.split("\n")) {
+            g2.drawString(line, x, y += g2.getFontMetrics().getHeight());
+        }
+    }
+	
+	/**
+	 * Sets the timer in the upper left
+	 */
+	public void setTimer2() {
+		drawFilledRectangle(50, 50, 270, 90);
+		drawFilledRectangle(1050, 50, 270, 90);
+		
+		g2.setColor(Color.black);
+		//g2.drawString(Float.toString(t2.getTime()), 55, 55);
+		
+	}
+	
+	/**
+	 * Updates the notation history list with the most recenely played move
+	 * @param mostRecentMove The squares from which the piece was and moved to
+	 * @param pieceMoved The piece in question that moved
+	 */
+	public void updateNotation(Move mostRecentMove, Piece pieceMoved) {
+		pastMoves.updateNotation(mostRecentMove, pieceMoved);
+		String recentMove = pastMoves.getPastMoves().get(pastMoves.getPastMovesSize()-1);
+		pastMovesTextArea.setText(pastMovesTextArea.getText() + "\n" + recentMove);
+	}
+	
+	@Override
+	public void run() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+			ex.printStackTrace();
+		}
+
+		
+		//TODO: Create separate class for displaying NotationHistory
+		JFrame frame = new JFrame();
+		JScrollPane scrollPane = new JScrollPane(this);
+		frame.add(scrollPane);
+		frame.pack();
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setVisible(true);
+		
+		// Every 40ms, check if anything has been clicked
+		while(run) {
+			try {
+				Thread.sleep(ScreenParameters.SLEEPAMOUNT);
+			} catch (InterruptedException e) {
+				System.out.println(e.getMessage());
+			}
+			//System.out.println(mouseClickedPiece + " " + mouseMovingPiece);
+			
+			// Ensure that the game is not stopped during the iteration.
+			if (run) {
+				if(mouseClickedPiece && mouseMovingPiece) {
+						Move move = new Move(pieceX, pieceY, mouseX, mouseY);
+						Moving moving = new Moving(board,move);
+						if(moving.isLegal()) {
+							board.doMove(move);
+							updateNotation(move, movingPiece);
+							mouseClickedPiece = false;
+						}
+						mouseMovingPiece = false;
+				}
+				repaint();
+
+			}
+		}
+	}
+	@Override
+	public void mousePressed(MouseEvent e) {
+
+		// floorDiv makes sure that negative numbers between -1 and 0 get rounded down to -1 and not 0
+		mouseX = Math.floorDiv((e.getX()-leftMostPixel), squareLength);
+		mouseY = Math.floorDiv((e.getY()-margin), squareLength);
+
+		boolean xInRange = (mouseX >= 0) && (mouseX <= 10);
+		boolean yInRange = (mouseY >= 0) && (mouseY <= 10);
+
+		if(xInRange && yInRange) {
+			if(mouseClickedPiece) {
+				Piece newPiece = board.getCoords(mouseX,mouseY);
+				boolean switchedPiece = false;
+				if(newPiece != null) {
+					switchedPiece = newPiece.getPlace() == movingPiece.getPlace();
+					
+					//Update current piece and location
+					if(switchedPiece) {
+						movingPiece = newPiece;
+						pieceX = mouseX;
+						pieceY = mouseY;
+					}
+				}
+				mouseMovingPiece = !switchedPiece;
+			}
+			else {
+				movingPiece = board.getCoords(mouseX,mouseY);
+				pieceX = mouseX;
+				pieceY = mouseY;
+				
+				mouseClickedPiece = movingPiece != null;
+			}
+		}
+		// We want to click off the piece
+		else {
+			mouseClickedPiece = false;
+		}
+
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+	}
+
+	/**
 	 * Draws a filled square using default board color (i.e. not the palace color)
 	 * @param g2 The graphics class that draws on the board
 	 * @param topX The top left x-position of the rectangle
@@ -210,7 +369,7 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	 * @param length The amount of pixels the rectangle extends positively over the x and y axis
 	 */
 	public void drawFilledRectangle(int topX, int topY, int length) {
-		drawFilledRectangle(ScreenParameters.OUTLINEBOARDCOLOR, ScreenParameters.BOARDCOLOR, topX, topY, length, length);
+		drawFilledRectangle(ScreenParameters.OUTLINECOLOR, ScreenParameters.BOARDCOLOR, topX, topY, length, length);
 	}
 	
 	/**
@@ -222,7 +381,7 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	 * @param height The amount of pixels the rectangle extends positively over the y-axis
 	 */
 	public void drawFilledRectangle(int topX, int topY, int length, int height) {
-		drawFilledRectangle(ScreenParameters.OUTLINEBOARDCOLOR, ScreenParameters.BOARDCOLOR, topX, topY, length, height);
+		drawFilledRectangle(ScreenParameters.OUTLINECOLOR, ScreenParameters.BOARDCOLOR, topX, topY, length, height);
 	}
 	
 	/**
@@ -256,147 +415,6 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 		g2.draw(rOutline);
 		g2.setColor(fillColor);
 		g2.fill(rFill);
-	}
-
-	public void setPieceImages() {
-		for(int col = 0; col<11; col++) {
-			for(int row = 0; row<11; row++) {
-				int topLeftX = leftMostPixel + col * squareLength;
-				int topLeftY = margin + row * squareLength;
-				Piece[][] pieceList = board.getCoords();
-				Piece piece = pieceList[col][row];
-				//This breaks the order in Board but it works so...
-				if (piece != null) {
-					String fileName = piece.getImageName();
-					Image scaledImage = new ImageIcon("pictures/chinese_"+fileName).getImage();
-					// figure out why is the y instead of x (i think it's because of the board's order)
-					g2.drawImage(scaledImage, topLeftX+5, topLeftY+5, squareLength-10, squareLength-10, null);
-
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Places the notation history onto the board on the left
-	 */
-	public void setNotation() {
-		int chessboardEdge = leftMostPixel + 11 * squareLength;
-		int rightMostX = ScreenParameters.SCREENWIDTH - notationMargin;
-		
-		int leftNotationBoxX = chessboardEdge + notationMargin;
-		int topNotationY = 2*ScreenParameters.SCREENHEIGHT/5;
-		drawFilledRectangle(leftNotationBoxX, topNotationY, rightMostX - chessboardEdge - 2*notationMargin, ScreenParameters.SCREENHEIGHT/2);
-		
-		g2.setFont(new Font(getFont().getFontName(), Font.PLAIN, (int)(36*ScreenParameters.xReduce)));
-		g2.setColor(ScreenParameters.OUTLINEBOARDCOLOR);
-		g2.drawString(pastMovesLabel.getText(), leftNotationBoxX + notationMargin, topNotationY + fontMarginY);
-	}
-	
-	/**
-	 * Sets the timer in the upper left
-	 */
-	public void setTimer2() {
-		drawFilledRectangle(50, 50, 270, 90);
-		drawFilledRectangle(1050, 50, 270, 90);
-		
-		g2.setColor(Color.black);
-		//g2.drawString(Float.toString(t2.getTime()), 55, 55);
-		
-	}
-	
-	/**
-	 * Updates the notation history list with the most recenely played move
-	 * @param mostRecentMove The squares from which the piece was and moved to
-	 * @param pieceMoved The piece in question that moved
-	 */
-	public void updateNotation(Move mostRecentMove, Piece pieceMoved) {
-		pastMoves.updateNotation(mostRecentMove, pieceMoved);
-		String recentMove = pastMoves.getPastMoves().get(pastMoves.getPastMovesSize()-1);
-		pastMovesLabel.setText(pastMovesLabel.getText() + "\n" + recentMove);
-	}
-	
-	public void updateTimer() {
-		//g2.drawString(Float.toString(t2.getTime()), 55, 55);
-	}
-	
-	@Override
-	public void run() {
-		// Every 40ms, check if anything has been clicked
-		while(run) {
-			try {
-				Thread.sleep(ScreenParameters.SLEEPAMOUNT);
-			} catch (InterruptedException e) {
-				System.out.println(e.getMessage());
-			}
-			//System.out.println(mouseClickedPiece + " " + mouseMovingPiece);
-			
-			// Ensure that the game is not stopped during the iteration.
-			if (run && mouseClickedPiece) {
-				if(mouseMovingPiece) {
-					Move move = new Move(pieceX, pieceY, mouseX, mouseY);
-					Moving moving = new Moving(board,move);
-					if(moving.isLegal()) {
-						board.doMove(move);
-						updateNotation(move, movingPiece);
-						mouseClickedPiece = false;
-					}
-
-					mouseMovingPiece = false;
-				}
-				repaint();
-
-			}
-		}
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-
-		// floorDiv makes sure that negative numbers between -1 and 0 get rounded down to -1 and not 0
-		mouseX = Math.floorDiv((e.getX()-leftMostPixel), squareLength);
-		mouseY = Math.floorDiv((e.getY()-margin), squareLength);
-		System.out.println(mouseX+"; "+mouseY);
-
-		boolean xInRange = (mouseX >= 0) && (mouseX <= 10);
-		boolean yInRange = (mouseY >= 0) && (mouseY <= 10);
-
-		if(xInRange && yInRange) {
-			if(mouseClickedPiece) {
-				mouseMovingPiece = true;
-			}
-			else {
-				movingPiece = board.getCoords(mouseX,mouseY);
-				pieceX = mouseX;
-				pieceY = mouseY;
-				
-				mouseClickedPiece = movingPiece != null;
-			}
-		}
-		// We want to click off the piece
-		else {
-			mouseClickedPiece = false;
-		}
-
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		
 	}
 
 }

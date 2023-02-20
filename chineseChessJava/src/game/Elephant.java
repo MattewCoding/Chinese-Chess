@@ -21,14 +21,13 @@ public class Elephant extends Piece {
         }
 
         //river crossing prevention
-        //changed the finalY to finalX
         if (place) {
-            if (move.getFinalX() > 4) {
+            if (move.getFinalY() > 4) {
                 move.setValid(false);
             }
         }
         else{
-            if (move.getFinalX() < 5) {
+            if (move.getFinalY() < 5) {
                 move.setValid(false);
             }
         }

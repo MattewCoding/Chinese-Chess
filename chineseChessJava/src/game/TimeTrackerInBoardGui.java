@@ -11,11 +11,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import logic.TimeTracker;
-import logic.TimeTrackingLogic;
-
 public class TimeTrackerInBoardGui extends JFrame {
-  private JLabel timeLabel;
+  private static final long serialVersionUID = 1L;
+private JLabel timeLabel;
   private JButton player1Button;
   private JButton player2Button;
   private Calendar calendar;

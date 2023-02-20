@@ -167,11 +167,10 @@ public class Moving {
 		if (board.getCoords(move.getFinalX(), move.getFinalY()) == null) {
 			attack = false;
 		} else {
-			boolean origin = board.getCoords(move.getOriginX(), move.getOriginY()).getSide();
-			boolean dest = board.getCoords(move.getFinalX(), move.getFinalY()).getSide();
-			if (origin != dest) {
-				attack = true;
-			}
+			boolean origin = board.getCoords(move.getOriginX(), move.getOriginY()).getPlace();
+			boolean dest = board.getCoords(move.getFinalX(), move.getFinalY()).getPlace();
+			
+			attack = origin != dest;
 			if (origin == dest) {
 				this.attack = false;
 				this.legal = false;
