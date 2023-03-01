@@ -21,7 +21,7 @@ public class Elephant extends Piece {
         }
 
         //river crossing prevention
-        if (place) {
+        if (isBlack) {
             if (move.getFinalY() > 4) {
                 move.setValid(false);
             }

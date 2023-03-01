@@ -167,8 +167,8 @@ public class Moving {
 		if (board.getCoords(move.getFinalX(), move.getFinalY()) == null) {
 			attack = false;
 		} else {
-			boolean origin = board.getCoords(move.getOriginX(), move.getOriginY()).getPlace();
-			boolean dest = board.getCoords(move.getFinalX(), move.getFinalY()).getPlace();
+			boolean origin = board.getCoords(move.getOriginX(), move.getOriginY()).isBlack();
+			boolean dest = board.getCoords(move.getFinalX(), move.getFinalY()).isBlack();
 			
 			attack = origin != dest;
 			if (origin == dest) {

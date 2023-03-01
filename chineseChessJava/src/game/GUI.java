@@ -85,7 +85,7 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 
 	// players
 	private Profile player1, player2;
-	private boolean playerTurn = true;
+	private boolean blackTurn = true;
 
 	
 	private boolean run = false;
@@ -277,11 +277,8 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	 * updates all the captured pieces
 	 */
 	public void updateCaptured() {
-		
 		capturedPieceBlack = player1.getPiecesCaptured();
 		capturedPieceRed = player2.getPiecesCaptured();
-		
-		
 	}
 
 	/**
@@ -331,24 +328,40 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 			// Ensure that the game is not stopped during the iteration.
 			if (run) {
 				if(mouseClickedPiece && mouseMovingPiece) {
+					
+						// Check if move is legal
 						Move move = new Move(pieceX, pieceY, mouseX, mouseY);
 						Moving moving = new Moving(board,move);
-						if(moving.isLegal() && playerTurn == board.getCoords(pieceX, pieceY).getPlace()) {
-							if(board.getCoords(pieceX, pieceY).getPlace()== true) {
+						
+						// This name is just as long as writing the right side of this equation
+						// But it's much clearer to understand why the boolean is true or false
+						boolean thePieceClickedOnIsBlack = board.getCoords(pieceX, pieceY).isBlack();
+						Piece thePieceBeingAttacked = board.getCoords(mouseX, mouseY);
+						
+						if(moving.isLegal() && blackTurn != thePieceClickedOnIsBlack) {
+							if(thePieceClickedOnIsBlack != true) { // Player 1's turn is over
 								player1.stopTurnTimer();
 								player2.startTurnTimer();
-							}else if(board.getCoords(pieceX, pieceY).getPlace()== false) {
+							}else{
 								player2.stopTurnTimer();
 								player1.startTurnTimer();
 							}
+							blackTurn = !blackTurn;
+							
 							board.doMove(move);
-							updateCaptured();
-							updateNotation(move, movingPiece);
-							if(playerTurn==true) {
-								playerTurn=false;
-							}else {
-								playerTurn=true;
+							
+							if(thePieceBeingAttacked != null) {
+								if(thePieceBeingAttacked.isBlack()) {
+									player1.addPieceCaptured(thePieceBeingAttacked);
+								}
+								else {
+									player2.addPieceCaptured(thePieceBeingAttacked);
+								}
+								updateCaptured();
 							}
+							
+							updateNotation(move, movingPiece);
+							
 							mouseClickedPiece = false;
 						}
 						mouseMovingPiece = false;
@@ -362,6 +375,7 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	public void mousePressed(MouseEvent e) {
 
 		// floorDiv makes sure that negative numbers between -1 and 0 get rounded down to -1 and not 0
+		// (casting directly to int does that for some reason)
 		mouseX = Math.floorDiv((e.getX()-leftMostPixel), squareLength);
 		mouseY = Math.floorDiv((e.getY()-margin), squareLength);
 
@@ -373,18 +387,15 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 				Piece newPiece = board.getCoords(mouseX,mouseY);
 				boolean switchedPiece = false;
 				if(newPiece != null) {
-					if(newPiece.getPlace()== true) {
-						player1.addPieceCaptured(newPiece);
-					}else {
-						player2.addPieceCaptured(newPiece);
-					}
-					switchedPiece = newPiece.getPlace() == movingPiece.getPlace();
+					switchedPiece = newPiece.isBlack() == movingPiece.isBlack();
 					
 					//Update current piece and location
 					if(switchedPiece) {
 						movingPiece = newPiece;
 						pieceX = mouseX;
 						pieceY = mouseY;
+					} else {
+						
 					}
 				}
 				mouseMovingPiece = !switchedPiece;

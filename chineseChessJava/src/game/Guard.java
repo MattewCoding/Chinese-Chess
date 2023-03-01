@@ -25,7 +25,7 @@ public class Guard extends Piece {
             move.setValid(false);
         }
 
-        if (place) {
+        if (isBlack) {
             if (move.getFinalY() > 2) {
                 move.setValid(false);
             }
