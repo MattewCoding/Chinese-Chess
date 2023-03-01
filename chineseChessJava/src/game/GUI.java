@@ -3,6 +3,7 @@ package game;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -12,6 +13,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -58,11 +61,19 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	
 	// Notation history
 	private JTextArea pastMovesTextArea;
+	private ArrayList<String> pastMovesArrayList;
 	private NotationHistory pastMoves;
 	private int notationMargin = (int) (15 * ScreenParameters.XREDUCE);
 	private int leftNotationBoxX = chessboardEdge + notationMargin;
 	private int rightMostX = ScreenParameters.SCREENWIDTH - notationMargin;
 	private int topNotationY = 2*ScreenParameters.SCREENHEIGHT/5;
+	
+	// Captured pieces 
+	private ArrayList<Piece> capturedPieceRed;
+	private ArrayList<Piece> capturedPieceBlack;
+	private int capturedMargin = (int) (15 * ScreenParameters.XREDUCE);
+	private int rightCapturedBoxX = chessboardEdge - 81*capturedMargin;
+	private int deplacepiecesX = rightCapturedBoxX;
 	
 	// Mouse stuff
 	private int mouseX = 0,mouseY = 0, pieceX = 0, pieceY = 0;
@@ -74,8 +85,8 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 
 	// players
 	private Profile player1, player2;
+	private boolean playerTurn = true;
 
-	private TimerListener timerListener;
 	
 	private boolean run = false;
 	
@@ -84,10 +95,14 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 		
 		pastMoves = new NotationHistory();
 		pastMovesTextArea = new JTextArea("");
+		pastMovesArrayList = new ArrayList<String>();
+		capturedPieceRed = new ArrayList<Piece>();
+		capturedPieceBlack = new ArrayList<Piece>();
 		
-		timerListener = new TimerListener();
-		player1 = new Profile("rona",0,true);
-		player2 = new Profile("mattew",0,false);
+		//timerListener = new TimerListener();
+		player1 = new Profile("Rona",0,true);
+		player2 = new Profile("Mattew",0,false);
+		player2.getTimer().stop();
 		
 		addMouseListener(this);
 		repaint();
@@ -148,6 +163,7 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 		setPieceImages();
 		drawTurnTimer();
 		setNotation();
+		setCapturedPieces();
 
 		if(!run) {
 			
@@ -155,32 +171,39 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 			chronoThread.start();
 			run = true;
 		}
-		
-		//Testing code
-		g2.drawLine(30, 30, 30, 3000);
-		g2.drawLine(30, 400, 500, 3000);
 	}
 
 	public void drawTurnTimer(){
+		//Rectangle calculations
+		int widthTurnTimer = 270;
+		int timerRedLeftX = 50;
+		int timerBlackLeftX = ScreenParameters.SCREENWIDTH-(timerRedLeftX+widthTurnTimer);
 
-		Rectangle.Float ellipse = new Rectangle.Float();
-		Rectangle.Float ellipse2 = new Rectangle.Float();
+		String p1ID = player1.getId();
+		String p2ID = player2.getId();
+		String timeLeft = player1.getTimer().getElapsedTime();
+		String timeRight = player2.getTimer().getElapsedTime();
 
-		ellipse.setFrame(50, 50, 270, 90);
-		ellipse2.setFrame(1050, 50, 270, 90);
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.setColor(new Color(244,227,166));
-		g2.draw(ellipse);
-		g2.fill(ellipse);
-		g2.setColor(new Color(226,192,106));
-		g2.draw(ellipse2);
-		g2.fill(ellipse2);
-		g2.setFont(new Font("Arial", Font.BOLD, 30));
+		g2.setFont(new Font(getFont().getFontName(), Font.BOLD, 30));
+	    FontMetrics metrics = g2.getFontMetrics(getFont());
+	    
+	    // Determine the X coordinate for the text
+	    // You know, I'm not actually sure why we need to multiply the string width
+	    // By 4/3, (it should be 1/2), but if it works...
+	    int timerRedPlayerX = timerRedLeftX + widthTurnTimer/2 - 4*metrics.stringWidth(p1ID)/3;
+	    int timerBlackPlayerX = timerBlackLeftX + widthTurnTimer/2 - 4*metrics.stringWidth(p2ID)/3;
+	    
+	    int timerRedCountX = timerRedLeftX + widthTurnTimer/2 - 4*metrics.stringWidth(timeLeft)/3;
+	    int timerBlackCountX = timerBlackLeftX + widthTurnTimer/2 - 4*metrics.stringWidth(timeRight)/3;
+
+		CreateRectangle.drawFilledRectangle(g2, timerRedLeftX, 50, widthTurnTimer, 90);
+		CreateRectangle.drawFilledRectangle(g2, timerBlackLeftX, 50, widthTurnTimer, 90);
+		
 		g2.setColor(Color.black);
-		g2.drawString(player1.getId(), 130, 75);
-		g2.drawString(player2.getId(), 1130, 75);
-		g2.drawString(timerListener.getElapsedTime(), 130, 118);
-		g2.drawString(timerListener.getElapsedTime(), 1130, 118);
+		g2.drawString(p1ID, timerRedPlayerX, 75);
+		g2.drawString(p2ID, timerBlackPlayerX, 75);
+		g2.drawString(timeLeft, timerRedCountX, 118);
+		g2.drawString(timeRight, timerBlackCountX, 118);
 
 	}
 	
@@ -196,9 +219,39 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	}
 
     private void drawString(String text, int x, int y) {
-        for (String line : text.split("\n")) {
+        for (String line : pastMovesArrayList) {
             g2.drawString(line, x, y += g2.getFontMetrics().getHeight());
         }
+    }
+	
+	/**
+	 * Places the captured pieces onto the board on the right
+	 */
+	public void setCapturedPieces() {
+		CreateRectangle.drawFilledRectangle(g2, rightCapturedBoxX, topNotationY, rightMostX - chessboardEdge - 2*notationMargin, ScreenParameters.SCREENHEIGHT/2);
+
+			drawİmage(capturedPieceBlack, deplacepiecesX+10, topNotationY+10,deplacepiecesX+10);
+			drawİmage(capturedPieceRed, deplacepiecesX+10, 2*topNotationY-5,deplacepiecesX+10);
+		}
+    
+    
+    /*
+     * to draw all the captured pieces
+     * @param the list of the captured pieces, the x and y are the initial coordinates and the xİnitial is also the initial x-coordinate that will be compared to add the x coordinate to the next line
+     * @return draws the pieces
+     */
+    private void drawİmage(ArrayList<Piece> capturedPiece, int x, int y, int xİnitial) {
+    	for(Piece captured : capturedPiece) {
+			String fileName = captured.getImageName();
+			Image scaledImage = new ImageIcon("pictures/chinese_"+fileName).getImage();
+			g2.drawImage(scaledImage, x, y,squareLength-10, squareLength-10, null);
+			if(x<7*xİnitial) {
+				x  += 35;
+			}else {
+				y += 50;
+				x = xİnitial;
+			}
+		}
     }
 	
 	/**
@@ -209,7 +262,26 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	public void updateNotation(Move mostRecentMove, Piece pieceMoved) {
 		pastMoves.updateNotation(mostRecentMove, pieceMoved);
 		String recentMove = pastMoves.getPastMoves().get(pastMoves.getPastMovesSize()-1);
-		pastMovesTextArea.setText(pastMovesTextArea.getText() + "\n" + recentMove);
+		pastMovesTextArea.setText(recentMove + "\n" + pastMovesTextArea.getText());
+		
+		pastMovesArrayList.add(recentMove);
+		
+    	int notationBoxSize = ScreenParameters.SCREENHEIGHT/2;
+    	int turnsFittableInBox = (int) (notationBoxSize/g2.getFontMetrics().getHeight());
+    	if(pastMovesArrayList.size() > turnsFittableInBox) {
+    		pastMovesArrayList.remove(0);
+    	}
+	}
+	
+	/*
+	 * updates all the captured pieces
+	 */
+	public void updateCaptured() {
+		
+		capturedPieceBlack = player1.getPiecesCaptured();
+		capturedPieceRed = player2.getPiecesCaptured();
+		
+		
 	}
 
 	/**
@@ -246,19 +318,6 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	
 	@Override
 	public void run() {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-			ex.printStackTrace();
-		}
-
-		/*
-		JFrame frame = new JFrame();
-		JScrollPane scrollPane = new JScrollPane(pastMovesTextArea);
-		frame.add(scrollPane);
-		frame.pack();
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setVisible(true);*/
 		
 		// Every 40ms, check if anything has been clicked
 		while(run) {
@@ -274,9 +333,22 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 				if(mouseClickedPiece && mouseMovingPiece) {
 						Move move = new Move(pieceX, pieceY, mouseX, mouseY);
 						Moving moving = new Moving(board,move);
-						if(moving.isLegal()) {
+						if(moving.isLegal() && playerTurn == board.getCoords(pieceX, pieceY).getPlace()) {
+							if(board.getCoords(pieceX, pieceY).getPlace()== true) {
+								player1.stopTurnTimer();
+								player2.startTurnTimer();
+							}else if(board.getCoords(pieceX, pieceY).getPlace()== false) {
+								player2.stopTurnTimer();
+								player1.startTurnTimer();
+							}
 							board.doMove(move);
+							updateCaptured();
 							updateNotation(move, movingPiece);
+							if(playerTurn==true) {
+								playerTurn=false;
+							}else {
+								playerTurn=true;
+							}
 							mouseClickedPiece = false;
 						}
 						mouseMovingPiece = false;
@@ -301,6 +373,11 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 				Piece newPiece = board.getCoords(mouseX,mouseY);
 				boolean switchedPiece = false;
 				if(newPiece != null) {
+					if(newPiece.getPlace()== true) {
+						player1.addPieceCaptured(newPiece);
+					}else {
+						player2.addPieceCaptured(newPiece);
+					}
 					switchedPiece = newPiece.getPlace() == movingPiece.getPlace();
 					
 					//Update current piece and location

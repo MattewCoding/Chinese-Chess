@@ -14,22 +14,32 @@ import javax.swing.Timer;
  */
 
 public class TimerListener extends JComponent{
-
+	
 	Timer timer;
+	private long pausedTime;
 	private long startTime;
-	private String elapsedTime = "00:00";
+    private String elapsedTime = "00:00";
+    
+    
+    
+	public void setElapsedTime(String elapsedTime) {
+		this.elapsedTime = elapsedTime;
+	}
+	
 
 
 
 	public TimerListener(){
-
-
+		
+		
 		startTime = System.currentTimeMillis();
 
 		timer = new Timer(1000, new TimerActionListener());
 		timer.start();
 
-	}
+	  }
+	
+	
 
 	public String getElapsedTime() {
 		return elapsedTime;
@@ -50,10 +60,24 @@ public class TimerListener extends JComponent{
 		}
 	}
 
+
+
 	public void stop() {
+		pausedTime = System.currentTimeMillis();
 		timer.stop();
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void start() {
+		long elapsedPausedTime = System.currentTimeMillis() - pausedTime;
+		startTime += elapsedPausedTime;
+		timer.start();
+		// TODO Auto-generated method stub
+		
 	}
 
 
-}
+	
+	}
 
