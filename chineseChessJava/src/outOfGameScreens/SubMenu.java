@@ -24,6 +24,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.apache.logging.log4j.Logger;
+
+import log.LoggerUtility;
+
 public class SubMenu extends JPanel implements ListSelectionListener {
 	/**
 	 * 
@@ -40,6 +44,8 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 	private JSplitPane menuSideBar;
 	private GameLauncher mainMenuObject;
 	private JFrame mainScreen;
+	
+	private static Logger logData = LoggerUtility.getLogger(SubMenu.class, "html");
 
 	/**
 	 * Listens to the list
@@ -72,8 +78,8 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 	 * @param menuFrame The screen that shows all of the menus
 	 */
 	public SubMenu(String pathName, GameLauncher menuScreen) {
-		int SCREENWIDTH = ScreenParameters.SCREENWIDTH;
-		int SCREENHEIGHT = ScreenParameters.SCREENHEIGHT;
+		int screenWidth = ScreenParameters.SCREENWIDTH;
+		int screenHeight = ScreenParameters.SCREENHEIGHT;
 		mainMenuObject = menuScreen;
 		mainScreen = menuScreen.getFrame();
 
@@ -87,10 +93,20 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 
 			//Split the options from its content
 			while ((line = reader.readLine()) != null) {
-				if(!line.isBlank()) { //Aids with readability in text file
+				if(!line.isBlank()) { //Demarks the end of an option
 					optionArrayList.add(line);
 					line=reader.readLine();
 					contentArrayList.add("        " + line); // \t is waaaay too big
+					
+					// For new paragraphs still in the same option
+					for(line = reader.readLine(); line != null && !line.isBlank(); line = reader.readLine()){
+						String informationString = contentArrayList.get(contentArrayList.size()-1);
+						informationString += ("\n        " + line);
+						contentArrayList.set(contentArrayList.size()-1, informationString);
+						
+						logData.info("Line added: " + line);
+						logData.info("End result: " + contentArrayList.get(contentArrayList.size()-1));
+					}
 				}
 			}
 			reader.close();
@@ -141,17 +157,17 @@ public class SubMenu extends JPanel implements ListSelectionListener {
 		JScrollPane optionScroll = new JScrollPane(optionList);
 		JScrollPane contentScroll = new JScrollPane(contentLabel);
 		JSplitPane menuNameAndOptionsScroll = new JSplitPane(JSplitPane.VERTICAL_SPLIT, menuName, optionScroll);
-		menuNameAndOptionsScroll.setDividerLocation(SCREENHEIGHT/8);
+		menuNameAndOptionsScroll.setDividerLocation(screenHeight/8);
 		
 		JSplitPane leftSideOfMenu = new JSplitPane(JSplitPane.VERTICAL_SPLIT, menuNameAndOptionsScroll, backButton);
-		int autoAdjust = SCREENHEIGHT - SCREENHEIGHT/7;
-		int minSize = SCREENHEIGHT - 100;
+		int autoAdjust = screenHeight - screenHeight/7;
+		int minSize = screenHeight - 100;
 		int buttonDivider = autoAdjust > minSize ? minSize : autoAdjust;
 		leftSideOfMenu.setDividerLocation(buttonDivider);
 
 		//Regrouping to create the general menu screen
 		menuSideBar = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftSideOfMenu, contentScroll);
-		menuSideBar.setDividerLocation(SCREENWIDTH/4);
+		menuSideBar.setDividerLocation(screenWidth/4);
 
 		//Prevent menus from being interact-able
 		menuNameAndOptionsScroll.setEnabled(false);

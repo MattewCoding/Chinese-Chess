@@ -1,5 +1,5 @@
 Pieces
-Each player starts with sixteen circular pieces. Player one's pieces are completely black, whilst player two's pieces are red on the inside. The chess pieces are each named after chinese military rankings, with their chinese character displayed on their respective chess pieces.
+Chaque joueur commence avec seize pièces circulaires. Les pièces du joueur 1 sont entièrement noires, tandis que les pièces du joueur 2 sont rouges à l'intérieur. Les pièces d'échecs portent chacune le nom d'un grade militaire chinois, avec leur caractère chinois affiché sur leurs pièces d'échecs respectives.
 
 Soldat
 Le soldat ne peut avancer que d'un point, jusqu'à ce qu'il ait traversé la rivière, où il pourra ensuite se déplacer horizontalement ou avancer d'une case. Le soldat, contrairement à son équivalent international, n'est pas promu lorsqu'il atteint la fin du tableau.

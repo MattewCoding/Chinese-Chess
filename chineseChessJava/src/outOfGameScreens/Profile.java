@@ -21,6 +21,7 @@ public class Profile {
 	private BufferedWriter sw;
 	private BufferedReader sr, br;
 	private TimerListener timer;
+   
 	
 	
 
@@ -163,6 +164,11 @@ public class Profile {
 	 * Stop the timer. Call at end of turn. Add time elapsed during that turn to
 	 * previous turn's elapsed time.
 	 */
+	public void startTurnTimer() {
+		timer.start();
+		//timeElapsed += timer.getElapsedTime();
+	}
+	
 	public void stopTurnTimer() {
 		timer.stop();
 		//timeElapsed += timer.getElapsedTime();

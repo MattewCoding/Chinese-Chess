@@ -6,6 +6,11 @@ import java.awt.Rectangle;
 
 import outOfGameScreens.ScreenParameters;
 
+/**
+ * This utility class allows the creation of rectangles in the game screen.
+ * 
+ * @author YANG Mattew
+ */
 public class CreateRectangle {
 	private static int strokeWidth = 2;
 
