@@ -10,16 +10,16 @@ import logic.Move;
 
 public abstract class Piece {
     protected String type;
-    protected boolean place;
+    protected boolean isBlack;
     private boolean captured;
 
     /**
      * Constructor for creating a Piece. All that is needed is which side of the board the piece is on. The side is provided as an enum.
      *
-     * for the place if black it is true if red it is false.
+     * for the isBlack if black it is true if red it is false.
      */
     public Piece(boolean place) {
-        this.place = place;
+        this.isBlack = place;
         this.setCaptured(false);
     }
 
@@ -31,11 +31,11 @@ public abstract class Piece {
     }
 
     /**
-     * Are we up river or down river? Determines the player
+     * Are we up river or down river? Determines the player. Returns true if we are up the river
      **/
     
-    public boolean getPlace() {
-        return place;
+    public boolean isBlack() {
+        return isBlack;
     }
 
     /**
@@ -65,7 +65,7 @@ public abstract class Piece {
      */
     public String getImageName() {
         String fileName = "";
-        if (place)
+        if (isBlack)
             fileName += "black_";
         else
             fileName += "red_";

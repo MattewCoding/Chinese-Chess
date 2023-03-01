@@ -1,5 +1,74 @@
-Test
-this is a glorious test.
+Introduction
+Just like international chess, in Chinese Chess there are also a variety of strategies that can be employed to gain an advantage over the opposing player. This menu will go through some of the basic strategies commonly used. Many of these strategies will be familiar to players of international chess, due to the fact that they are both types of chess.
 
-test2
-this is a second better test.
+
+
+Terminology
+This subsection explains commonly used terms in international and Chinese chess, in alphabetical order.
+
+  active (piece)
+A piece that can move to multiple points able to damage the opponent's position.
+
+  Black
+The designation for the player who moves second, playing the black pieces, even if the pieces are not black but some other dark color (i.e. dark blue)
+
+  Chinese Chess / Xiangqi
+The game being played.
+
+  develop
+Moving non-pawn pieces in the opening to points where they can be more active.
+
+  endgame
+The last phase of the game, when few pieces remain on the board.
+
+  file
+A vertical column of squares on the board. The bottom row is labelled the first file.
+
+  international chess
+What is traditionnaly thought when chess is evoked. It is 'international' in the sense that it is popularly played worldwide, whereas Chinese chess is mainly restricted to China.
+
+  middlegame
+The middle of a game, between the opening and the endgame.
+
+  move
+A full move is a turn by both players, White and Black.
+
+  opening
+The start of a game, generally counted as the first dozen moves. This is when players attempt to develop their pieces to be able to efficiently attack the opposing player. The opening preceeds the middlegame.
+
+  point
+A location on the board.
+
+  rank
+A horizontal row of squares on the board. The rightmost row is labelled the first rank.
+
+  Red
+The designation for the player who moves first, playing the red pieces.
+
+  river
+A rank of the board.
+
+
+
+Opening Moves
+Unlike in international chess, where the left and right sides are asymmetrical due to the position of the king and queen, in Chinese chess, both sides are symmetrical. There is thus no strategic theory in whether to start moving pieces on the left or right, although traditionnally, players start by moving the pieces on the right side.
+
+  First move (red)
+Chinese chess is similiar to international chess wherein there is a small, limited set of optimal moves that red and black can use in order to rapidly gain the advantage. The most common move is the Central Cannon, to move the right-side cannon to the center coloumn. Other first moves include moving an elephant towards the center of the board, advancing the soldier on the third or nineth file, moving a horse forward, and moving either cannon to the 4th or 6th file. 
+
+  First move (black)
+Black can respond to Red's most common move (the first one described) by advancing the horse in the same original column towards the center, and can develop their pieces to protect their middle pawn. Black can also instead develop either cannons
+
+  Outside of the first move
+Both players are advised to quickly develop one of their chariots onto an open file or rank, as they have long attack ranges, and focus on controlling the center area of the board.
+
+
+
+Middlegame strategy
+The center becomes less important as the game progresses to the middlegame, however the center file remains vital to control. Due to its heavily guarded state, players are recommended to mount offences from the left or right side to gain control over the center instead of attacking head on.
+Whereas pawns in international chess are used to defend each other, here pawns aim to cross the river to attack opposing pieces. Pawns also are pushed aside to avoid blocking their own horses.
+
+
+
+Endgame
+Chinese chess endgames differ from international chess in that, for the player who currently has an advantage in material, that they should not readily sacrafice pieces, as with fewer pieces on the board, the opponent can more easily defend (whereas in international chess the opposite is true).

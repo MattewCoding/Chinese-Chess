@@ -35,13 +35,13 @@ public class Soldier extends Piece {
         }
 
         //checks for vertical forward moves only based on side
-        if (place == curSide) {
-            if (this.place == true) {
+        if (isBlack == curSide) {
+            if (this.isBlack == true) {
                 if (move.getDy() != 1 || !move.isVertical()) {
                     move.setValid(false);
                 }
             }
-            if (place == false) {
+            if (isBlack == false) {
                 if (move.getDy() != -1 || !move.isVertical()) {
                     move.setValid(false);
                 }
@@ -49,17 +49,17 @@ public class Soldier extends Piece {
 
         }
         //allows for horizontal movement once river is crossed
-        if (this.place != curSide) {
+        if (this.isBlack != curSide) {
             if (!move.isHorizontal() && !move.isVertical()) {
                 move.setValid(false);
             }
 
-            if (this.place == true) {
+            if (this.isBlack == true) {
                 if (!(move.getDy() == 1 || Math.abs(move.getDx()) == 1)) {
                     move.setValid(false);
                 }
             }
-            if (this.place == false) {
+            if (this.isBlack == false) {
                 if (!(move.getDy() == -1 || Math.abs(move.getDx()) == 1)) {
                     move.setValid(false);
                 }
