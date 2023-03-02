@@ -2,7 +2,8 @@ package game;
 
 import java.util.ArrayList;
 
-import logic.Move;
+import game.pieces.Piece;
+import logic.moveChecking.Move;
 
 public class NotationHistory {
 	private ArrayList<String> pastMoves = new ArrayList<String>();

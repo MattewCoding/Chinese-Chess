@@ -1,6 +1,14 @@
 package game;
 
-import logic.Move;
+import game.pieces.Canon;
+import game.pieces.Chariot;
+import game.pieces.Elephant;
+import game.pieces.General;
+import game.pieces.Guard;
+import game.pieces.Horse;
+import game.pieces.Piece;
+import game.pieces.Soldier;
+import logic.moveChecking.Move;
 
 public class Board {
 

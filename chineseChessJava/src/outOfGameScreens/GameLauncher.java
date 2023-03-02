@@ -28,7 +28,6 @@ public class GameLauncher extends JPanel implements Runnable{
 
 	/**
 	 * Creates the first screen you see upon launching the program.
-	 * TODO: Create the actual menu screen w/ buttons to play, go to options/records, quit
 	 */
 	public GameLauncher() {
 		frame = new JFrame("Chinese Chess");

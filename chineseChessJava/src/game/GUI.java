@@ -7,7 +7,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -17,18 +16,17 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import org.apache.logging.log4j.Logger;
 
-import logic.Move;
-import logic.Moving;
-import logic.TimerListener;
+import game.pieces.Piece;
+import log.LoggerUtility;
+import logic.moveChecking.Move;
+import logic.moveChecking.Moving;
 import outOfGameScreens.Profile;
 import outOfGameScreens.ScreenParameters;
+import outOfGameScreens.SubMenu;
 
 /**
  * 
@@ -41,6 +39,7 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private static Logger logData = LoggerUtility.getLogger(SubMenu.class, "html");
 	
 	// Looks visually pleasing if the board is centered
 	// and tall enough to fit most of the screen
@@ -72,7 +71,7 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	private ArrayList<Piece> capturedPieceRed;
 	private ArrayList<Piece> capturedPieceBlack;
 	private int capturedMargin = (int) (15 * ScreenParameters.XREDUCE);
-	private int rightCapturedBoxX = chessboardEdge - 81*capturedMargin;
+	private int rightCapturedBoxX = leftMostPixel - capturedMargin;
 	private int deplacepiecesX = rightCapturedBoxX;
 	
 	// Mouse stuff
@@ -85,7 +84,7 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 
 	// players
 	private Profile player1, player2;
-	private boolean blackTurn = true;
+	private boolean redTurn = true;
 
 	
 	private boolean run = false;
@@ -113,13 +112,13 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 		super.paintComponent(g);
 
 		//Image background
+		String imgLocation = "images"+ScreenParameters.PATHSEP+"wood-background.jpg";
 		try {
-			String imgLocation = "images/wood-background.jpg";
 			Image background = ImageIO.read(new File(imgLocation));
 			g.drawImage(background,0,0,null);
 			
 		} catch (IOException e) {
-			e.printStackTrace();
+			logData.error("Image at " + imgLocation + " was not found.");
 		}
 
 		// Drawing board
@@ -228,10 +227,10 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	 * Places the captured pieces onto the board on the right
 	 */
 	public void setCapturedPieces() {
-		CreateRectangle.drawFilledRectangle(g2, rightCapturedBoxX, topNotationY, rightMostX - chessboardEdge - 2*notationMargin, ScreenParameters.SCREENHEIGHT/2);
+		CreateRectangle.drawFilledRectangle(g2, capturedMargin, topNotationY, leftMostPixel - 2*capturedMargin, ScreenParameters.SCREENHEIGHT/2);
 
-			drawİmage(capturedPieceBlack, deplacepiecesX+10, topNotationY+10,deplacepiecesX+10);
-			drawİmage(capturedPieceRed, deplacepiecesX+10, 2*topNotationY-5,deplacepiecesX+10);
+			drawCapturedPieces(capturedPieceBlack, deplacepiecesX+10, topNotationY+10,deplacepiecesX+10);
+			drawCapturedPieces(capturedPieceRed, deplacepiecesX+10, 2*topNotationY-5,deplacepiecesX+10);
 		}
     
     
@@ -240,7 +239,7 @@ public class GUI extends JPanel implements MouseListener, Runnable{
      * @param the list of the captured pieces, the x and y are the initial coordinates and the xİnitial is also the initial x-coordinate that will be compared to add the x coordinate to the next line
      * @return draws the pieces
      */
-    private void drawİmage(ArrayList<Piece> capturedPiece, int x, int y, int xİnitial) {
+    private void drawCapturedPieces(ArrayList<Piece> capturedPiece, int x, int y, int xİnitial) {
     	for(Piece captured : capturedPiece) {
 			String fileName = captured.getImageName();
 			Image scaledImage = new ImageIcon("pictures/chinese_"+fileName).getImage();
@@ -293,7 +292,7 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 				Piece piece = pieceList[col][row];
 				if (piece != null) {
 					String fileName = piece.getImageName();
-					Image scaledImage = new ImageIcon("pictures/chinese_"+fileName).getImage();
+					Image scaledImage = new ImageIcon("pictures"+ScreenParameters.PATHSEP+"chinese_"+fileName).getImage();
 					g2.drawImage(scaledImage, topLeftX+5, topLeftY+5, squareLength-10, squareLength-10, null);
 
 				}
@@ -335,18 +334,18 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 						
 						// This name is just as long as writing the right side of this equation
 						// But it's much clearer to understand why the boolean is true or false
-						boolean thePieceClickedOnIsBlack = board.getCoords(pieceX, pieceY).isBlack();
+						boolean thePieceClickedOnIsRed = !board.getCoords(pieceX, pieceY).isBlack();
 						Piece thePieceBeingAttacked = board.getCoords(mouseX, mouseY);
 						
-						if(moving.isLegal() && blackTurn != thePieceClickedOnIsBlack) {
-							if(thePieceClickedOnIsBlack != true) { // Player 1's turn is over
+						if(moving.isLegal() && redTurn == thePieceClickedOnIsRed) {
+							if(thePieceClickedOnIsRed == true) { // Player 1's turn is over
 								player1.stopTurnTimer();
 								player2.startTurnTimer();
 							}else{
 								player2.stopTurnTimer();
 								player1.startTurnTimer();
 							}
-							blackTurn = !blackTurn;
+							redTurn = !redTurn;
 							
 							board.doMove(move);
 							

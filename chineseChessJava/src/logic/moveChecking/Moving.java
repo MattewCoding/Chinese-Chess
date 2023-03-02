@@ -1,11 +1,11 @@
-package logic;
+package logic.moveChecking;
 import game.Board;
-import game.Piece;
+import game.pieces.Piece;
 
 public class Moving {
 	private Board board;
 	private Move move;
-
+	private MoveVisitor moveChecker = new MoveVisitor();
 
 	private int obstacleCount; //number of pieces in the way
 	private boolean isClear; //if obstacles = 0
@@ -33,7 +33,7 @@ public class Moving {
 
 		//  1. first check if movement pattern is legal (ie horse moves 1 up 2 left)
 		CheckPiece();
-		Piece curr = board.getCoords(move.getOriginX(), move.getOriginY());
+		Piece currentPiece = board.getCoords(move.getOriginX(), move.getOriginY());
 		Piece captured = board.getCoords(move.getFinalX(), move.getFinalY());
 
 		//  2. check if we are doing an attack, and also check if the end point is blocked by a friendly piece
@@ -41,12 +41,12 @@ public class Moving {
 			isAttack();
 		}
 
-		//  3. Check if the path is clear, if not See if we're an attacking cannon or a non attacking cannon that can't move
+		//  3. Check if the path is clear, if not see if we're an attacking cannon or a non attacking cannon that can't move
 		if (legal) {
 			obstacleStats();
 
 			if (!isClear) {
-				if (board.getCoords(move.getOriginX(), move.getOriginY()).toString().equals("Cannon")) {
+				if (currentPiece.toString().equals("Cannon")) {
 					if (!(obstacleCount == 1 && attack)) {
 						legal = false;
 					}
@@ -54,7 +54,7 @@ public class Moving {
 					legal = false;
 				}
 			} else {
-				if (board.getCoords(move.getOriginX(), move.getOriginY()).toString().equals("Cannon")) {
+				if (currentPiece.toString().equals("Cannon")) {
 					if (attack) {
 						legal = false;
 					}
@@ -152,10 +152,8 @@ public class Moving {
 		if (temp == null) {
 			this.legal = false;
 		} else {
-			temp.checkPattern(move);
-			if (!move.isValid()) {
-				this.legal = false;
-			}
+			moveChecker.setCurrentMove(move);
+			this.legal = temp.accept(moveChecker);
 		}
 
 	}

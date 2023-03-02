@@ -8,7 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import game.Piece;
+import game.pieces.Piece;
 import logic.TimerListener;
 
 public class Profile {
