@@ -18,7 +18,6 @@ public class NotationHistory {
 		// We have the space to allow for international chess-style notation
 		// (i.e. have a turn displayed on one line instead of two)
 		Boolean blackIsPlaying = pieceMoved.isBlack();
-		System.out.println(pieceMoved.isBlack());
 		if(blackIsPlaying) {
 			pastMoves.add(currentMove+ " " + moveThisTurn);
 			pastMovesSize += 1;
