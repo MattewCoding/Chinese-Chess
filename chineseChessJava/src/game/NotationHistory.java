@@ -1,5 +1,6 @@
 package game;
 
+
 import java.util.ArrayList;
 
 import game.pieces.Piece;
@@ -8,12 +9,22 @@ import logic.moveChecking.Move;
 public class NotationHistory {
 	private ArrayList<String> pastMoves = new ArrayList<String>();
 	private int pastMovesSize = 0;
+	private String currentMove;
 	
-	public NotationHistory() {}
+	public NotationHistory() {
+	}
 	
-	public void addNotation(String movesThisTurn) {
-		pastMoves.add(movesThisTurn);
-		pastMovesSize += 1;
+	public void addNotation(String moveThisTurn, Piece pieceMoved) {
+		// We have the space to allow for international chess-style notation
+		// (i.e. have a turn displayed on one line instead of two)
+		Boolean blackIsPlaying = pieceMoved.isBlack();
+		System.out.println(pieceMoved.isBlack());
+		if(blackIsPlaying) {
+			pastMoves.add(currentMove+ " " + moveThisTurn);
+			pastMovesSize += 1;
+		} else {
+			currentMove = moveThisTurn;
+		}
 	}
 
 	public void updateNotation(Move mostRecentMove, Piece pieceMoved) {
@@ -42,7 +53,7 @@ public class NotationHistory {
 		}
 		String movesThisTurnWXF = pieceName + fileLocation + movement + fileTarget;
 		//System.out.println(movesThisTurnWXF);
-		addNotation(movesThisTurnWXF);
+		addNotation(movesThisTurnWXF, pieceMoved);
 	}
 	
 	public ArrayList<String> getPastMoves() {
