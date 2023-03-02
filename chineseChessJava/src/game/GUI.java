@@ -71,8 +71,7 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	private ArrayList<Piece> capturedPieceRed;
 	private ArrayList<Piece> capturedPieceBlack;
 	private int capturedMargin = (int) (15 * ScreenParameters.XREDUCE);
-	private int rightCapturedBoxX = leftMostPixel - capturedMargin;
-	private int deplacepiecesX = rightCapturedBoxX;
+	private int deplacepiecesX = capturedMargin;
 	
 	// Mouse stuff
 	private int mouseX = 0,mouseY = 0, pieceX = 0, pieceY = 0;
@@ -239,16 +238,16 @@ public class GUI extends JPanel implements MouseListener, Runnable{
      * @param the list of the captured pieces, the x and y are the initial coordinates and the xİnitial is also the initial x-coordinate that will be compared to add the x coordinate to the next line
      * @return draws the pieces
      */
-    private void drawCapturedPieces(ArrayList<Piece> capturedPiece, int x, int y, int xİnitial) {
+    private void drawCapturedPieces(ArrayList<Piece> capturedPiece, int x, int y, int xInitial) {
     	for(Piece captured : capturedPiece) {
 			String fileName = captured.getImageName();
 			Image scaledImage = new ImageIcon("pictures/chinese_"+fileName).getImage();
 			g2.drawImage(scaledImage, x, y,squareLength-10, squareLength-10, null);
-			if(x<7*xİnitial) {
+			if(x<7*xInitial) {
 				x  += 35;
 			}else {
 				y += 50;
-				x = xİnitial;
+				x = xInitial;
 			}
 		}
     }
@@ -260,10 +259,13 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 	 */
 	public void updateNotation(Move mostRecentMove, Piece pieceMoved) {
 		pastMoves.updateNotation(mostRecentMove, pieceMoved);
-		String recentMove = pastMoves.getPastMoves().get(pastMoves.getPastMovesSize()-1);
-		pastMovesTextArea.setText(recentMove + "\n" + pastMovesTextArea.getText());
 		
-		pastMovesArrayList.add(recentMove);
+		if(redTurn) {
+			String recentMove = pastMoves.getPastMoves().get(pastMoves.getPastMovesSize()-1);
+			pastMovesTextArea.setText(recentMove + "\n" + pastMovesTextArea.getText());
+			
+			pastMovesArrayList.add(recentMove);
+		}
 		
     	int notationBoxSize = ScreenParameters.SCREENHEIGHT/2;
     	int turnsFittableInBox = (int) (notationBoxSize/g2.getFontMetrics().getHeight());
@@ -387,14 +389,12 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 				boolean switchedPiece = false;
 				if(newPiece != null) {
 					switchedPiece = newPiece.isBlack() == movingPiece.isBlack();
-					
+
 					//Update current piece and location
 					if(switchedPiece) {
 						movingPiece = newPiece;
 						pieceX = mouseX;
 						pieceY = mouseY;
-					} else {
-						
 					}
 				}
 				mouseMovingPiece = !switchedPiece;
@@ -403,8 +403,10 @@ public class GUI extends JPanel implements MouseListener, Runnable{
 				movingPiece = board.getCoords(mouseX,mouseY);
 				pieceX = mouseX;
 				pieceY = mouseY;
-				
-				mouseClickedPiece = movingPiece != null;
+
+				if(movingPiece != null) {
+					mouseClickedPiece = redTurn != movingPiece.isBlack();
+				}
 			}
 		}
 		// We want to click off the piece
