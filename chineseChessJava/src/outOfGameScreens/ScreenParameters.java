@@ -3,8 +3,7 @@ package outOfGameScreens;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-
-import log.LoggerUtility;
+import java.io.File;
 
 public class ScreenParameters {
 	
@@ -20,5 +19,7 @@ public class ScreenParameters {
 	public static final Color OUTLINECOLOR = new Color(158,79,34);
 	
 	public static final int SLEEPAMOUNT = 40; // 25fps
+	
+	public static final char PATHSEP = File.separatorChar;
 	
 }

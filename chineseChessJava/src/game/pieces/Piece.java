@@ -1,6 +1,6 @@
-package game;
+package game.pieces;
 
-import logic.Move;
+import logic.moveChecking.PieceVisitor;
 
 /**
  * Abstract class for Piece. Each piece is unaware of it's location. They contain little member data and are stored on points, which are managed by boards.
@@ -22,13 +22,8 @@ public abstract class Piece {
         this.isBlack = place;
         this.setCaptured(false);
     }
-
-    /**
-     * This method will check if a given move is a move that this piece can generally make. For example, elephants can move diagonally two spaces. In a way, this is what defines a piece.
-     */
-    public void checkPattern(Move move) {
-        move.setValid(true);
-    }
+	
+	public abstract <T> T accept(PieceVisitor<T> visitor);
 
     /**
      * Are we up river or down river? Determines the player. Returns true if we are up the river
@@ -48,7 +43,6 @@ public abstract class Piece {
     }
 
     public String toString() {
-
         return this.type;
     }
 

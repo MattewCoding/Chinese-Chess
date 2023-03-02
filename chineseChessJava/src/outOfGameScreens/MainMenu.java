@@ -103,7 +103,7 @@ public class MainMenu extends JPanel implements ListSelectionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			SubMenu tutorialMenu = new SubMenu("menu/How to Play.txt", mainScreen);
+			SubMenu tutorialMenu = new SubMenu("menu"+ScreenParameters.PATHSEP+"How to Play.txt", mainScreen);
 			menuFrame.setContentPane(tutorialMenu.getSplitPane());
 			menuFrame.revalidate();
 
@@ -115,7 +115,7 @@ public class MainMenu extends JPanel implements ListSelectionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			SubMenu strategyMenu = new SubMenu("menu/Strategies.txt", mainScreen);
+			SubMenu strategyMenu = new SubMenu("menu"+ScreenParameters.PATHSEP+"Strategies.txt", mainScreen);
 			menuFrame.setContentPane(strategyMenu.getSplitPane());
 			menuFrame.revalidate();
 
@@ -127,7 +127,7 @@ public class MainMenu extends JPanel implements ListSelectionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			SubMenu notationMenu = new SubMenu("menu/Notation.txt", mainScreen);
+			SubMenu notationMenu = new SubMenu("menu"+ScreenParameters.PATHSEP+"Notation.txt", mainScreen);
 			menuFrame.setContentPane(notationMenu.getSplitPane());
 			menuFrame.revalidate();
 
