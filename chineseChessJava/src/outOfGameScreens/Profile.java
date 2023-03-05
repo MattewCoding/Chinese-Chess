@@ -33,7 +33,7 @@ public class Profile {
 		this.place = place;
 		
 
-		timer = new TimerListener();
+		timer = new TimerListener(place);
 	}
 
 	public void addPieceCaptured(Piece pieceCaptured) {

@@ -1,4 +1,4 @@
-package outOfGameScreens;
+package outOfGameScreens.menus;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,28 +12,27 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
 import game.GUI;
+import outOfGameScreens.ScreenParameters;
 
-public class MainMenu extends JPanel implements ListSelectionListener {
+/**
+ * The main menu of the program, where the user can access the submenus
+ * @author Yang Mattew
+ *
+ */
+public class MainMenu extends AbstractMenu {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private GameLauncher mainScreen;
-	private JFrame menuFrame;
-
-	public MainMenu(GameLauncher menuScreen) {
+	public MainMenu(JFrame menuScreen) {
 		JPanel buttonPanel = new JPanel(new GridLayout(0,1,0,20));
-		buttonPanel.setBackground(ScreenParameters.BOARDCOLOR);
+		buttonPanel.setBackground(boardColor);
 
 		mainScreen=menuScreen;
-		menuFrame=mainScreen.getFrame();
 
-		mainScreen.getFrame().setBackground(ScreenParameters.BOARDCOLOR);
+		mainScreen.setBackground(boardColor);
 
 		JButton playButton = new JButton("Jouer");
 		JButton optionButton = new JButton("Options");
@@ -64,7 +63,7 @@ public class MainMenu extends JPanel implements ListSelectionListener {
 			button.setBackground(new Color(226,192,106));
 			button.setBorderPainted(false);
 		}
-		setBackground(ScreenParameters.BOARDCOLOR);
+		setBackground(boardColor);
 		add(buttonPanel);
 		
         int top = 60;
@@ -74,19 +73,13 @@ public class MainMenu extends JPanel implements ListSelectionListener {
 		setBorder(BorderFactory.createEmptyBorder(top, left, bottom, right));
 	}
 
-	@Override
-	public void valueChanged(ListSelectionEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
 	public class PlayButtonListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			GUI chessBoard = new GUI();
-			menuFrame.setContentPane(chessBoard);
-			menuFrame.revalidate();
+			mainScreen.setContentPane(chessBoard);
+			mainScreen.revalidate();
 		}
 
 	}
@@ -95,6 +88,9 @@ public class MainMenu extends JPanel implements ListSelectionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			OptionsMenu options = new OptionsMenu(mainScreen);
+			mainScreen.setContentPane(options.getSplitPane());
+			mainScreen.revalidate();
 		}
 
 	}
@@ -104,8 +100,8 @@ public class MainMenu extends JPanel implements ListSelectionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			SubMenu tutorialMenu = new SubMenu("menu"+ScreenParameters.PATHSEP+"How to Play.txt", mainScreen);
-			menuFrame.setContentPane(tutorialMenu.getSplitPane());
-			menuFrame.revalidate();
+			mainScreen.setContentPane(tutorialMenu.getSplitPane());
+			mainScreen.revalidate();
 
 		}
 
@@ -116,8 +112,8 @@ public class MainMenu extends JPanel implements ListSelectionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			SubMenu strategyMenu = new SubMenu("menu"+ScreenParameters.PATHSEP+"Strategies.txt", mainScreen);
-			menuFrame.setContentPane(strategyMenu.getSplitPane());
-			menuFrame.revalidate();
+			mainScreen.setContentPane(strategyMenu.getSplitPane());
+			mainScreen.revalidate();
 
 		}
 
@@ -128,8 +124,8 @@ public class MainMenu extends JPanel implements ListSelectionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			SubMenu notationMenu = new SubMenu("menu"+ScreenParameters.PATHSEP+"Notation.txt", mainScreen);
-			menuFrame.setContentPane(notationMenu.getSplitPane());
-			menuFrame.revalidate();
+			mainScreen.setContentPane(notationMenu.getSplitPane());
+			mainScreen.revalidate();
 
 		}
 
@@ -139,7 +135,7 @@ public class MainMenu extends JPanel implements ListSelectionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			menuFrame.dispose();
+			mainScreen.dispose();
 
 		}
 

@@ -69,6 +69,58 @@ public class Moving {
 	}
 	
 	/**
+	 * This is the shallow checker. Upon instantiation it will:
+	 * <ul>
+	 *     <li>Check Move patter validity</li>
+	 *     <li>Check if it's an attacking move or a movement move</li>
+	 *     <li>Count the number of obstackles and determine if it's a legal move (ie Chariot can attack by jumping over one obstacle</li>
+	 * </ul>
+	 * <p>
+	 * It differs from the deep check because it doesn't check generals, something not required for delivering check.
+	 *
+	 * @param board the current board object
+	 * @param move  the move to be validated
+	 * @param i     is just used to overload
+	 */
+	public Moving(Board board, Move move, int i) {
+		this.board = board;
+		this.move = move;
+		this.legal = true;
+
+		//  1. first check if movement pattern is legal (ie horse moves 1 up 2 left)
+		CheckPiece();
+
+		//  2. check if we are doing an attack, and also check if the end point is blocked by a friendly piece
+		if (legal) {
+			isAttack();
+		}
+
+		//  3. Check if the path is clear, if not See if we're an attacking cannon or a non attacking cannon that can't move
+
+		if (legal) {
+			obstacleStats();
+
+			if (!isClear) {
+				if (board.getCoords(move.getOriginX(), move.getOriginY()).toString().equals("Cannon")) {
+					if (!(obstacleCount == 1 && attack)) {
+						legal = false;
+					}
+				} else {
+					legal = false;
+				}
+			} else {
+				if (board.getCoords(move.getOriginX(), move.getOriginY()).toString().equals("Cannon")) {
+					if (attack) {
+						legal = false;
+					}
+				}
+			}
+		}
+	}
+
+
+	
+	/**
 	 * Returns the column number if the generals are in the same column
 	 * 
 	 * @return curr The column number where both generals are or -1 if in different columns
