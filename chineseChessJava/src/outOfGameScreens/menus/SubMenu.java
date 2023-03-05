@@ -56,7 +56,7 @@ public class SubMenu extends AbstractMenu {
 
 			//Split the options from its content
 			while ((line = reader.readLine()) != null) {
-				if(!line.isBlank()) { //Demarks the end of an option
+				if(!line.isBlank()) { // Demarks the end of an option
 					optionArrayList.add(line);
 					line=reader.readLine();
 					contentArrayList.add("        " + line); // \t is waaaay too big
