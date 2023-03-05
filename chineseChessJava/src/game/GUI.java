@@ -5,7 +5,7 @@ import javax.swing.JPanel;
 import outOfGameScreens.ScreenParameters;
 
 /**
- * The game's main GUI
+ * The game's main GUI, where the updates happen
  * 
  * @author YANG Mattew, Nasro Rona
  *

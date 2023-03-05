@@ -27,7 +27,7 @@ import logic.moveChecking.Move;
 import logic.moveChecking.Moving;
 import outOfGameScreens.Profile;
 import outOfGameScreens.ScreenParameters;
-import outOfGameScreens.SubMenu;
+import outOfGameScreens.menus.SubMenu;
 
 /**
  * This class is the panel in which the chess pieces are printed

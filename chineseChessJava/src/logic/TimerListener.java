@@ -18,7 +18,7 @@ public class TimerListener extends JComponent{
 	Timer timer;
 	private long pausedTime;
 	private long startTime;
-    private String elapsedTime = "00:00";
+    private String elapsedTime = "10:59";
     
     
     
@@ -55,6 +55,9 @@ public class TimerListener extends JComponent{
 			int hours = (int) (elapsed / 3600000);
 			int minutes = (int) ((elapsed - hours * 3600000) / 60000);
 			int seconds = (int) ((elapsed - hours * 3600000 - minutes * 60000) / 1000);
+			
+			minutes = 10 - minutes;
+			seconds = 59 - seconds;
 			elapsedTime = String.format("%02d:%02d", minutes, seconds);
 			repaint();
 		}

@@ -5,6 +5,12 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
 
+/**
+ * These are parameters that are used all throughout the game (i.e. not used by
+ * just one class)
+ * @author Yang Mattew
+ *
+ */
 public class ScreenParameters {
 	
 	private static Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
@@ -21,5 +27,14 @@ public class ScreenParameters {
 	public static final int SLEEPAMOUNT = 40; // 25fps
 	
 	public static final char PATHSEP = File.separatorChar;
+
+	private static int musicVolume = 50;
+	private static int soundVolume = 50;
+	
+	public static int getMusicVolume() { return musicVolume; }
+	public static void setMusicVolume(int newVolume) { musicVolume = newVolume; }
+	
+	public static int getSoundVolume() { return soundVolume; }
+	public static void setSoundVolume(int newVolume) { musicVolume = newVolume; }
 	
 }
