@@ -5,33 +5,34 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-public class GameLauncher extends JPanel implements Runnable{
+import outOfGameScreens.menus.MainMenu;
+
+/**
+ * Launches the game by opening the main menu and setting up the frame.
+ * Principally, this is the JFrame.
+ * @author Yang Mattew
+ *
+ */
+public class GameLauncher extends JFrame{
 
 	/**
 	 * Launches the game
 	 * @param args Parameters one can input from the console
 	 */
 	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new GameLauncher());
-	}
-	
-	@Override
-	public void run() {
+		new GameLauncher();
 	}
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
-	private JFrame frame;
 
 	/**
 	 * Creates the first screen you see upon launching the program.
-	 * TODO: Create the actual menu screen w/ buttons to play, go to options/records, quit
 	 */
 	public GameLauncher() {
-		frame = new JFrame("Chinese Chess");
+		super("Chinese Chess");
 		//GUI chessBoard = new GUI();
 		
 		/*  This part is for testing the various screens bc we dont have the main menu screen */
@@ -42,20 +43,17 @@ public class GameLauncher extends JPanel implements Runnable{
 		//frame.getContentPane().add(new SubMenu("menu/How to Play.txt", this).getSplitPane());
 		
 		//This code tests the menu
-		frame.getContentPane().add(new MainMenu(this));
+		getContentPane().add(new MainMenu(this));
 		
 		/* This part is to make sure the frame shows up */
 		//Frame settings
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		frame.pack();
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
+		pack();
 		
 		// Have program fill up screen
-		frame.setMinimumSize(new Dimension(ScreenParameters.SCREENWIDTH, ScreenParameters.SCREENHEIGHT));
-		frame.setVisible(true);
+		setMinimumSize(new Dimension(ScreenParameters.SCREENWIDTH, ScreenParameters.SCREENHEIGHT));
+		setVisible(true);
 	}
 	
-	public JFrame getFrame() {
-		return frame;
-	}
 }

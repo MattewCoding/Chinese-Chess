@@ -1,16 +1,18 @@
-package logic;
+package logic.moveChecking;
 import game.Board;
-import game.Piece;
+import game.pieces.Piece;
 
 public class Moving {
 	private Board board;
 	private Move move;
-
+	private MoveVisitor moveChecker = new MoveVisitor();
 
 	private int obstacleCount; //number of pieces in the way
 	private boolean isClear; //if obstacles = 0
 	private boolean attack;
 	private boolean legal;
+	
+	private int redGeneralX, redGeneralY, blackGeneralX, blackGeneralY;
 
 	/**
 	 * This is the deep checker. Upon instantiation it will:
@@ -33,20 +35,23 @@ public class Moving {
 
 		//  1. first check if movement pattern is legal (ie horse moves 1 up 2 left)
 		CheckPiece();
-		Piece curr = board.getCoords(move.getOriginX(), move.getOriginY());
-		Piece captured = board.getCoords(move.getFinalX(), move.getFinalY());
+		Piece currentPiece = board.getCoords(move.getOriginX(), move.getOriginY());
+		
+		//  2. Check if moving the piece exposes our general
+		getGenerals();
+		approveGenerals();
 
-		//  2. check if we are doing an attack, and also check if the end point is blocked by a friendly piece
+		//  3. check if we are doing an attack, and also check if the end point is blocked by a friendly piece
 		if (legal) {
 			isAttack();
 		}
 
-		//  3. Check if the path is clear, if not See if we're an attacking cannon or a non attacking cannon that can't move
+		//  4. Check if the path is clear, if not see if we're an attacking cannon or a non attacking cannon that can't move
 		if (legal) {
 			obstacleStats();
 
 			if (!isClear) {
-				if (board.getCoords(move.getOriginX(), move.getOriginY()).toString().equals("Cannon")) {
+				if (currentPiece.toString().equals("Cannon")) {
 					if (!(obstacleCount == 1 && attack)) {
 						legal = false;
 					}
@@ -54,17 +59,15 @@ public class Moving {
 					legal = false;
 				}
 			} else {
-				if (board.getCoords(move.getOriginX(), move.getOriginY()).toString().equals("Cannon")) {
+				if (currentPiece.toString().equals("Cannon")) {
 					if (attack) {
 						legal = false;
 					}
 				}
 			}
 		}
-
-
 	}
-
+	
 	/**
 	 * This is the shallow checker. Upon instantiation it will:
 	 * <ul>
@@ -116,27 +119,56 @@ public class Moving {
 	}
 
 
+	
+	/**
+	 * Returns the column number if the generals are in the same column
+	 * 
+	 * @return curr The column number where both generals are or -1 if in different columns
+	 */
+	public void getGenerals() {
+        for (int x = 3; x < 8; x++) {
+            for (int y = 0; y < 3; y++) {
+                Piece curr = board.getCoords(x, y);
+                if (curr != null && curr.toString().equals("General")) {
+                	redGeneralX = x;
+                	redGeneralY = y;
+                }
+
+            }
+
+            for (int y = 8; y < 11; y++) {
+                Piece curr = board.getCoords(x, y);
+                if (curr != null && curr.toString().equals("General")) {
+                	blackGeneralX = x;
+                	blackGeneralY = y;
+                }
+            }
+        }
+	}
+
+
 	/**
 	 * Returns that the generals aren't facing each other by counting the obstacles between them if they're in line.
 	 *
 	 * @return True if they are facing eachother (illegal)
 	 */
-	private boolean approveGenerals() {
-
-		//uses location to determine if generals are facing each other
-		board.updateGenerals();
-
-		if (board.getBlackGeneralX() != board.getRedGeneralX()) {
-			return true;
-		} else {
-			for (int i = board.getBlackGeneralY() + 1; i < board.getRedGeneralY(); i++) {
-				if (board.getCoords(board.getBlackGeneralX(), i) != null) {
-					obstacleCount++;
+	private void approveGenerals() {
+		// Generals can only face each other if they're in the same column
+		// And the piece moving is moving out of said column
+		if( (redGeneralX == blackGeneralX) && (move.getOriginX() == redGeneralX) && (move.getOriginX() != move.getFinalX()) ) {
+			int numberOfPieces=0;
+			
+			// We could count the generals and make it work but
+			// This is more clear as it better shows how many pieces are
+			// Inbetween the generals
+			for(int y = redGeneralY+1; y < blackGeneralY - 1; y++) {
+				if(board.getCoords(redGeneralX, y) != null) {
+					numberOfPieces++;
 				}
 			}
-
-			// System.out.print(" Generals Exposed!");
-			return obstacleCount != 0;
+			// If there's only one, then based on the if-statements it has to be
+			// The piece we're moving
+			legal = numberOfPieces != 1;
 		}
 
 	}
@@ -152,10 +184,8 @@ public class Moving {
 		if (temp == null) {
 			this.legal = false;
 		} else {
-			temp.checkPattern(move);
-			if (!move.isValid()) {
-				this.legal = false;
-			}
+			moveChecker.setCurrentMove(move);
+			this.legal = temp.accept(moveChecker);
 		}
 
 	}
@@ -167,8 +197,8 @@ public class Moving {
 		if (board.getCoords(move.getFinalX(), move.getFinalY()) == null) {
 			attack = false;
 		} else {
-			boolean origin = board.getCoords(move.getOriginX(), move.getOriginY()).getPlace();
-			boolean dest = board.getCoords(move.getFinalX(), move.getFinalY()).getPlace();
+			boolean origin = board.getCoords(move.getOriginX(), move.getOriginY()).isBlack();
+			boolean dest = board.getCoords(move.getFinalX(), move.getFinalY()).isBlack();
 			
 			attack = origin != dest;
 			if (origin == dest) {

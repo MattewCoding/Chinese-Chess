@@ -1,6 +1,16 @@
 package game;
 
-import logic.Move;
+import game.pieces.Canon;
+import game.pieces.Chariot;
+import game.pieces.Elephant;
+import game.pieces.General;
+import game.pieces.Guard;
+import game.pieces.Horse;
+import game.pieces.Piece;
+import game.pieces.Soldier;
+import logic.moveChecking.Move;
+import logic.moveChecking.Moving;
+import outOfGameScreens.Profile;
 
 public class Board {
 
@@ -12,6 +22,16 @@ public class Board {
     private int redGeneralY = 0;
     private int blackGeneralX = 4;
     private int blackGeneralY = 9;
+    
+    private static int winner;
+    private boolean blackCheck = false; //up is in check
+    private boolean redCheck = false; //down is in check
+    public static final int PLAYER1_WINS = 1;
+    public static final int PLAYER2_WINS = 2;
+    public static final int PLAYER1_TIMEOUT_WIN = 3;
+    public static final int PLAYER2_TIMEOUT_WIN = 4;
+    public static final int DRAW = 0;
+    public static final int NA = -1;
 
 	public Board() {
 		coords = new Piece[COLUMNS][ROWS];
@@ -81,6 +101,168 @@ public class Board {
         //System.out.print(" Illegal Move");
     }
     
+
+    public boolean tryMove(Move move, Profile player, Profile player2) {
+
+        if (new Moving(this,move).isLegal()) {
+
+            Piece curr = this.getCoords(move.getOriginX(),move.getOriginY());
+            Piece captured = this.getCoords(move.getFinalX(),move.getFinalY());
+
+            int x = move.getOriginX();
+            int y = move.getOriginY();
+            int finalX = move.getFinalX();
+            int finalY = move.getFinalY();
+
+
+            if (curr.isBlack() == player.getPlayerPlace()) {
+                this.doMove(move);
+                testCheck();
+                if (curr.isBlack() == true && blackCheck) {
+                    System.out.println(" Illegal Move, you're in check");
+                    this.undoMove(move, captured);
+                    return false;
+                }
+                if (curr.isBlack() == false && redCheck) {
+                    System.out.println(" Illegal Move, you're in check");
+                    this.undoMove(move, captured);
+                    return false;
+
+
+                } else {
+                    //the move is legal, now lets see if it's a winning move.
+                    if (blackCheck && curr.isBlack() == false) {
+                        if (checkMate(true)) {
+                            winner = PLAYER1_WINS;
+//                            System.out.println("##########################CHECK MATE#############################");
+//                            System.out.println(player.getName() + "WINS!");
+//                            System.out.println("##########################CHECK MATE#############################");
+                        }
+//                        return true;
+
+                        //the move is legal, now lets see if it's a winning move.
+                    } else if (redCheck && curr.isBlack() == true) {
+                        if (checkMate(false)) {
+                            winner = PLAYER2_WINS;
+//                            System.out.println("##########################CHECK MATE#############################");
+//                            System.out.println(player.getName() + "WINS!");
+//                            System.out.println("##########################CHECK MATE#############################");
+                        }
+//                        return true;
+
+                        //the move is legal, now lets see if it's a stalemate , i reoved the || separated()
+                    } else if (curr.isBlack() == false) {
+                        if (checkMate(true)) {
+                            winner = DRAW;
+//                            System.out.println("##########################STALE MATE#############################");
+//                            System.out.println("ITS A DRAW");
+//                            System.out.println("##########################STALE MATE#############################");
+                        }
+//                        return true;
+                    } else if (curr.isBlack() == true) {
+                        if (checkMate(false)) {
+                            winner = DRAW;
+//                            System.out.println("##########################STALE MATE#############################");
+//                            System.out.println("ITS A DRAW");
+//                            System.out.println("##########################STALE MATE#############################");
+                        }
+//                        return true;
+                    }
+
+                    // if (!checkMate) {   //LEGAL MOVE AND NOT IN CHECKMATE?
+                    System.out.println("Moved " + curr + " from (" + x + ", " + y + ") to (" + finalX + ", " + finalY + ")");
+                    if (captured != null) {
+                        player.addPieceCaptured(captured);
+                        System.out.println(captured + " Captured!");
+                        //MoveLogger.addMove(new Move(curr, captured, x, y, finalX, finalY));
+                    } else {
+                        //MoveLogger.addMove(new Move(curr, x, y, finalX, finalY));
+                    }
+
+                    //DO OTHER THINGS =============
+
+                    return true;
+                    //   }
+
+                }
+            } else {
+                System.out.println("That's not your piece");
+                return false;
+            }
+        }
+        System.out.println("Illegal Move");
+        return false;
+
+
+    }
+
+    private void testCheck() {
+        this.updateGenerals();
+        redCheck = false;
+        blackCheck = false;
+        for (int x = 0; x < 11; x++) {
+            for (int y = 0; y < 11; y++) {
+                if (this.getCoords(x, y) != null) {
+
+                    if (!redCheck && this.getCoords(x, y).isBlack() == true) {
+                        if (new Moving(this, new Move(x, y, this.getRedGeneralX(), this.getRedGeneralY()), 0).isLegal()) {
+                            redCheck = true;
+//                            System.out.println("Down is in check");
+                        }
+                    } else if (!blackCheck && this.getCoords(x, y).isBlack() == false) {
+                        if (new Moving(this, new Move(x, y, this.getBlackGeneralX(), this.getBlackGeneralY()), 0).isLegal()) {
+                            blackCheck = true;
+//                            System.out.println("up is in check");
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    private boolean checkMate(boolean loserPlace) {
+        this.updateGenerals();
+
+
+        //running through every loser piece
+        for (int x = 0; x < 11; x++) {
+            for (int y = 0; y < 11; y++) {
+
+                if (this.getCoords(x, y) != null && this.getCoords(x, y).isBlack() == loserPlace) {
+
+                    //running through every possible point to generate every possible move
+                    for (int i = 0; i < 9; i++) {
+                        for (int j = 0; j < 10; j++) {
+                            Move tempMove = new Move(x, y, i, j); //generating the temporary move
+                            Piece tempCaptured = this.getCoords(i, j);
+                            //if that move is legal then attempt it.
+                            if (new Moving(this, tempMove).isLegal()) { //trying every possible move for the piece
+                                this.doMove(tempMove); //doing the temporary move
+                                testCheck(); //updates check status
+                                //if any of these moves were both legal, and result with us not being in check, we aren't in checkmate.
+                                if (loserPlace == false) {
+                                    if (!redCheck) {
+                                        this.undoMove(tempMove, tempCaptured);
+                                        return false;
+                                    }
+                                }
+                                if (loserPlace == true) {
+                                    if (!blackCheck) {
+                                        this.undoMove(tempMove, tempCaptured);
+                                        return false;
+                                    }
+                                }
+                                this.undoMove(tempMove, tempCaptured);
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
     
     public void updateGenerals() {
         //finds location of generals
@@ -104,10 +286,6 @@ public class Board {
             }
         }
     }
-	
-	
-	
-	
 
 	public int getRedGeneralX() {
 		return redGeneralX;

@@ -1,6 +1,6 @@
-package logic;
+package logic.moveChecking;
 
-import game.Piece;
+import game.pieces.Piece;
 
 /**
  * Class to generate the move object, which handles moves on the board
