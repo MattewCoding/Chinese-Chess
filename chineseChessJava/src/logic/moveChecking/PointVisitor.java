@@ -80,6 +80,8 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		return (currentPiece.isBlack() != attackedPiece.isBlack());
 	}
 	
+	
+	// TODO: this is broken
 	/**
 	 * Returns true if the selected piece is the only piece between the two generals, false otherwise.
 	 * @return Boolean

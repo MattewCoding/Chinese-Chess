@@ -312,6 +312,7 @@ public class Board {
 		blackGeneralY = blackGen.getY();
     }
     
+    // TODO: this is broken
     /**
      * Returns true if the generals aren't facing each other by counting the obstacles between them if they're in line.
      * @param move The move attemping to be done
