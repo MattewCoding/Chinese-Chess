@@ -15,7 +15,7 @@ public class Move {
     private Piece capturedPiece;
 
     private int x1;
-    private int Y1;
+    private int y1;
     private int x2;
     private int y2;
 
@@ -39,7 +39,7 @@ public class Move {
      */
     public Move(int originX, int originY, int finalX, int finalY) {
         this.x1 = originX;
-        this.Y1 = originY;
+        this.y1 = originY;
         this.x2 = finalX;
         this.y2 = finalY;
 
@@ -70,7 +70,7 @@ public class Move {
         //this iteration makes the move object hold the piece? Not sure how to structure
         this.piece = piece;
         this.x1 = originX;
-        this.Y1 = originY;
+        this.y1 = originY;
         this.x2 = finalX;
         this.y2 = finalY;
 
@@ -102,7 +102,7 @@ public class Move {
         this.piece = piece;
         this.capturedPiece = capturedPiece;
         this.x1 = originX;
-        this.Y1 = originY;
+        this.y1 = originY;
         this.x2 = finalX;
         this.y2 = finalY;
 
@@ -124,7 +124,7 @@ public class Move {
     }
 
     public int getOriginY() {
-        return Y1;
+        return y1;
     }
 
     public int getFinalX() {
@@ -177,7 +177,7 @@ public class Move {
     }
 
     public String toString() {
-        return x1 + ", " + Y1 + ", " + x2 + ", " + y2;
+        return x1 + ", " + y1 + ", " + x2 + ", " + y2;
     }
 
 	public int getNumObstacles() {

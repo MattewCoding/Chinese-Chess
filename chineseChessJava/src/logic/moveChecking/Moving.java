@@ -1,5 +1,6 @@
 package logic.moveChecking;
 import game.Board;
+import game.pieces.General;
 import game.pieces.Piece;
 
 public class Moving {
@@ -22,7 +23,6 @@ public class Moving {
 	 *     <li>Count the number of obstackles and determine if it's a legal move (ie Chariot can attack by jumping over one obstacle</li>
 	 *     <li>Check if the generals are facing each other</li>
 	 * </ul>
-	 * <p>
 	 * It differs from the shallow check because it checks generals, something not required for delivering check.
 	 *
 	 * @param board the current board object
@@ -35,12 +35,14 @@ public class Moving {
 
 		//  1. first check if movement pattern is legal (ie horse moves 1 up 2 left)
 		CheckPiece();
-		Piece currentPiece = board.getCoords(move.getOriginX(), move.getOriginY());
+		Piece currentPiece = board.getPiece(move.getOriginX(), move.getOriginY());
 		
 		//  2. Check if moving the piece exposes our general
-		getGenerals();
-		approveGenerals();
-
+		if (legal) {
+			updateGenerals();
+			approveGenerals();
+		}
+		
 		//  3. check if we are doing an attack, and also check if the end point is blocked by a friendly piece
 		if (legal) {
 			isAttack();
@@ -101,7 +103,7 @@ public class Moving {
 			obstacleStats();
 
 			if (!isClear) {
-				if (board.getCoords(move.getOriginX(), move.getOriginY()).toString().equals("Cannon")) {
+				if (board.getPiece(move.getOriginX(), move.getOriginY()).toString().equals("Cannon")) {
 					if (!(obstacleCount == 1 && attack)) {
 						legal = false;
 					}
@@ -109,7 +111,7 @@ public class Moving {
 					legal = false;
 				}
 			} else {
-				if (board.getCoords(move.getOriginX(), move.getOriginY()).toString().equals("Cannon")) {
+				if (board.getPiece(move.getOriginX(), move.getOriginY()).toString().equals("Cannon")) {
 					if (attack) {
 						legal = false;
 					}
@@ -121,29 +123,16 @@ public class Moving {
 
 	
 	/**
-	 * Returns the column number if the generals are in the same column
-	 * 
-	 * @return curr The column number where both generals are or -1 if in different columns
+	 * Updates the location of the generals
 	 */
-	public void getGenerals() {
-        for (int x = 3; x < 8; x++) {
-            for (int y = 0; y < 3; y++) {
-                Piece curr = board.getCoords(x, y);
-                if (curr != null && curr.toString().equals("General")) {
-                	redGeneralX = x;
-                	redGeneralY = y;
-                }
-
-            }
-
-            for (int y = 8; y < 11; y++) {
-                Piece curr = board.getCoords(x, y);
-                if (curr != null && curr.toString().equals("General")) {
-                	blackGeneralX = x;
-                	blackGeneralY = y;
-                }
-            }
-        }
+	public void updateGenerals() {
+		General redGen = board.getGeneralRed(), blackGen = board.getGeneralBlack();
+		
+		redGeneralX = redGen.getX();
+		redGeneralY = redGen.getY();
+		
+		blackGeneralX = blackGen.getX();
+		blackGeneralY = blackGen.getY();
 	}
 
 
@@ -153,16 +142,17 @@ public class Moving {
 	 * @return True if they are facing eachother (illegal)
 	 */
 	private void approveGenerals() {
+		int numberOfPieces=0;
+		
 		// Generals can only face each other if they're in the same column
 		// And the piece moving is moving out of said column
 		if( (redGeneralX == blackGeneralX) && (move.getOriginX() == redGeneralX) && (move.getOriginX() != move.getFinalX()) ) {
-			int numberOfPieces=0;
 			
 			// We could count the generals and make it work but
 			// This is more clear as it better shows how many pieces are
 			// Inbetween the generals
-			for(int y = redGeneralY+1; y < blackGeneralY - 1; y++) {
-				if(board.getCoords(redGeneralX, y) != null) {
+			for(int y = blackGeneralY+1; y < redGeneralY - 1; y++) {
+				if(board.getPiece(redGeneralX, y) != null) {
 					numberOfPieces++;
 				}
 			}
@@ -179,7 +169,7 @@ public class Moving {
 	 * If not, terminates the process
 	 */
 	private void CheckPiece() {
-		Piece temp = board.getCoords(move.getOriginX(), move.getOriginY());
+		Piece temp = board.getPiece(move.getOriginX(), move.getOriginY());
 
 		if (temp == null) {
 			this.legal = false;
@@ -194,11 +184,11 @@ public class Moving {
 	 * Checks the destination piece to see if we're attacking or self blocked
 	 */
 	private void isAttack() {
-		if (board.getCoords(move.getFinalX(), move.getFinalY()) == null) {
+		if (board.getPiece(move.getFinalX(), move.getFinalY()) == null) {
 			attack = false;
 		} else {
-			boolean origin = board.getCoords(move.getOriginX(), move.getOriginY()).isBlack();
-			boolean dest = board.getCoords(move.getFinalX(), move.getFinalY()).isBlack();
+			boolean origin = board.getPiece(move.getOriginX(), move.getOriginY()).isBlack();
+			boolean dest = board.getPiece(move.getFinalX(), move.getFinalY()).isBlack();
 			
 			attack = origin != dest;
 			if (origin == dest) {
@@ -224,13 +214,13 @@ public class Moving {
 		if (move.isVertical()) {
 			if (move.getDy() > 0) {
 				for (int y = move.getOriginY() + 1; y < move.getFinalY(); y++) {
-					if (board.getCoords(move.getOriginX(), y) != null) {
+					if (board.getPiece(move.getOriginX(), y) != null) {
 						obstacleCount++;
 					}
 				}
 			} else if (move.getDy() < 0) {
 				for (int y = move.getOriginY() - 1; y > move.getFinalY(); y--) {
-					if (board.getCoords(move.getOriginX(), y) != null) {
+					if (board.getPiece(move.getOriginX(), y) != null) {
 						obstacleCount++;
 					}
 				}
@@ -242,13 +232,13 @@ public class Moving {
 		else if (move.isHorizontal()) {
 			if (move.getDx() > 0) {
 				for (int x = move.getOriginX() + 1; x < move.getFinalX(); x++) {
-					if (board.getCoords(x, move.getOriginY()) != null) {
+					if (board.getPiece(x, move.getOriginY()) != null) {
 						obstacleCount++;
 					}
 				}
 			} else if (move.getDx() < 0) {
 				for (int x = move.getOriginX() - 1; x > move.getFinalX(); x--) {
-					if (board.getCoords(x, move.getOriginY()) != null) {
+					if (board.getPiece(x, move.getOriginY()) != null) {
 						obstacleCount++;
 					}
 				}
@@ -261,7 +251,7 @@ public class Moving {
 			//left up
 			if (move.getDx() < 0 && move.getDy() < 0) {
 				for (int x = 1; x < move.getDx(); x++) {
-					if (board.getCoords(move.getOriginX() - x, move.getOriginY() - x) != null) {
+					if (board.getPiece(move.getOriginX() - x, move.getOriginY() - x) != null) {
 						obstacleCount++;
 					}
 				}
@@ -269,7 +259,7 @@ public class Moving {
 			//left down
 			else if (move.getDx() < 0 && move.getDy() > 0) {
 				for (int x = 1; x < move.getDx(); x++) {
-					if (board.getCoords(move.getOriginX() - x, move.getOriginY() + x) != null) {
+					if (board.getPiece(move.getOriginX() - x, move.getOriginY() + x) != null) {
 						obstacleCount++;
 					}
 				}
@@ -277,7 +267,7 @@ public class Moving {
 			//right down
 			else if (move.getDx() > 0 && move.getDy() > 0) {
 				for (int x = 1; x < move.getDx(); x++) {
-					if (board.getCoords(move.getOriginX() + x, move.getOriginY() + x) != null) {
+					if (board.getPiece(move.getOriginX() + x, move.getOriginY() + x) != null) {
 						obstacleCount++;
 					}
 				}
@@ -286,7 +276,7 @@ public class Moving {
 			//right up
 			else {// (move.getDx() > 0 && move.getDy() > 0) {
 				for (int x = 1; x < move.getDx(); x++) {
-					if (board.getCoords(move.getOriginX() + x, move.getOriginY() - x) != null) {
+					if (board.getPiece(move.getOriginX() + x, move.getOriginY() - x) != null) {
 						obstacleCount++;
 					}
 				}
@@ -296,19 +286,19 @@ public class Moving {
 		else {
 
 			if (move.getDx() == 2) {
-				if (board.getCoords(move.getOriginX() + 1, move.getOriginY()) != null) {
+				if (board.getPiece(move.getOriginX() + 1, move.getOriginY()) != null) {
 					obstacleCount++;
 				}
 			} else if (move.getDx() == -2) {
-				if (board.getCoords(move.getOriginX() - 1, move.getOriginY()) != null) {
+				if (board.getPiece(move.getOriginX() - 1, move.getOriginY()) != null) {
 					obstacleCount++;
 				}
 			} else if (move.getDy() == 2) {
-				if (board.getCoords(move.getOriginX(), move.getOriginY() + 1) != null) {
+				if (board.getPiece(move.getOriginX(), move.getOriginY() + 1) != null) {
 					obstacleCount++;
 				}
 			} else if (move.getDy() == -2) {
-				if (board.getCoords(move.getOriginX(), move.getOriginY() - 1) != null) {
+				if (board.getPiece(move.getOriginX(), move.getOriginY() - 1) != null) {
 					obstacleCount++;
 				}
 			}

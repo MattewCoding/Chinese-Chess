@@ -110,8 +110,8 @@ public class Dashboard extends JPanel implements MouseListener{
 		
 		// This name is just as long as writing the right side of this equation
 		// But it's much clearer to understand why the boolean is true or false
-		boolean thePieceClickedOnIsRed = !board.getCoords(pieceX, pieceY).isBlack();
-		Piece thePieceBeingAttacked = board.getCoords(mouseX, mouseY);
+		boolean thePieceClickedOnIsRed = !board.getPiece(pieceX, pieceY).isBlack();
+		Piece thePieceBeingAttacked = board.getPiece(mouseX, mouseY);
 		
 		if(moving.isLegal() && redTurn == thePieceClickedOnIsRed) {
 			if(thePieceClickedOnIsRed == true) { // Player 1's turn is over
@@ -354,7 +354,7 @@ public class Dashboard extends JPanel implements MouseListener{
 
 		if(xInRange && yInRange) {
 			if(mouseClickedPiece) {
-				Piece newPiece = board.getCoords(mouseX,mouseY);
+				Piece newPiece = board.getPiece(mouseX,mouseY);
 				boolean switchedPiece = false;
 				if(newPiece != null) {
 					switchedPiece = newPiece.isBlack() == movingPiece.isBlack();
@@ -369,7 +369,7 @@ public class Dashboard extends JPanel implements MouseListener{
 				mouseMovingPiece = !switchedPiece;
 			}
 			else {
-				movingPiece = board.getCoords(mouseX,mouseY);
+				movingPiece = board.getPiece(mouseX,mouseY);
 				pieceX = mouseX;
 				pieceY = mouseY;
 

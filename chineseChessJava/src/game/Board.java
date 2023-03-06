@@ -1,5 +1,7 @@
 package game;
 
+import java.util.HashMap;
+
 import game.pieces.Canon;
 import game.pieces.Chariot;
 import game.pieces.Elephant;
@@ -22,6 +24,9 @@ public class Board {
     private int redGeneralY = 0;
     private int blackGeneralX = 4;
     private int blackGeneralY = 9;
+    private int mirror;
+    
+    private HashMap<String, Piece> generalPositions = new HashMap<String, Piece>();
     
     private static int winner;
     private boolean blackCheck = false; //up is in check
@@ -36,33 +41,44 @@ public class Board {
 	public Board() {
 		coords = new Piece[COLUMNS][ROWS];
 
-		short quadrant = 0, mirror, side;
-		boolean creatingBlack;
+		int quadrant = 0, side, edgeYCoord;
+		boolean onBlackSide;
 		for(;quadrant < 4; quadrant++) {
-			creatingBlack = (quadrant>1);
-			if(creatingBlack) side = -1;
-			else side = 1;
+			onBlackSide = (quadrant>1);
+			side = onBlackSide? -1 : 1;
+			edgeYCoord = 5+side*(5);
 			
-			if(quadrant%2 == 0) mirror = 1;
+			String sideString = onBlackSide? "B" : "R";
+			
+			if(quadrant%2 == 0) {
+				mirror = 1; // Where 1 is the right side of the board and -1 the left side.
+			}
 			else {
 				mirror = -1;
 
 				// Only needs to be created once for each side
 				// Since this if-statement is only true once for both side
 				// Why NOT put it here?
-				coords[5][5+side*(2)] = new Soldier(creatingBlack);
-				coords[5][5+side*(5)] = new General(creatingBlack);
+				coords[5][5+side*(2)] = new Soldier(onBlackSide, 5, 5+side*(2));
+				coords[5][edgeYCoord] = new General(onBlackSide, 5, edgeYCoord);
+				
+				//allPieces.put("Soldier-1"+sideString, new Soldier(onBlackSide, 5, 5+side*(2)));
+				generalPositions.put("General-"+sideString, new General(onBlackSide, 5, edgeYCoord));
 			}
 			
-			coords[5+mirror*(5)][5+side*(2)] = new Soldier(creatingBlack);
-			coords[5+mirror*(3)][5+side*(2)] = new Soldier(creatingBlack);
-			coords[5+mirror*(4)][5+side*(3)] = new Canon(creatingBlack);
-
-			coords[5+mirror*(5)][5+side*(5)] = new Chariot(creatingBlack);
-			coords[5+mirror*(4)][5+side*(5)] = new Horse(creatingBlack);
-			coords[5+mirror*(3)][5+side*(5)] = new Elephant(creatingBlack);
-			coords[5+mirror*(1)][5+side*(5)] = new Guard(creatingBlack);
+			coords[calculateX(5)][5+side*2] = new Soldier(onBlackSide, calculateX(5), 5+side*2);
+			coords[calculateX(3)][5+side*2] = new Soldier(onBlackSide, calculateX(3), 5+side*2);
+			coords[calculateX(4)][5+side*3] = new Canon(onBlackSide, calculateX(4), 5+side*3);
+			
+			coords[calculateX(5)][edgeYCoord] = new Chariot(onBlackSide, calculateX(5), edgeYCoord);
+			coords[calculateX(4)][edgeYCoord] = new Horse(onBlackSide, calculateX(4), edgeYCoord);
+			coords[calculateX(3)][edgeYCoord] = new Elephant(onBlackSide, calculateX(3), edgeYCoord);
+			coords[calculateX(1)][edgeYCoord] = new Guard(onBlackSide, calculateX(1), edgeYCoord);
 		}
+	}
+	
+	public int calculateX(int x) {
+		return 5+mirror*x;
 	}
 
 	public Piece[][] getCoords() {
@@ -73,17 +89,27 @@ public class Board {
 		this.coords = coords;
 	}
 
-	public Piece getCoords(int x, int y) {
+	/**
+	 * Return the piece at the specified coordinates
+	 * @param x The horizontal coordinate. Lower value indicates a piece further left on the board.
+	 * @param y The vertical coordinate. Lower value indicates a piece higher up on the board
+	 * @return The current piece located at the coordinates, or null if there's no piece
+	 */
+	public Piece getPiece(int x, int y) {
 		return coords[x][y];
 	}
 	
-	
-	
+	/**
+	 * Moves the piece on the board.
+	 * @param move Contains the original position and the final position of the piece.
+	 */
 	public void doMove(Move move) {
         Piece curr = this.coords[move.getOriginX()][move.getOriginY()];
         
+        curr.movePiece(move.getFinalX(), move.getFinalY());
+        
         this.coords[move.getFinalX()][move.getFinalY()] = curr;
-        this.coords[move.getOriginX()][move.getOriginY()]= null;
+        this.coords[move.getOriginX()][move.getOriginY()] = null;
     }
 
 
@@ -95,9 +121,9 @@ public class Board {
      * @param captured The piece that was previously captured, so that it can be restored
      */
     public void undoMove(Move move, Piece captured) {
-        Piece curr = getCoords(move.getFinalX(), move.getFinalY());
+        Piece curr = getPiece(move.getFinalX(), move.getFinalY());
         coords[move.getOriginX()][ move.getOriginY()] = curr;
-        getCoords(move.getFinalX(), move.getFinalY()).Capture();
+        getPiece(move.getFinalX(), move.getFinalY()).Capture();
         //System.out.print(" Illegal Move");
     }
     
@@ -106,8 +132,8 @@ public class Board {
 
         if (new Moving(this,move).isLegal()) {
 
-            Piece curr = this.getCoords(move.getOriginX(),move.getOriginY());
-            Piece captured = this.getCoords(move.getFinalX(),move.getFinalY());
+            Piece curr = this.getPiece(move.getOriginX(),move.getOriginY());
+            Piece captured = this.getPiece(move.getFinalX(),move.getFinalY());
 
             int x = move.getOriginX();
             int y = move.getOriginY();
@@ -202,14 +228,14 @@ public class Board {
         blackCheck = false;
         for (int x = 0; x < 11; x++) {
             for (int y = 0; y < 11; y++) {
-                if (this.getCoords(x, y) != null) {
+                if (this.getPiece(x, y) != null) {
 
-                    if (!redCheck && this.getCoords(x, y).isBlack() == true) {
+                    if (!redCheck && this.getPiece(x, y).isBlack() == true) {
                         if (new Moving(this, new Move(x, y, this.getRedGeneralX(), this.getRedGeneralY()), 0).isLegal()) {
                             redCheck = true;
 //                            System.out.println("Down is in check");
                         }
-                    } else if (!blackCheck && this.getCoords(x, y).isBlack() == false) {
+                    } else if (!blackCheck && this.getPiece(x, y).isBlack() == false) {
                         if (new Moving(this, new Move(x, y, this.getBlackGeneralX(), this.getBlackGeneralY()), 0).isLegal()) {
                             blackCheck = true;
 //                            System.out.println("up is in check");
@@ -229,13 +255,13 @@ public class Board {
         for (int x = 0; x < 11; x++) {
             for (int y = 0; y < 11; y++) {
 
-                if (this.getCoords(x, y) != null && this.getCoords(x, y).isBlack() == loserPlace) {
+                if (this.getPiece(x, y) != null && this.getPiece(x, y).isBlack() == loserPlace) {
 
                     //running through every possible point to generate every possible move
                     for (int i = 0; i < 9; i++) {
                         for (int j = 0; j < 10; j++) {
                             Move tempMove = new Move(x, y, i, j); //generating the temporary move
-                            Piece tempCaptured = this.getCoords(i, j);
+                            Piece tempCaptured = this.getPiece(i, j);
                             //if that move is legal then attempt it.
                             if (new Moving(this, tempMove).isLegal()) { //trying every possible move for the piece
                                 this.doMove(tempMove); //doing the temporary move
@@ -264,27 +290,22 @@ public class Board {
         return true;
     }
     
+    public General getGeneralRed() {
+    	return (General) generalPositions.get("General-R");
+    }
+    
+    public General getGeneralBlack() {
+    	return (General) generalPositions.get("General-B");
+    }
+    
     public void updateGenerals() {
-        //finds location of generals
-
-        for (int x = 3; x < 8; x++) {
-            for (int y = 0; y < 3; y++) {
-                Piece curr = getCoords(x, y);
-                if (curr != null && curr.toString().equals("General")) {
-                    this.redGeneralX = x;
-                    this.redGeneralY = y;
-                }
-
-            }
-
-            for (int y = 8; y < 11; y++) {
-                Piece curr = getCoords(x, y);
-                if (curr != null && curr.toString().equals("General")) {
-                	this.blackGeneralX = x;
-                	this.blackGeneralY = y;
-                }
-            }
-        }
+		General redGen = getGeneralRed(), blackGen = getGeneralBlack();
+		
+		redGeneralX = redGen.getX();
+		redGeneralY = redGen.getY();
+		
+		blackGeneralX = blackGen.getX();
+		blackGeneralY = blackGen.getY();
     }
 
 	public int getRedGeneralX() {
