@@ -42,7 +42,6 @@ public class GUI extends JPanel implements Runnable{
 			} catch (InterruptedException e) {
 				System.out.println(e.getMessage());
 			}
-			//System.out.println(mouseClickedPiece + " " + mouseMovingPiece);
 			
 			// Ensure that the game is not stopped during the iteration.
 			if (run) {

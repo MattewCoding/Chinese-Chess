@@ -297,6 +297,10 @@ public class Board {
     public General getGeneralBlack() {
     	return (General) generalPositions.get("General-B");
     }
+	
+	public boolean generalsAligned() {
+		return redGeneralX == blackGeneralX;
+	}
     
     public void updateGenerals() {
 		General redGen = getGeneralRed(), blackGen = getGeneralBlack();
@@ -307,6 +311,33 @@ public class Board {
 		blackGeneralX = blackGen.getX();
 		blackGeneralY = blackGen.getY();
     }
+    
+    /**
+     * Returns true if the generals aren't facing each other by counting the obstacles between them if they're in line.
+     * @param move The move attemping to be done
+     * @return Boolean True if they are facing each other
+     */
+	public Boolean approveGenerals(Move move) {
+		int numberOfPieces=0;
+		
+		// Generals can only face each other if they're in the same column
+		// And the piece moving is moving out of said column
+		if( generalsAligned() && (move.getOriginX() == redGeneralX) && (move.getOriginX() != move.getFinalX()) ) {
+			
+			// We could count the generals and make it work but
+			// This is more clear as it better shows how many pieces are
+			// Inbetween the generals
+			for(int y = blackGeneralY+1; y < redGeneralY - 1; y++) {
+				if(getPiece(redGeneralX, y) != null) {
+					numberOfPieces++;
+				}
+			}
+			// If there's only one, then based on the if-statements it has to be
+			// The piece we're moving
+			return numberOfPieces != 1;
+		}
+		return true;
+	}
 
 	public int getRedGeneralX() {
 		return redGeneralX;

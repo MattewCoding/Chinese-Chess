@@ -10,6 +10,7 @@ import game.pieces.Soldier;
 
 /**
  * This class will check if a given move is a move that this piece can generally make. For example, elephants can move diagonally two spaces. In a way, this is what defines a piece.
+ * @author Yang Mattew
  */
 public class MoveVisitor implements PieceVisitor<Boolean> {
 
@@ -140,7 +141,6 @@ public class MoveVisitor implements PieceVisitor<Boolean> {
 			if (!move.isHorizontal() && !move.isVertical()) {
 				move.setValid(false);
 			}
-			System.out.println(move.getDy() + " " + Math.abs(move.getDx()));
 			if (piece.isBlack() == true) {
 				if (!(move.getDy() == 1 || Math.abs(move.getDx()) == 1)) {
 					move.setValid(false);

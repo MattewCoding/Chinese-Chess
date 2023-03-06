@@ -99,6 +99,6 @@ public abstract class Piece {
 	public void setY(int y) {
 		this.y = y;
 	}
-	
+
 	public abstract <T> T accept(PieceVisitor<T> visitor);
 }

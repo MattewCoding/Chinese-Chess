@@ -39,8 +39,8 @@ public class Moving {
 		
 		//  2. Check if moving the piece exposes our general
 		if (legal) {
-			updateGenerals();
-			approveGenerals();
+			board.updateGenerals();
+			legal = board.approveGenerals(move);
 		}
 		
 		//  3. check if we are doing an attack, and also check if the end point is blocked by a friendly piece
@@ -119,50 +119,6 @@ public class Moving {
 			}
 		}
 	}
-
-
-	
-	/**
-	 * Updates the location of the generals
-	 */
-	public void updateGenerals() {
-		General redGen = board.getGeneralRed(), blackGen = board.getGeneralBlack();
-		
-		redGeneralX = redGen.getX();
-		redGeneralY = redGen.getY();
-		
-		blackGeneralX = blackGen.getX();
-		blackGeneralY = blackGen.getY();
-	}
-
-
-	/**
-	 * Returns that the generals aren't facing each other by counting the obstacles between them if they're in line.
-	 *
-	 * @return True if they are facing eachother (illegal)
-	 */
-	private void approveGenerals() {
-		int numberOfPieces=0;
-		
-		// Generals can only face each other if they're in the same column
-		// And the piece moving is moving out of said column
-		if( (redGeneralX == blackGeneralX) && (move.getOriginX() == redGeneralX) && (move.getOriginX() != move.getFinalX()) ) {
-			
-			// We could count the generals and make it work but
-			// This is more clear as it better shows how many pieces are
-			// Inbetween the generals
-			for(int y = blackGeneralY+1; y < redGeneralY - 1; y++) {
-				if(board.getPiece(redGeneralX, y) != null) {
-					numberOfPieces++;
-				}
-			}
-			// If there's only one, then based on the if-statements it has to be
-			// The piece we're moving
-			legal = numberOfPieces != 1;
-		}
-
-	}
-
 
 	/**
 	 * Checks if the move pattern is a valid move pattern and if there's a piece present.
