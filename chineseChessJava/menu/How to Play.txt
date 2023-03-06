@@ -1,3 +1,6 @@
+Échecs chinois
+Les échecs chinois, également appelés Xiangqi, sont un jeu de plateau de stratégie pour deux joueurs, ou un joueur contre un bot. Le jeu représente unebataille entre deux armées, séparées par une rivière, avec un palais de chaque côté de la rivière.Une armée est représentée par des pions rouges, tandis que l'autre est représentée par des pionsnoirs. Les rouges commencent à se déplacer en premier, et alternent avec les noirs jusqu'à ce quele jeu aboutisse à un match nul ou qu'un joueur gagne.
+
 Pieces
 Each player starts with sixteen circular pieces. Player one's pieces are completely black, whilst player two's pieces are red on the inside. The chess pieces are each named after chinese military rankings, with their chinese character displayed on their respective chess pieces.
 
