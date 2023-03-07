@@ -6,8 +6,8 @@ import logic.moveChecking.PieceVisitor;
  * Elephant Piece
  */
 public class Elephant extends Piece {
-    public Elephant(boolean place) {
-        super(place);
+    public Elephant(boolean place, int x, int y) {
+        super(place, x, y);
         this.type = "Elephant";
     }
 

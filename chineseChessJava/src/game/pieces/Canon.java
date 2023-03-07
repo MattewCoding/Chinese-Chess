@@ -6,8 +6,8 @@ import logic.moveChecking.PieceVisitor;
  * Cannon Piece
  */
 public class Canon extends Piece {
-    public Canon(boolean place) {
-        super(place);
+    public Canon(boolean place, int x, int y) {
+        super(place, x, y);
         this.type = "Cannon";
     }
 

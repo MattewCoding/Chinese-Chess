@@ -12,23 +12,29 @@ public abstract class Piece {
     protected String type;
     protected boolean isBlack;
     private boolean captured;
+    private int x;
+    private int y;
 
     /**
      * Constructor for creating a Piece. All that is needed is which side of the board the piece is on. The side is provided as an enum.
      *
      * for the isBlack if black it is true if red it is false.
      */
-    public Piece(boolean place) {
+    public Piece(boolean place, int x, int y) {
         this.isBlack = place;
         this.setCaptured(false);
+        this.x = x;
+        this.y = y;
     }
-	
-	public abstract <T> T accept(PieceVisitor<T> visitor);
+    
+    public void movePiece(int newX, int newY) {
+    	x = newX;
+    	y = newY;
+    }
 
     /**
      * Are we up river or down river? Determines the player. Returns true if we are up the river
      **/
-    
     public boolean isBlack() {
         return isBlack;
     }
@@ -37,7 +43,6 @@ public abstract class Piece {
      * Sets the current piece to a captured state, not capturing a different piece.
      * If this piece was captured by another, than you would use capture on this piece.
      */
-    
     public void Capture() {
         this.setCaptured(true);
     }
@@ -79,4 +84,21 @@ public abstract class Piece {
 		this.captured = captured;
 	}
 
+	public int getX() {
+		return x;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	public abstract <T> T accept(PieceVisitor<T> visitor);
 }
