@@ -10,7 +10,7 @@ import javax.swing.Timer;
 import outOfGameScreens.ScreenParameters;
 
 /**
- * Timer to keep track of time elapsed and update timer GUI (*going to be modified*)
+ * Timer to keep track of time elapsed and update timer GameUpdater (*going to be modified*)
  * @author Rona Nasro
  *
  */

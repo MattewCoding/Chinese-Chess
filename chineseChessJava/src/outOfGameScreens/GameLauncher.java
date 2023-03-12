@@ -33,7 +33,7 @@ public class GameLauncher extends JFrame{
 	 */
 	public GameLauncher() {
 		super("Chinese Chess");
-		//GUI chessBoard = new GUI();
+		//GameUpdater chessBoard = new GameUpdater();
 		
 		/*  This part is for testing the various screens bc we dont have the main menu screen */
 		//  This code is for creating the board
