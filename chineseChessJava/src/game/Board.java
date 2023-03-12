@@ -28,7 +28,7 @@ public class Board {
     
     private HashMap<String, Piece> generalPositions = new HashMap<String, Piece>();
     
-    private static int winner;
+    private static int winner =-1;
     private boolean blackCheck = false; //up is in check
     private boolean redCheck = false; //down is in check
     public static final int PLAYER1_WINS = 1;
@@ -123,12 +123,13 @@ public class Board {
     public void undoMove(Move move, Piece captured) {
         Piece curr = getPiece(move.getFinalX(), move.getFinalY());
         coords[move.getOriginX()][ move.getOriginY()] = curr;
-        getPiece(move.getFinalX(), move.getFinalY()).Capture();
+        //getPiece(move.getFinalX(), move.getFinalY()).Capture();
+        coords[move.getFinalX()][ move.getFinalY()] = captured;
         //System.out.print(" Illegal Move");
     }
     
 
-    public boolean tryMove(Move move, Profile player, Profile player2) {
+    public boolean tryMove(Move move, Profile player) {
 
         if (new Moving(this,move).isLegal()) {
 
@@ -140,7 +141,7 @@ public class Board {
             int finalX = move.getFinalX();
             int finalY = move.getFinalY();
 
-
+            System.out.println(curr.isBlack() + " " + player.getPlayerPlace());
             if (curr.isBlack() == player.getPlayerPlace()) {
                 this.doMove(move);
                 testCheck();
@@ -159,7 +160,7 @@ public class Board {
                     //the move is legal, now lets see if it's a winning move.
                     if (blackCheck && curr.isBlack() == false) {
                         if (checkMate(true)) {
-                            winner = PLAYER1_WINS;
+                            setWinner(PLAYER1_WINS);
 //                            System.out.println("##########################CHECK MATE#############################");
 //                            System.out.println(player.getName() + "WINS!");
 //                            System.out.println("##########################CHECK MATE#############################");
@@ -169,7 +170,7 @@ public class Board {
                         //the move is legal, now lets see if it's a winning move.
                     } else if (redCheck && curr.isBlack() == true) {
                         if (checkMate(false)) {
-                            winner = PLAYER2_WINS;
+                            setWinner(PLAYER2_WINS);
 //                            System.out.println("##########################CHECK MATE#############################");
 //                            System.out.println(player.getName() + "WINS!");
 //                            System.out.println("##########################CHECK MATE#############################");
@@ -179,7 +180,7 @@ public class Board {
                         //the move is legal, now lets see if it's a stalemate , i reoved the || separated()
                     } else if (curr.isBlack() == false) {
                         if (checkMate(true)) {
-                            winner = DRAW;
+                            setWinner(DRAW);
 //                            System.out.println("##########################STALE MATE#############################");
 //                            System.out.println("ITS A DRAW");
 //                            System.out.println("##########################STALE MATE#############################");
@@ -187,7 +188,7 @@ public class Board {
 //                        return true;
                     } else if (curr.isBlack() == true) {
                         if (checkMate(false)) {
-                            winner = DRAW;
+                            setWinner(DRAW);
 //                            System.out.println("##########################STALE MATE#############################");
 //                            System.out.println("ITS A DRAW");
 //                            System.out.println("##########################STALE MATE#############################");
@@ -204,7 +205,7 @@ public class Board {
                     } else {
                         //MoveLogger.addMove(new Move(curr, x, y, finalX, finalY));
                     }
-
+                    this.undoMove(move, captured);
                     //DO OTHER THINGS =============
 
                     return true;
@@ -371,6 +372,14 @@ public class Board {
 
 	public int getBlackGeneralY() {
 		return blackGeneralY;
+	}
+
+	public static int getWinner() {
+		return winner;
+	}
+
+	public static void setWinner(int winner) {
+		Board.winner = winner;
 	}
 }
 

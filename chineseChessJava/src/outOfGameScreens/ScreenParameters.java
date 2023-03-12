@@ -28,8 +28,8 @@ public class ScreenParameters {
 	
 	public static final char PATHSEP = File.separatorChar;
 
-	private static String blackTime = "15:00:000";
-	private static String redTime = "15:00:000";
+	private static String blackTime = "15:00";
+	private static String redTime = "15:00";
 
 	private static int musicVolume = 50;
 	private static int soundVolume = 50;

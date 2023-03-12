@@ -27,6 +27,7 @@ import log.LoggerUtility;
 import logic.moveChecking.PointVisitor;
 import logic.moveChecking.Move;
 import logic.moveChecking.Moving;
+import outOfGameScreens.EndGame;
 import outOfGameScreens.Profile;
 import outOfGameScreens.ScreenParameters;
 import outOfGameScreens.menus.SubMenu;
@@ -99,8 +100,8 @@ public class Dashboard extends JPanel implements MouseListener{
 		capturedPieceBlack = new ArrayList<Piece>();
 
 		//timerListener = new TimerListener();
-		player1 = new Profile("Rona",0,true);
-		player2 = new Profile("Mattew",0,false);
+		player1 = new Profile("Rona",0,false);
+		player2 = new Profile("Mattew",0,true);
 		player2.getTimer().stop();
 		
 		searchValidMoves = new PointVisitor(board);
@@ -116,14 +117,16 @@ public class Dashboard extends JPanel implements MouseListener{
 
 			// Check if move is legal
 			Move move = new Move(pieceX, pieceY, mouseX, mouseY);
-			Moving moving = new Moving(board,move);
+			//Moving moving = new Moving(board,move);
+			//board.tryMove(move, player1, player2);
 
 			// This name is just as long as writing the right side of this equation
 			// But it's much clearer to understand why the boolean is true or false
 			boolean thePieceClickedOnIsRed = !board.getPiece(pieceX, pieceY).isBlack();
 			Piece thePieceBeingAttacked = board.getPiece(mouseX, mouseY);
 
-			if(moving.isLegal() && redTurn == thePieceClickedOnIsRed) {
+			//i removed moving.isLegal() && from the if statment and  && redTurn == thePieceClickedOnIsRed
+			if((redTurn && board.tryMove(move, player1)) || (!redTurn && board.tryMove(move, player2))) {
 				if(thePieceClickedOnIsRed == true) { // Player 1's turn is over
 					player1.stopTurnTimer();
 					player2.startTurnTimer();
@@ -135,22 +138,13 @@ public class Dashboard extends JPanel implements MouseListener{
 
 				board.doMove(move);
 
-				if(thePieceBeingAttacked != null) {
-					if(thePieceBeingAttacked.isBlack()) {
-						player1.addPieceCaptured(thePieceBeingAttacked);
-					}
-					else {
-						player2.addPieceCaptured(thePieceBeingAttacked);
-					}
-					updateCaptured();
-				}
-
+				updateCaptured();
 				updateNotation(move, movingPiece);
 
 				mouseClickedPiece = false;
 			}
 			mouseMovingPiece = false;
-		}
+			}
 	}
 
 	@Override
@@ -377,6 +371,14 @@ public class Dashboard extends JPanel implements MouseListener{
 		int turnsFittableInBox = (int) (notationBoxSize/g2.getFontMetrics().getHeight());
 		if(pastMovesArrayList.size() > turnsFittableInBox) {
 			pastMovesArrayList.remove(0);
+		}
+		if(board.getWinner()!=-1) {
+			player1.calculateScore();
+			player2.calculateScore();
+			player2.stopTurnTimer();
+			player1.stopTurnTimer();
+			EndGame endgame = new EndGame(board.getWinner(),player1,player2);
+			
 		}
 	}
 
