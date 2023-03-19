@@ -13,15 +13,23 @@ import outOfGameScreens.ScreenParameters;
  * 
  * We can generate logs in a text file or an html file.
  * 
+ * How to use log4j2: https://www.youtube.com/playlist?list=PLL34mf651faNrQbmeK2XigJ68fLAj9buv
+ * 
  * @author Tianxiao.Liu@u-cergy.fr & Yang Mattew
  */
 public class LoggerUtility {
-	private static final File TEXT_LOG_CONFIG = new File("src"+ScreenParameters.PATHSEP+"log"+ScreenParameters.PATHSEP+"log4j-text.properties");
-	private static final File HTML_LOG_CONFIG = new File("src"+ScreenParameters.PATHSEP+"log"+ScreenParameters.PATHSEP+"log4j-html.properties");
+	private static final char PATHSEP = ScreenParameters.PATHSEP;
+	private static final String FILELOCATION = "."+PATHSEP+"src"+PATHSEP+"log"+PATHSEP;
+	
+	private static final File CONSOLE_LOG_CONFIG = new File(FILELOCATION+"log4j2-console.xml");
+	private static final File TEXT_LOG_CONFIG = new File(FILELOCATION+"log4j2-text.xml");
+	private static final File HTML_LOG_CONFIG = new File(FILELOCATION+"log4j2-html.xml");
 
 	public static Logger getLogger(Class<?> logClass, String logFileType) {
 		LoggerContext context = (LoggerContext) LogManager.getContext(false);
-		if (logFileType.equals("text")) {
+		if(logFileType.equals("console")) {
+			context.setConfigLocation(CONSOLE_LOG_CONFIG.toURI());
+	    } else if (logFileType.equals("text")) {
 			context.setConfigLocation(TEXT_LOG_CONFIG.toURI());
 		} else if (logFileType.equals("html")) {
 			context.setConfigLocation(HTML_LOG_CONFIG.toURI());
@@ -29,7 +37,7 @@ public class LoggerUtility {
 			throw new IllegalArgumentException("Unknown log file type !");
 		}
 
-		String className = logClass.getName();
+		String className = logClass.getClass().getName();
 		return LogManager.getLogger(className);
 	}
 }
