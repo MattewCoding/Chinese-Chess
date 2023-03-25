@@ -37,7 +37,7 @@ import outOfGameScreens.menus.SubMenu;
  * 
  * @author Yang Mattew, Nasro Rona
  */
-public class GUI extends JPanel implements MouseListener{
+public class GUIRenamed extends JPanel implements MouseListener{
 
 	private static final long serialVersionUID = 1L;
 
@@ -90,7 +90,7 @@ public class GUI extends JPanel implements MouseListener{
 
 	private static Logger logDataGUI = LoggerUtility.getLogger(SubMenu.class, "html");
 
-	public GUI() {
+	public GUIRenamed() {
 		board = new Board();
 
 		pastMoves = new NotationHistory();
