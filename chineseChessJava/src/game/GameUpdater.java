@@ -18,14 +18,14 @@ public class GameUpdater extends JPanel implements Runnable{
 	private static final long serialVersionUID = 1L;
 
 
-	private GUIRenamed gUIRenamed = new GUIRenamed();
+	private GUI gUI = new GUI();
 	private boolean run = false;
 	
 	public GameUpdater(){
 
 		setLayout(new BorderLayout());
-		add(BorderLayout.CENTER, gUIRenamed);
-		gUIRenamed.repaint();
+		add(BorderLayout.CENTER, gUI);
+		gUI.repaint();
 		
 		Thread chronoThread = new Thread(this);
 		chronoThread.start();
@@ -45,8 +45,8 @@ public class GameUpdater extends JPanel implements Runnable{
 			
 			// Ensure that the game is not stopped during the iteration.
 			if (run) {
-				gUIRenamed.checkPieces();
-				gUIRenamed.repaint();
+				gUI.checkPieces();
+				gUI.repaint();
 
 			}
 		}
