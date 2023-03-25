@@ -395,5 +395,13 @@ public class Board {
 	public static void setWinner(int winner) {
 		Board.winner = winner;
 	}
+
+	public static int getWinner() {
+		return winner;
+	}
+
+	public static void setWinner(int winner) {
+		Board.winner = winner;
+	}
 }
 
