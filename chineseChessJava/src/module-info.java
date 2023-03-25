@@ -7,4 +7,6 @@
  */
 module chineseChess {
 	requires java.desktop;
-} //Test
+	requires org.apache.logging.log4j;
+	requires org.apache.logging.log4j.core;
+}

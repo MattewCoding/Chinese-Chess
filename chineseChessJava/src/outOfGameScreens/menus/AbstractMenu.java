@@ -37,6 +37,8 @@ public abstract class AbstractMenu extends JPanel {
 	protected JLabel menuName;
 	protected JList<String> optionList;
 	protected JButton backButton = setBackButtonOptions();
+	
+
 	protected JScrollPane contentScroll;
 	
 	protected Color boardColor = ScreenParameters.BOARDCOLOR;
@@ -124,6 +126,10 @@ public abstract class AbstractMenu extends JPanel {
 
 	}
 
+	
+	public JButton getBackButton() {
+		return backButton;
+	}
 	/**
 	 * Get the menu (that is, the name of the menu, the options available, and its associated content)
 	 * @return The menu

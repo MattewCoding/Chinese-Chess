@@ -63,7 +63,7 @@ public class Test11 extends JPanel {
 			else {
 				component = getComponent(e.getX(),e.getY()); // on mémorise le composant en déplacement
 				if ( component!=null ) {
-					container.setComponentZOrder(component,0); // place le composant le plus haut possible
+					container.setComponentZOrder(component,0); // isBlack le composant le plus haut possible
 					relx = e.getX()-component.getX(); // on mémorise la position relative
 					rely = e.getY()-component.getY(); // on mémorise la position relative
 					move=true; // démarrage du mouvement

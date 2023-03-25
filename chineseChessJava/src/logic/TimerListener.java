@@ -60,7 +60,7 @@ public class TimerListener extends JComponent{
 			minutes = (seconds<0)? fullMinutes - minutes - 1: fullMinutes - minutes;
 			seconds = (seconds<0)? seconds + 60 : seconds;
 			milliseconds = 1000 - milliseconds;
-			elapsedTime = String.format("%02d:%02d:%03d", minutes, seconds, milliseconds);
+			elapsedTime = String.format("%02d:%02d", minutes, seconds);
 			repaint();
 		}
 	}
