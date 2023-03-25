@@ -1,0 +1,3 @@
+Making a heat map of chinese chess games
+https://medium.com/nerd-for-tech/chess-heatmap-where-does-most-of-the-action-take-place-52b2a007dfa2
+https://www.kaggle.com/datasets/boyofans/onlinexiangqi
