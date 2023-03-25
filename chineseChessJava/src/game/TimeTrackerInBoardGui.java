@@ -1,7 +1,4 @@
 package game;
-import game1.TimeTracker;
-import game1.TimeTrackingLogic;
-
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;

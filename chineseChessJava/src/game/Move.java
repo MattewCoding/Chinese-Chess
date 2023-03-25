@@ -1,5 +1,7 @@
 package game;
 
+import game.pieces.Piece;
+
 /**
  * Class to generate the move object, which handles moves on the board
  * It does not actually carry out moves or check for their validity.
