@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+	<Properties>
+		<Property name="filename">./src/log</Property>
+	</Properties>
+	<Appenders>
+		<RollingFile name="HtmlFormat" fileName="${filename}/logTextFormat.html"
+			filePattern="${filename}/logTextFormat-%d{MM-dd HH-mm-ss-SSS}.html">
+			<PatternLayout>
+				<pattern>%d{HH:mm:ss} [%t] %-5level %logger{36} - %msg%n</pattern>
+			</PatternLayout>
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+			</Policies>
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<Logger name="HtmlLogger" level="info" additivity="true">
+			<AppenderRef ref="HtmlFormat" />
+		</Logger>
+		<Root level="info">
+			<AppenderRef ref="HtmlFormat" />
+		</Root>
+	</Loggers>
+</Configuration>

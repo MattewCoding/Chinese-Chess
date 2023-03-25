@@ -12,7 +12,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import game.GUI;
+import game.GameUpdater;
 import outOfGameScreens.ScreenParameters;
 
 /**
@@ -77,7 +77,7 @@ public class MainMenu extends AbstractMenu {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			GUI chessBoard = new GUI();
+			GameUpdater chessBoard = new GameUpdater();
 			mainScreen.setContentPane(chessBoard);
 			mainScreen.revalidate();
 		}

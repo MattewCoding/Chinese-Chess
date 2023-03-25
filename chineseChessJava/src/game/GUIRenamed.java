@@ -37,7 +37,7 @@ import outOfGameScreens.menus.SubMenu;
  * 
  * @author Yang Mattew, Nasro Rona
  */
-public class Dashboard extends JPanel implements MouseListener{
+public class GUIRenamed extends JPanel implements MouseListener{
 
 	private static final long serialVersionUID = 1L;
 
@@ -88,9 +88,9 @@ public class Dashboard extends JPanel implements MouseListener{
 	// Points
 	private PointVisitor searchValidMoves;
 
-	private static Logger logData = LoggerUtility.getLogger(SubMenu.class, "html");
+	private static Logger logDataGUI = LoggerUtility.getLogger(SubMenu.class, "html");
 
-	public Dashboard() {
+	public GUIRenamed() {
 		board = new Board();
 
 		pastMoves = new NotationHistory();
@@ -125,6 +125,9 @@ public class Dashboard extends JPanel implements MouseListener{
 			boolean thePieceClickedOnIsRed = !board.getPiece(pieceX, pieceY).isBlack();
 			Piece thePieceBeingAttacked = board.getPiece(mouseX, mouseY);
 
+			logDataGUI.info( "(redTurn && board.tryMove(move, player1) = " + (redTurn && board.tryMove(move, player1)) + " (!redTurn && board.tryMove(move, player2)) = " + (!redTurn && board.tryMove(move, player2)) );
+			
+
 			//i removed moving.isLegal() && from the if statment and  && redTurn == thePieceClickedOnIsRed
 			if((redTurn && board.tryMove(move, player1)) || (!redTurn && board.tryMove(move, player2))) {
 				if(thePieceClickedOnIsRed == true) { // Player 1's turn is over
@@ -150,7 +153,6 @@ public class Dashboard extends JPanel implements MouseListener{
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		
 		//Image background
 		String imgLocation = "images"+ScreenParameters.PATHSEP+"wood-background.jpg";
 		try {
@@ -158,7 +160,7 @@ public class Dashboard extends JPanel implements MouseListener{
 			g.drawImage(background,0,0,null);
 
 		} catch (IOException e) {
-			logData.error("Image at " + imgLocation + " was not found.");
+			logDataGUI.error("Image at " + imgLocation + " was not found.");
 		}
 
 		// Drawing board
@@ -207,6 +209,11 @@ public class Dashboard extends JPanel implements MouseListener{
 		if(mouseClickedPiece) {
 			drawPoints();
 		}
+	}
+	
+	public void logCreationData() {
+		logDataGUI.info(board.toString());
+		logDataGUI.info("Players created: Player 1 is " + player1.getId() + " and Player 2 is " + player2.getId());
 	}
 
 	/**

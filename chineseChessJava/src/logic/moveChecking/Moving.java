@@ -38,8 +38,8 @@ public class Moving {
 		Piece currentPiece = board.getPiece(move.getOriginX(), move.getOriginY());
 		
 		//  2. Check if moving the piece exposes our general
-		if (legal) {
-			board.updateGenerals();
+		if (legal && currentPiece.getType() == "General") {
+			board.updateGenerals(move.getFinalX(), move.getFinalY(), currentPiece.isBlack());
 			legal = board.approveGenerals(move);
 		}
 		

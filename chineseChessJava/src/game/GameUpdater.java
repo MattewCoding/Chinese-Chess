@@ -5,12 +5,12 @@ import javax.swing.JPanel;
 import outOfGameScreens.ScreenParameters;
 
 /**
- * The game's main GUI, where the updates happen
+ * The game's main GameUpdater, where the updates happen
  * 
  * @author YANG Mattew, Nasro Rona
  *
  */
-public class GUI extends JPanel implements Runnable{
+public class GameUpdater extends JPanel implements Runnable{
 
 	/**
 	 * 
@@ -18,14 +18,14 @@ public class GUI extends JPanel implements Runnable{
 	private static final long serialVersionUID = 1L;
 
 
-	private Dashboard dashboard = new Dashboard();
+	private GUIRenamed gUIRenamed = new GUIRenamed();
 	private boolean run = false;
 	
-	public GUI(){
+	public GameUpdater(){
 
 		setLayout(new BorderLayout());
-		add(BorderLayout.CENTER, dashboard);
-		dashboard.repaint();
+		add(BorderLayout.CENTER, gUIRenamed);
+		gUIRenamed.repaint();
 		
 		Thread chronoThread = new Thread(this);
 		chronoThread.start();
@@ -45,8 +45,8 @@ public class GUI extends JPanel implements Runnable{
 			
 			// Ensure that the game is not stopped during the iteration.
 			if (run) {
-				dashboard.checkPieces();
-				dashboard.repaint();
+				gUIRenamed.checkPieces();
+				gUIRenamed.repaint();
 
 			}
 		}

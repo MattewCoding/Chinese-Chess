@@ -5,7 +5,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import org.apache.logging.log4j.Logger;
+
+import log.LoggerUtility;
 import outOfGameScreens.menus.MainMenu;
+import outOfGameScreens.menus.SubMenu;
 
 /**
  * Launches the game by opening the main menu and setting up the frame.
@@ -33,7 +37,7 @@ public class GameLauncher extends JFrame{
 	 */
 	public GameLauncher() {
 		super("Chinese Chess");
-		//GUI chessBoard = new GUI();
+		//GameUpdater chessBoard = new GameUpdater();
 		
 		/*  This part is for testing the various screens bc we dont have the main menu screen */
 		//  This code is for creating the board
