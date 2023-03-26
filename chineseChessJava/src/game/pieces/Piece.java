@@ -14,22 +14,34 @@ public abstract class Piece {
     private boolean captured;
     private int x;
     private int y;
+    private int id;
+    protected int worth;
 
     /**
      * Constructor for creating a Piece. All that is needed is which side of the board the piece is on. The side is provided as an enum.
      *
      * for the isBlack if black it is true if red it is false.
      */
-    public Piece(boolean place, int x, int y) {
+    public Piece(boolean place, int x, int y, int id, int worth) {
         this.isBlack = place;
         this.setCaptured(false);
         this.x = x;
         this.y = y;
+        this.id = id;
+        this.worth = worth;
     }
     
-    public void movePiece(int newX, int newY) {
+    /**
+     * Move a piece on the board to a new position. Can chain multiple moves.
+     * 
+     * @param newX The new x-coordinate of the piece.
+     * @param newY The new y-coordinate of the piece.
+     * @return The piece itself, for multiple moves.
+     */
+    public Piece movePiece(int newX, int newY) {
     	x = newX;
     	y = newY;
+    	return this;
     }
 
     /**
@@ -47,32 +59,12 @@ public abstract class Piece {
         this.setCaptured(true);
     }
 
-    public String toString() {
-        return this.type;
-    }
-
     public String getType() {
     	return this.type;
     }
     
     public void setType(String type) {
     	this.type = type;
-    }
-    /**
-     * returns the matching file name of a piece
-     *
-     */
-    public String getImageName() {
-        String fileName = "";
-        if (isBlack)
-            fileName += "black_";
-        else
-            fileName += "red_";
-        
-        fileName += type.toLowerCase();
-
-        fileName += ".png";
-        return fileName;
     }
 
 
@@ -99,6 +91,41 @@ public abstract class Piece {
 	public void setY(int y) {
 		this.y = y;
 	}
+	
+	public int getId() {
+		return id;
+	}
+	
+	public int getWorth() {
+		return worth;
+	}
+	
+	public Integer[] getPosition() {
+		Integer[] pos = {x,y};
+		return pos;
+	}
+	
+    /**
+     * Finds where a piece's image is stored
+     *
+     * @return fileName the file location of the piece's image relative to src/../
+     */
+    public String getImageName() {
+        String fileName = "";
+        if (isBlack)
+            fileName += "black_";
+        else
+            fileName += "red_";
+        
+        fileName += type.toLowerCase();
+
+        fileName += ".png";
+        return fileName;
+    }
+
+    public String toString() {
+        return this.type;
+    }
 
 	public abstract <T> T accept(PieceVisitor<T> visitor);
 }

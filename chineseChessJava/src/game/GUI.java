@@ -14,6 +14,7 @@ import java.awt.geom.Ellipse2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -60,6 +61,7 @@ public class GUI extends JPanel implements MouseListener{
 	private Piece movingPiece = null;
 	private boolean mouseClickedPiece = false;
 	private boolean mouseMovingPiece = false;
+	private List<Piece> randomPieces;
 
 	// players
 	private Profile player1, player2;
@@ -84,7 +86,7 @@ public class GUI extends JPanel implements MouseListener{
 	private ArrayList<Piece> capturedPieceBlack;
 	private int capturedMargin = (int) (15 * ScreenParameters.XREDUCE);
 	private int deplacepiecesX = capturedMargin;
-	
+
 	// Points
 	private PointVisitor searchValidMoves;
 
@@ -101,9 +103,9 @@ public class GUI extends JPanel implements MouseListener{
 
 		//timerListener = new TimerListener();
 		player1 = new Profile("Rona",0,false);
-		player2 = new Profile("Mattew",0,true);
+		player2 = new Profile("Computer",0,true);
 		player2.getTimer().stop();
-		
+
 		searchValidMoves = new PointVisitor(board);
 
 		addMouseListener(this);
@@ -113,41 +115,52 @@ public class GUI extends JPanel implements MouseListener{
 	 * Updates the state of the game
 	 */
 	public void checkPieces() {
-		if(mouseClickedPiece && mouseMovingPiece) {
+		if(redTurn || player2.getId()!="Computer") {
+			if(mouseClickedPiece && mouseMovingPiece) {
 
-			// Check if move is legal
-			Move move = new Move(pieceX, pieceY, mouseX, mouseY);
-			//Moving moving = new Moving(board,move);
-			//board.tryMove(move, player1, player2);
+			// Player1's turn (or the not-computer)
 
-			// This name is just as long as writing the right side of this equation
-			// But it's much clearer to understand why the boolean is true or false
-			boolean thePieceClickedOnIsRed = !board.getPiece(pieceX, pieceY).isBlack();
-			Piece thePieceBeingAttacked = board.getPiece(mouseX, mouseY);
+				// Check if move is legal
+				Move move = new Move(pieceX, pieceY, mouseX, mouseY);
+				Moving moving = new Moving(board, move);
 
-			logDataGUI.info( "(redTurn && board.tryMove(move, player1) = " + (redTurn && board.tryMove(move, player1)) + " (!redTurn && board.tryMove(move, player2)) = " + (!redTurn && board.tryMove(move, player2)) );
-			
+				// This name is just as long as writing the right side of this equation
+				// But it's much clearer to understand why the boolean is true or false
+				boolean thePieceClickedOnIsRed = !board.getPiece(pieceX, pieceY).isBlack();
+				//logDataGUI.info( "\n(redTurn && board.tryMove(move, player1) = " + (redTurn && board.tryMove(move, player1)) + " (!redTurn && board.tryMove(move, player2)) = " + (!redTurn && board.tryMove(move, player2)) );
 
-			//i removed moving.isLegal() && from the if statment and  && redTurn == thePieceClickedOnIsRed
-			if((redTurn && board.tryMove(move, player1)) || (!redTurn && board.tryMove(move, player2))) {
-				if(thePieceClickedOnIsRed == true) { // Player 1's turn is over
-					player1.stopTurnTimer();
-					player2.startTurnTimer();
-				}else{
-					player2.stopTurnTimer();
-					player1.startTurnTimer();
+				if(moving.isLegal() && (redTurn && board.tryMove(moving, player1)) || (!redTurn && board.tryMove(moving, player2))) {
+					if(thePieceClickedOnIsRed == true) { // Player 1's turn is over
+						player1.stopTurnTimer();
+						player2.startTurnTimer();
+					} else {
+						player2.stopTurnTimer();
+						player1.startTurnTimer();
+					}
+					redTurn = !redTurn;
+
+					board.doMove(move);
+
+					updateCaptured();
+					updateNotation(move, movingPiece);
+
+					mouseClickedPiece = false;
 				}
-				redTurn = !redTurn;
-
-				board.doMove(move);
-
-				updateCaptured();
-				updateNotation(move, movingPiece);
-
-				mouseClickedPiece = false;
+				mouseMovingPiece = false;
 			}
-			mouseMovingPiece = false;
-			}
+		} else {
+			// Auto generate a move
+			Move move = board.GenerateMoves(randomPieces);
+
+			// We know it's not red's turn, and we know it's a legal move
+			player2.stopTurnTimer();
+			player1.startTurnTimer();
+			redTurn = !redTurn;
+
+			board.doMove(move);
+
+			updateCaptured();
+		}
 	}
 
 	@Override
@@ -205,12 +218,12 @@ public class GUI extends JPanel implements MouseListener{
 		drawTurnTimer();
 		drawNotation();
 		drawCapturedBox();
-		
+
 		if(mouseClickedPiece) {
 			drawPoints();
 		}
 	}
-	
+
 	public void logCreationData() {
 		logDataGUI.info(board.toString());
 		logDataGUI.info("Players created: Player 1 is " + player1.getId() + " and Player 2 is " + player2.getId());
@@ -333,19 +346,20 @@ public class GUI extends JPanel implements MouseListener{
 	 */
 	public void drawPoints() {
 		ArrayList<Integer[]> legalMoves = movingPiece.accept(searchValidMoves);
-		
+
 		int circleSize = squareLength*2/5;
 		int displacement = squareLength - circleSize;
-		
+
 		for(Integer[] legalCoord : legalMoves) {
 			int col = legalCoord[0], row = legalCoord[1];
+
 			int topLeftX = leftMostPixel + col * squareLength + displacement/2;
 			int topLeftY = margin + row * squareLength + displacement/2;
-			
+
 			drawCircle(new Color(0f,0f,0f,.5f), topLeftX, topLeftY, circleSize);
 		}
 	}
-	
+
 	/**
 	 * Draw a circle
 	 * @param fillColor The color of the circle's interior
@@ -379,13 +393,13 @@ public class GUI extends JPanel implements MouseListener{
 		if(pastMovesArrayList.size() > turnsFittableInBox) {
 			pastMovesArrayList.remove(0);
 		}
-		if(board.getWinner()!=-1) {
+		if(Board.getWinner()!=-1) {
 			player1.calculateScore();
 			player2.calculateScore();
 			player2.stopTurnTimer();
 			player1.stopTurnTimer();
-			EndGame endgame = new EndGame(board.getWinner(),player1,player2);
-			
+			EndGame endgame = new EndGame(Board.getWinner(),player1,player2);
+
 		}
 	}
 
@@ -411,20 +425,19 @@ public class GUI extends JPanel implements MouseListener{
 		if(xInRange && yInRange) {
 			if(mouseClickedPiece) {
 				Piece newPiece = board.getPiece(mouseX,mouseY);
-				boolean switchedPiece = false;
+				boolean canSwitchPlace = false;
 				if(newPiece != null) {
-					switchedPiece = newPiece.isBlack() == movingPiece.isBlack();
+					canSwitchPlace = newPiece.isBlack() == movingPiece.isBlack();
 
 					//Update current piece and location
-					if(switchedPiece) {
+					if(canSwitchPlace) {
 						movingPiece = newPiece;
 						pieceX = mouseX;
 						pieceY = mouseY;
 					}
 				}
-				mouseMovingPiece = !switchedPiece;
-			}
-			else {
+				mouseMovingPiece = !canSwitchPlace;
+			} else {
 				movingPiece = board.getPiece(mouseX,mouseY);
 				pieceX = mouseX;
 				pieceY = mouseY;
@@ -438,7 +451,6 @@ public class GUI extends JPanel implements MouseListener{
 		else {
 			mouseClickedPiece = false;
 		}
-
 	}
 
 	@Override

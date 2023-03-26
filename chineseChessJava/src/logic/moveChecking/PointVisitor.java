@@ -35,7 +35,6 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		currentPiece = piece;
 		pieceX = currentPiece.getX();
 		pieceY = currentPiece.getY();
-		
 	}
 
 	/**
@@ -45,16 +44,29 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 	public void updateBoard(Board newBoard) {
 		currentBoard = newBoard;
 	}
-	
+
 	/**
 	 * Returns true if the specified square actually exists and false if it is out of bounds
 	 * @param x The horizontal coordinate of the specified square
 	 * @param y The vertical coordinate of the specified square
-	 * @return Boolean
+	 * @return Boolean True if the piece is in range, false otherwise
 	 */
 	public Boolean isInBound(int x, int y) {
-		Boolean xInRange = (x > -1 && x < 11);
-		Boolean yInRange = (y > -1 && y < 11);
+		int[] standardBounds = {-1, 11};
+		return isInBound(x,y, standardBounds, standardBounds);
+	}
+
+	/**
+	 * Returns true if the specified square actually exists and false if it is out of bounds
+	 * @param x The horizontal coordinate of the specified square
+	 * @param y The vertical coordinate of the specified square
+	 * @param topLeft The min and max values of x (exclusive)
+	 * @param bottomRight The min and max values of y (exclusive)
+	 * @return Boolean True if the piece is in range, false otherwise
+	 */
+	public Boolean isInBound(int x, int y, int[] xBounds, int[] yBounds) {
+		Boolean xInRange = (x > xBounds[0] && x < xBounds[1]);
+		Boolean yInRange = (y > yBounds[0] && y < yBounds[1]);
 		return xInRange && yInRange;
 	}
 
@@ -67,7 +79,7 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 	public Boolean isEmpty(int x, int y) {
 		return (currentBoard.getPiece(x, y) == null);
 	}
-	
+
 	/**
 	 * Returns true if the specifed square has an opponent piece
 	 * @param piece The piece being moved
@@ -79,22 +91,48 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		Piece attackedPiece = currentBoard.getPiece(x,y);
 		return (currentPiece.isBlack() != attackedPiece.isBlack());
 	}
-	
-	
+
+
 	// TODO: this is broken
 	/**
 	 * Returns true if the selected piece is the only piece between the two generals, false otherwise.
 	 * @return Boolean
 	 */
-	public Boolean exposesGeneral(int newX) {
-		int blackGeneralX = currentBoard.getBlackGeneralX();
-		if(currentBoard.generalsAligned() && blackGeneralX == currentPiece.getX() && currentPiece.getX() != newX) {
+	public Boolean exposesGeneral(int newX, int newY) {
+		int generalX = currentBoard.getBlackGeneralX();
+		int numberOfPieces = 0;
+
+		boolean generalsInSameColumn = currentBoard.generalsAligned();
+		boolean currentPieceInSameColumn = generalX == pieceX;
+		boolean movingHorizontally = pieceX != newX;
+
+		boolean isGeneral = currentPiece.getType() == "General";
+		if(isGeneral) {
+			currentPieceInSameColumn = true;
+			// This only matters if they move horizontally into the column of the enemy
+			// Or if the general removes a piece in front of them
+			if(movingHorizontally) {
+				// Simulate general moving and check if in same column as enemy
+				int blackGeneralX = currentBoard.getBlackGeneralX();
+				int redGeneralX = currentBoard.getRedGeneralX();
+				generalsInSameColumn = currentPiece.isBlack()? (newX == redGeneralX) : (newX == blackGeneralX);
+				generalX = newX;
+				numberOfPieces = 1; // Offset the fact that it's the general being moved
+			} else {
+				// Simulate the piece in front being eaten
+				if(currentBoard.getPiece(newX, newY) != null) {
+					numberOfPieces = 0;
+				} else {
+					numberOfPieces = 1;
+				}
+			}
+		}
+		if(generalsInSameColumn && currentPieceInSameColumn && movingHorizontally) {
 			int blackGeneralY = currentBoard.getBlackGeneralY();
 			int redGeneralY = currentBoard.getRedGeneralY();
-			int numberOfPieces = 0;
-			
+
 			for(int y = blackGeneralY + 1; y < redGeneralY - 1; y++) {
-				if(currentBoard.getPiece(blackGeneralX, y) != null) {
+				if(currentBoard.getPiece(generalX, y) != null) {
 					numberOfPieces++;
 				}
 			}
@@ -102,9 +140,9 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Add a specified square to the list of legal moves if it the piece, upon moving to said square:
+	 * Add a specified square to the list of legal moves if the piece, upon moving to said square:
 	 * <ul>
 	 * 		<li>Is not off the board (i.e. it stays within bounds)</li>
 	 * 		<li>Does not put their general in check</li>
@@ -120,10 +158,34 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 	 * @param y The vertical coordinate of the specified square
 	 */
 	public void addIfLegal(int x, int y) {
-		
+		int[] standardBounds = {-1, 11};
+		addIfLegal(x, y, standardBounds, standardBounds);
+	}
+
+
+	/**
+	 * Add a specified square to the list of legal moves if the piece, upon moving to said square:
+	 * <ul>
+	 * 		<li>Is within bounds (either not off the board or not outside the castle)</li>
+	 * 		<li>Does not put their general in check</li>
+	 * </ul>
+	 * Upon moving to said square at least one of the following must be true:
+	 * 	<ul>
+	 * 		<li>The current piece is not on top of a friendly piec</li>
+	 * 		<li>The current piece is on top of an enemy piece</li>
+	 * 	</ul>
+	 * 
+	 * @param piece The piece being moved
+	 * @param x The horizontal coordinate of the specified square
+	 * @param y The vertical coordinate of the specified square
+	 * @param topLeft The min and max values of x (exclusive)
+	 * @param bottomRight The min and max values of y (exclusive)
+	 */
+	public void addIfLegal(int x, int y, int[] xBounds, int[] yBounds) {
+
 		// Normally isEdible shouldn't ever throw an outOfBounds error
 		// Because isEmpty will be true before that happens
-		if(isInBound(x,y) && !exposesGeneral(x) && (isEmpty(x,y) || isEdible(x,y)) ) {
+		if(isInBound(x,y, xBounds, yBounds) && !exposesGeneral(x,y) && (isEmpty(x,y) || isEdible(x,y)) ) {
 			addLegal(x,y);
 		}
 	}
@@ -149,7 +211,7 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		addIfLegal(x+1, y);
 		addIfLegal(x-1, y);
 	}
-	
+
 	public int locateEnemyGeneral(Piece currentPiece) {
 		int enemyY;
 		if(currentPiece.isBlack()) {
@@ -157,10 +219,10 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		} else {
 			enemyY = currentBoard.getBlackGeneralY();
 		}
-		
+
 		// We don't care about the enemy general if they're out of reach
 		if(Math.abs(enemyY - currentPiece.getY()) <= 1) {
-			
+
 		}
 		return 0;
 	}
@@ -170,9 +232,9 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		init(piece);
 
 		int posY = pieceY;
-		
+
 		// Checking vertical movement //
-		
+
 		// Java 'reads' left to right, therefore posY -= 1 will be the first thing to be done
 		// Therefore isUnoccupied's first call will be with parameters (pieceX, pieceY-1)
 		// And will stop once posY is less than 0, avoiding an outOfBoundsError
@@ -205,7 +267,7 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		}
 		while(++posX <= 10 && isEmpty(posX, pieceY)) { }
 		addIfLegal(posX, pieceY);
-		
+
 		return legalMoves;
 	}
 
@@ -238,7 +300,7 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 			addLegal(posX, pieceY);
 		}
 		addIfLegal(posX, pieceY);
-		
+
 		return legalMoves;
 	}
 
@@ -255,10 +317,17 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 	@Override
 	public ArrayList<Integer[]> visit(General piece) {
 		init(piece);
-		addIfLegal(pieceX, pieceY+1);
-		addIfLegal(pieceX, pieceY-1);
-		addIfLegal(pieceX+1, pieceY);
-		addIfLegal(pieceX-1, pieceY);
+		int[] xBounds = {-2,8};
+		int[] yBounds = {7,11};
+		if(piece.isBlack()) {
+			yBounds[0] = -1;
+			yBounds[1] = 3;
+		}
+
+		addIfLegal(pieceX, pieceY+1, xBounds, yBounds);
+		addIfLegal(pieceX, pieceY-1, xBounds, yBounds);
+		addIfLegal(pieceX+1, pieceY, xBounds, yBounds);
+		addIfLegal(pieceX-1, pieceY, xBounds, yBounds);
 		return legalMoves;
 	}
 
@@ -301,7 +370,7 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 
 		return legalMoves;
 	}
-	
+
 	@Override
 	public ArrayList<Integer[]> visit(Soldier piece) {
 		init(piece);
