@@ -8,8 +8,8 @@ import logic.moveChecking.PieceVisitor;
 
 public class Chariot extends Piece{
 
-    public Chariot(boolean place, int x, int y) {
-        super(place, x, y);
+    public Chariot(boolean place, int x, int y, int id) {
+        super(place, x, y, id, 9);
         this.type = "Chariot";
     }
 

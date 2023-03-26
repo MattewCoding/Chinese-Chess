@@ -13,8 +13,6 @@ public class Moving {
 	private boolean attack;
 	private boolean legal;
 	
-	private int redGeneralX, redGeneralY, blackGeneralX, blackGeneralY;
-
 	/**
 	 * This is the deep checker. Upon instantiation it will:
 	 * <ul>
@@ -38,10 +36,17 @@ public class Moving {
 		Piece currentPiece = board.getPiece(move.getOriginX(), move.getOriginY());
 		
 		//  2. Check if moving the piece exposes our general
-		if (legal && currentPiece.getType() == "General") {
-			board.updateGenerals(move.getFinalX(), move.getFinalY(), currentPiece.isBlack());
-			legal = board.approveGenerals(move);
+		if (legal) {
+			if(currentPiece.getType() == "General") {
+				// Simulate the general move to test validity
+				board.updateGenerals(move.getFinalX(), move.getFinalY(), currentPiece.isBlack());
+				legal = board.approveGenerals(move);
+				board.updateGenerals(move.getOriginX(), move.getOriginY(), currentPiece.isBlack());
+			} else {
+				legal = board.approveGenerals(move);
+			}
 		}
+		//System.out.println("Moving: Moving: " + legal);
 		
 		//  3. check if we are doing an attack, and also check if the end point is blocked by a friendly piece
 		if (legal) {
@@ -270,6 +275,10 @@ public class Moving {
 
 	public boolean isLegal() {
 		return legal;
+	}
+	
+	public Move getMove() {
+		return move;
 	}
 }
 
