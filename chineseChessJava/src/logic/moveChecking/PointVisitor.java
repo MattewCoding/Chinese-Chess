@@ -46,12 +46,12 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 	}
 
 	/**
-	 * Returns true if the specified square actually exists and false if it is out of bounds
+	 * Returns true if the specified square exists (that is, is an existing point on the board)
 	 * @param x The horizontal coordinate of the specified square
 	 * @param y The vertical coordinate of the specified square
 	 * @return Boolean True if the piece is in range, false otherwise
 	 */
-	public Boolean isInBound(int x, int y) {
+	public Boolean isInBoard(int x, int y) {
 		int[] standardBounds = {-1, 11};
 		return isInBound(x,y, standardBounds, standardBounds);
 	}
@@ -160,6 +160,38 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 	public void addIfLegal(int x, int y) {
 		int[] standardBounds = {-1, 11};
 		addIfLegal(x, y, standardBounds, standardBounds);
+	}
+
+	/**
+	 * Check if a piece is legal, but only if the move is restricted to the castle
+	 * 
+	 * @param piece The piece being moved
+	 * @param x The horizontal coordinate of the specified square
+	 * @param y The vertical coordinate of the specified square
+	 */
+	public void addIfLegalCastle(int x, int y) {
+		int[] xBounds = {2,8};
+		int[] yBounds = {7,11};
+		if(currentPiece.isBlack()) { // Castle on different side
+			yBounds[0] = -1;
+			yBounds[1] = 3;
+		}
+		addIfLegal(x, y, xBounds, yBounds);
+	}
+	
+	/**
+	 * River variant
+	 * @param x
+	 * @param y
+	 */
+	public void addIfLegalRiver(int x, int y) {
+		int[] xBounds = {-1,11};
+		int[] yBounds = {5,11};
+		if(currentPiece.isBlack()) { // Castle on top side
+			yBounds[0] = -1;
+			yBounds[1] = 5;
+		}
+		addIfLegal(x, y, xBounds, yBounds);
 	}
 
 
@@ -307,37 +339,45 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 	@Override
 	public ArrayList<Integer[]> visit(Elephant piece) {
 		init(piece);
-		addIfLegal(pieceX+2, pieceY+2);
-		addIfLegal(pieceX+2, pieceY-2);
-		addIfLegal(pieceX-2, pieceY+2);
-		addIfLegal(pieceX-2, pieceY-2);
+
+		if(isInBoard(pieceX+1, pieceY+1) && isEmpty(pieceX+1, pieceY+1)) {
+			addIfLegalRiver(pieceX+2, pieceY+2);
+		}
+
+		if(isInBoard(pieceX+1, pieceY-1) && isEmpty(pieceX+1, pieceY-1)) {
+			addIfLegalRiver(pieceX+2, pieceY-2);
+		}
+
+		if(isInBoard(pieceX-1, pieceY+1) && isEmpty(pieceX-1, pieceY+1)) {
+			addIfLegalRiver(pieceX-2, pieceY+2);
+		}
+
+		if(isInBoard(pieceX-1, pieceY-1) && isEmpty(pieceX-1, pieceY-1)) {
+			addIfLegalRiver(pieceX-2, pieceY-2);
+		}
+		
 		return legalMoves;
 	}
 
 	@Override
 	public ArrayList<Integer[]> visit(General piece) {
 		init(piece);
-		int[] xBounds = {-2,8};
-		int[] yBounds = {7,11};
-		if(piece.isBlack()) {
-			yBounds[0] = -1;
-			yBounds[1] = 3;
-		}
 
-		addIfLegal(pieceX, pieceY+1, xBounds, yBounds);
-		addIfLegal(pieceX, pieceY-1, xBounds, yBounds);
-		addIfLegal(pieceX+1, pieceY, xBounds, yBounds);
-		addIfLegal(pieceX-1, pieceY, xBounds, yBounds);
+		addIfLegalCastle(pieceX, pieceY+1);
+		addIfLegalCastle(pieceX, pieceY-1);
+		addIfLegalCastle(pieceX+1, pieceY);
+		addIfLegalCastle(pieceX-1, pieceY);
 		return legalMoves;
 	}
 
 	@Override
 	public ArrayList<Integer[]> visit(Guard piece) {
 		init(piece);
-		addIfLegal(pieceX+1, pieceY+1);
-		addIfLegal(pieceX+1, pieceY-1);
-		addIfLegal(pieceX-1, pieceY+1);
-		addIfLegal(pieceX-1, pieceY-1);
+		
+		addIfLegalCastle(pieceX+1, pieceY+1);
+		addIfLegalCastle(pieceX+1, pieceY-1);
+		addIfLegalCastle(pieceX-1, pieceY+1);
+		addIfLegalCastle(pieceX-1, pieceY-1);
 		return legalMoves;
 	}
 
@@ -346,24 +386,24 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		init(piece);
 
 		// Since a horse moves straight then diagonally, check whether it can first move straight
-		if(isInBound(pieceX+1, pieceY) && isEmpty(pieceX+1, pieceY)) { //right
+		if(isInBoard(pieceX+1, pieceY) && isEmpty(pieceX+1, pieceY)) { //right
 			int tempX = pieceX+2;
 			addIfLegal(tempX, pieceY+1);
 			addIfLegal(tempX, pieceY-1);
 		}
 
-		if(isInBound(pieceX-1, pieceY) && isEmpty(pieceX-1, pieceY)) { //left
+		if(isInBoard(pieceX-1, pieceY) && isEmpty(pieceX-1, pieceY)) { //left
 			int tempX = pieceX-2;
 			addIfLegal(tempX, pieceY+1);
 			addIfLegal(tempX, pieceY-1);
 		}
 
-		if(isInBound(pieceX, pieceY+1) && isEmpty(pieceX, pieceY+1)) { //down
+		if(isInBoard(pieceX, pieceY+1) && isEmpty(pieceX, pieceY+1)) { //down
 			int tempY = pieceY+2;
 			checkLeftAndRight(pieceX, tempY);
 		}
 
-		if(isInBound(pieceX, pieceY-1) && isEmpty(pieceX, pieceY-1)) { //up
+		if(isInBoard(pieceX, pieceY-1) && isEmpty(pieceX, pieceY-1)) { //up
 			int tempY = pieceY-2;
 			checkLeftAndRight(pieceX, tempY);
 		}

@@ -43,7 +43,7 @@ public class Board {
 	public static final int DRAW = 0;
 	public static final int NA = -1;
 
-	//private static Logger logDataBoard = LoggerUtility.getLogger(SubMenu.class, "html");
+	private static Logger logDataBoard = LoggerUtility.getLogger(SubMenu.class, "html");
 
 	public Board() {
 		HashMap<Integer, Piece> blackPieces = new HashMap<Integer, Piece>();
@@ -145,23 +145,18 @@ public class Board {
 	}
     
     
-    public Move GenerateMoves(List<Piece> randomPieces){
+    public Move GenerateMoves(List<Piece> randomPieces) throws Exception{
     	searchValidMoves = new PointVisitor(this);
     	ArrayList<Integer[]> legalMoves = new ArrayList<Integer[]>();
     	Piece movingPiece = null;
 
     	Random random = new Random();
-    	while(legalMoves.size() == 0) { // Make sure the piece can actually move
+    	while(legalMoves.size() == 0) { // Make sure the piece has any legal moves
     		movingPiece = randomPieces.get(random.nextInt(randomPieces.size()));
     		legalMoves = movingPiece.accept(searchValidMoves);
     	}
     	Integer[] legalMove = legalMoves.get(random.nextInt(0,legalMoves.size()));
     	Move move = new Move(movingPiece, movingPiece.getX(),movingPiece.getY(),legalMove[0],legalMove[1]);
-    	while(!new Moving(this,move).isLegal()) {
-    		//System.out.println("Board: GenerateMoves: " + movingPiece.getX() + " " + movingPiece.getY() + " " + legalMove[0] + " " + legalMove[1]);
-        	legalMove = legalMoves.get(random.nextInt(0,legalMoves.size()));
-        	move = new Move(movingPiece, movingPiece.getX(),movingPiece.getY(),legalMove[0],legalMove[1]);
-    	}
     	return move;
     }
     
@@ -183,6 +178,12 @@ public class Board {
     }
 
 
+    /**
+     * Checks to see if a move checkmates.
+     * @param moving The move the user wants to do
+     * @param player The player profile
+     * @return Whether the move is legal
+     */
 	public boolean tryMove(Moving moving, Profile player) {
 		Move move = moving.getMove();
 
