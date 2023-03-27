@@ -7,6 +7,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -14,12 +15,12 @@ import java.awt.geom.Ellipse2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+
 
 import org.apache.logging.log4j.Logger;
 
@@ -32,6 +33,20 @@ import outOfGameScreens.EndGame;
 import outOfGameScreens.Profile;
 import outOfGameScreens.ScreenParameters;
 import outOfGameScreens.menus.SubMenu;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseAdapter;
+
+
+
 
 /**
  * This class is the panel in which the chess pieces are printed
@@ -61,7 +76,6 @@ public class GUI extends JPanel implements MouseListener{
 	private Piece movingPiece = null;
 	private boolean mouseClickedPiece = false;
 	private boolean mouseMovingPiece = false;
-	private List<Piece> randomPieces;
 
 	// players
 	private Profile player1, player2;
@@ -86,11 +100,24 @@ public class GUI extends JPanel implements MouseListener{
 	private ArrayList<Piece> capturedPieceBlack;
 	private int capturedMargin = (int) (15 * ScreenParameters.XREDUCE);
 	private int deplacepiecesX = capturedMargin;
+	
+	//music box
+		int imageWidth = 30;
+		int imageHeight = 30;
 
+		int musicBoxX = center - imageWidth - 5;
+		int soundBoxX = center + 5;
+
+		int boxY = margin - imageHeight - 5;
+	
 	// Points
 	private PointVisitor searchValidMoves;
 
 	private static Logger logDataGUI = LoggerUtility.getLogger(SubMenu.class, "html");
+	private boolean soundOn = true;
+	private String soundFilename = "/Users/abdelbassirimane/Documents/javachess/sound.wav";
+	private String musicFilename = "/Users/abdelbassirimane/Documents/javachess/music.wav";
+	private Clip clip;
 
 	public GUI() {
 		board = new Board();
@@ -103,66 +130,78 @@ public class GUI extends JPanel implements MouseListener{
 
 		//timerListener = new TimerListener();
 		player1 = new Profile("Rona",0,false);
-		player2 = new Profile("Computer",0,true);
+		player2 = new Profile("Mattew",0,true);
 		player2.getTimer().stop();
-
+		
 		searchValidMoves = new PointVisitor(board);
 
 		addMouseListener(this);
+		
+
+		
 	}
 
 	/**
 	 * Updates the state of the game
 	 */
 	public void checkPieces() {
-		if(redTurn || player2.getId()!="Computer") {
-			if(mouseClickedPiece && mouseMovingPiece) {
+		if(mouseClickedPiece && mouseMovingPiece) {
 
-			// Player1's turn (or the not-computer)
+			// Check if move is legal
+			Move move = new Move(pieceX, pieceY, mouseX, mouseY);
+			//Moving moving = new Moving(board,move);
+			//board.tryMove(move, player1, player2);
 
-				// Check if move is legal
-				Move move = new Move(pieceX, pieceY, mouseX, mouseY);
-				Moving moving = new Moving(board, move);
+			// This name is just as long as writing the right side of this equation
+			// But it's much clearer to understand why the boolean is true or false
+			boolean thePieceClickedOnIsRed = !board.getPiece(pieceX, pieceY).isBlack();
+			Piece thePieceBeingAttacked = board.getPiece(mouseX, mouseY);
 
-				// This name is just as long as writing the right side of this equation
-				// But it's much clearer to understand why the boolean is true or false
-				boolean thePieceClickedOnIsRed = !board.getPiece(pieceX, pieceY).isBlack();
-				//logDataGUI.info( "\n(redTurn && board.tryMove(move, player1) = " + (redTurn && board.tryMove(move, player1)) + " (!redTurn && board.tryMove(move, player2)) = " + (!redTurn && board.tryMove(move, player2)) );
+			logDataGUI.info( "(redTurn && board.tryMove(move, player1) = " + (redTurn && board.tryMove(move, player1)) + " (!redTurn && board.tryMove(move, player2)) = " + (!redTurn && board.tryMove(move, player2)) );
+			
 
-				if(moving.isLegal() && (redTurn && board.tryMove(moving, player1)) || (!redTurn && board.tryMove(moving, player2))) {
-					if(thePieceClickedOnIsRed == true) { // Player 1's turn is over
-						player1.stopTurnTimer();
-						player2.startTurnTimer();
-					} else {
-						player2.stopTurnTimer();
-						player1.startTurnTimer();
-					}
-					redTurn = !redTurn;
-
-					board.doMove(move);
-
-					updateCaptured();
-					updateNotation(move, movingPiece);
-
-					mouseClickedPiece = false;
+			//i removed moving.isLegal() && from the if statment and  && redTurn == thePieceClickedOnIsRed
+			if((redTurn && board.tryMove(move, player1)) || (!redTurn && board.tryMove(move, player2))) {
+				if(thePieceClickedOnIsRed == true) { // Player 1's turn is over
+					player1.stopTurnTimer();
+					player2.startTurnTimer();
+				}else{
+					player2.stopTurnTimer();
+					player1.startTurnTimer();
 				}
-				mouseMovingPiece = false;
+				redTurn = !redTurn;
+
+				board.doMove(move);
+
+				updateCaptured();
+				updateNotation(move, movingPiece);
+
+				mouseClickedPiece = false;
 			}
-		} else {
-			// Auto generate a move
-			Move move = board.GenerateMoves(randomPieces);
-
-			// We know it's not red's turn, and we know it's a legal move
-			player2.stopTurnTimer();
-			player1.startTurnTimer();
-			redTurn = !redTurn;
-
-			board.doMove(move);
-
-			updateCaptured();
-		}
+			mouseMovingPiece = false;
+			}
+		
 	}
-
+	/*
+	 */
+	public void playSound(String filename,boolean stop) {
+	    try {
+	    	if (stop) {
+	            clip.stop();
+	            return;
+	        }
+	        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filename).getAbsoluteFile());
+	        Clip clip = AudioSystem.getClip();
+	        clip.open(audioInputStream);
+	        clip.start();
+	    } catch (UnsupportedAudioFileException e) {
+	        e.printStackTrace();
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    } catch (LineUnavailableException e) {
+	        e.printStackTrace();
+	    }
+	}
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -213,20 +252,57 @@ public class GUI extends JPanel implements MouseListener{
 			}
 
 		}
-
+		
+		
 		drawPieceImages();
 		drawTurnTimer();
 		drawNotation();
 		drawCapturedBox();
-
+		drawMusicImages();
+		
 		if(mouseClickedPiece) {
 			drawPoints();
 		}
 	}
-
+	
 	public void logCreationData() {
 		logDataGUI.info(board.toString());
 		logDataGUI.info("Players created: Player 1 is " + player1.getId() + " and Player 2 is " + player2.getId());
+	}
+	
+	public void drawMusicImages() {
+		Image musicImage = null;
+		Image soundImage = null;
+		try {
+		    musicImage = ImageIO.read(new File("/Users/abdelbassirimane/Documents/javachess/logo/musicon.png"));
+		    soundImage = ImageIO.read(new File("/Users/abdelbassirimane/Documents/javachess/logo/soundon.png"));
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
+		
+		Rectangle soundImageBox;
+		Rectangle musicImageBox;
+
+		
+
+		// draw music box
+		g2.setColor(Color.WHITE);
+		g2.fillRect(musicBoxX, boxY, imageWidth, imageHeight);
+		g2.setColor(Color.BLACK);
+		g2.setStroke(new BasicStroke(strokeWidth));
+		g2.drawRect(musicBoxX, boxY, imageWidth, imageHeight);
+		g2.drawImage(musicImage, musicBoxX + 2, boxY + 2, imageWidth - 4, imageHeight - 4, null);
+		musicImageBox = new Rectangle(musicBoxX, boxY, imageWidth, imageHeight);
+		
+
+		// draw sound box
+		g2.setColor(Color.WHITE);
+		g2.fillRect(soundBoxX, boxY, imageWidth, imageHeight);
+		g2.setColor(Color.BLACK);
+		g2.setStroke(new BasicStroke(strokeWidth));
+		g2.drawRect(soundBoxX, boxY, imageWidth, imageHeight);
+		g2.drawImage(soundImage, soundBoxX + 2, boxY + 2, imageWidth - 4, imageHeight - 4, null);
+		soundImageBox = new Rectangle(soundBoxX, boxY, imageWidth, imageHeight);
 	}
 
 	/**
@@ -346,20 +422,19 @@ public class GUI extends JPanel implements MouseListener{
 	 */
 	public void drawPoints() {
 		ArrayList<Integer[]> legalMoves = movingPiece.accept(searchValidMoves);
-
+		
 		int circleSize = squareLength*2/5;
 		int displacement = squareLength - circleSize;
-
+		
 		for(Integer[] legalCoord : legalMoves) {
 			int col = legalCoord[0], row = legalCoord[1];
-
 			int topLeftX = leftMostPixel + col * squareLength + displacement/2;
 			int topLeftY = margin + row * squareLength + displacement/2;
-
+			
 			drawCircle(new Color(0f,0f,0f,.5f), topLeftX, topLeftY, circleSize);
 		}
 	}
-
+	
 	/**
 	 * Draw a circle
 	 * @param fillColor The color of the circle's interior
@@ -393,13 +468,13 @@ public class GUI extends JPanel implements MouseListener{
 		if(pastMovesArrayList.size() > turnsFittableInBox) {
 			pastMovesArrayList.remove(0);
 		}
-		if(Board.getWinner()!=-1) {
+		if(board.getWinner()!=-1) {
 			player1.calculateScore();
 			player2.calculateScore();
 			player2.stopTurnTimer();
 			player1.stopTurnTimer();
-			EndGame endgame = new EndGame(Board.getWinner(),player1,player2);
-
+			EndGame endgame = new EndGame(board.getWinner(),player1,player2);
+			
 		}
 	}
 
@@ -421,23 +496,24 @@ public class GUI extends JPanel implements MouseListener{
 
 		boolean xInRange = (mouseX >= 0) && (mouseX <= 10);
 		boolean yInRange = (mouseY >= 0) && (mouseY <= 10);
-
+		
 		if(xInRange && yInRange) {
 			if(mouseClickedPiece) {
 				Piece newPiece = board.getPiece(mouseX,mouseY);
-				boolean canSwitchPlace = false;
+				boolean switchedPiece = false;
 				if(newPiece != null) {
-					canSwitchPlace = newPiece.isBlack() == movingPiece.isBlack();
+					switchedPiece = newPiece.isBlack() == movingPiece.isBlack();
 
 					//Update current piece and location
-					if(canSwitchPlace) {
+					if(switchedPiece) {
 						movingPiece = newPiece;
 						pieceX = mouseX;
 						pieceY = mouseY;
 					}
 				}
-				mouseMovingPiece = !canSwitchPlace;
-			} else {
+				mouseMovingPiece = !switchedPiece;
+			}
+			else {
 				movingPiece = board.getPiece(mouseX,mouseY);
 				pieceX = mouseX;
 				pieceY = mouseY;
@@ -451,10 +527,28 @@ public class GUI extends JPanel implements MouseListener{
 		else {
 			mouseClickedPiece = false;
 		}
-	}
+		boolean xMusicRange = (e.getX() >= soundBoxX) && (e.getX() <= imageWidth+soundBoxX);
+		boolean yMusicRange = (e.getY() >= boxY) && (e.getY() <= imageHeight+boxY);
+		System.out.println(imageWidth/2+soundBoxX);
+		System.out.println(e.getX() + "test");
+		
+		if(xMusicRange && yMusicRange) {
+			if (soundOn) {
+	            soundOn = false;
+	            playSound(soundFilename, true);
+	        } else {
+	            playSound(musicFilename, false);
+	        }
+	    	
+	    }
+	
+    }
+		
+	
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
+		
 	}
 
 	@Override
