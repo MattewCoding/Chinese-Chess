@@ -7,6 +7,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -17,6 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -86,6 +92,22 @@ public class GUI extends JPanel implements MouseListener{
 	private ArrayList<Piece> capturedPieceBlack;
 	private int capturedMargin = (int) (15 * ScreenParameters.XREDUCE);
 	private int deplacepiecesX = capturedMargin;
+	
+	//music box
+	int imageWidth = 30;
+	int imageHeight = 30;
+
+	int musicBoxX = center - imageWidth - 5;
+	int soundBoxX = center + 5;
+
+	int boxY = margin - imageHeight - 5;
+	
+	private boolean soundOn = true;
+	private boolean musicOn = true;
+	private String soundFilename = "music-sounds/sound.wav";
+	private String musicFilename = "music-sounds/music.wav";
+	private Clip clip;
+	private Clip musicClip;
 
 	// Points
 	private PointVisitor searchValidMoves;
@@ -106,8 +128,21 @@ public class GUI extends JPanel implements MouseListener{
 		player2 = new Profile("Computer",0,true);
 		player2.getTimer().stop();
 
-		randomPieces = board.getAllPieces();
 		searchValidMoves = new PointVisitor(board);
+		
+        AudioInputStream audioInputStream;
+		try {
+			audioInputStream = AudioSystem.getAudioInputStream(new File(musicFilename).getAbsoluteFile());
+	        musicClip = AudioSystem.getClip();
+	        musicClip.open(audioInputStream);
+	        musicClip.start();
+	    } catch (UnsupportedAudioFileException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (LineUnavailableException e) {
+			e.printStackTrace();
+		}
 
 		addMouseListener(this);
 	}
@@ -144,12 +179,14 @@ public class GUI extends JPanel implements MouseListener{
 
 					updateCaptured();
 					updateNotation(move, movingPiece);
-
+					playSound(soundFilename, !soundOn ,soundOn);
+					
 					mouseClickedPiece = false;
 				}
 				mouseMovingPiece = false;
 			}
 		} else {
+			randomPieces = board.getAllPieces();
 			// Auto generate a move
 			Move move = board.GenerateMoves(randomPieces);
 
@@ -162,6 +199,48 @@ public class GUI extends JPanel implements MouseListener{
 
 			updateCaptured();
 			updateNotation(move, move.getPiece());
+		}
+	}
+	
+	public void playMusic(boolean play) {
+		if(play) {
+	        AudioInputStream audioInputStream;
+			try {
+				audioInputStream = AudioSystem.getAudioInputStream(new File(musicFilename).getAbsoluteFile());
+		        musicClip = AudioSystem.getClip();
+		        musicClip.open(audioInputStream);
+		        musicClip.start();
+		    } catch (UnsupportedAudioFileException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (LineUnavailableException e) {
+				e.printStackTrace();
+			}
+		} else {
+			musicClip.stop();
+        }
+		
+	}
+	
+	public void playSound(String filename,boolean stop, boolean play) {
+		if(play) {
+		    try {
+		    	if (stop) {
+		            clip.stop();
+		            return;
+		        }
+		        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filename).getAbsoluteFile());
+		        Clip clip = AudioSystem.getClip();
+		        clip.open(audioInputStream);
+		        clip.start();
+		    } catch (UnsupportedAudioFileException e) {
+		        e.printStackTrace();
+		    } catch (IOException e) {
+		        e.printStackTrace();
+		    } catch (LineUnavailableException e) {
+		        e.printStackTrace();
+		    }
 		}
 	}
 
@@ -215,11 +294,11 @@ public class GUI extends JPanel implements MouseListener{
 			}
 
 		}
-
 		drawPieceImages();
 		drawTurnTimer();
 		drawNotation();
 		drawCapturedBox();
+		drawMusicImages();
 
 		if(mouseClickedPiece) {
 			drawPoints();
@@ -251,6 +330,41 @@ public class GUI extends JPanel implements MouseListener{
 		}
 	}
 
+	
+	public void drawMusicImages() {
+		Image musicImage = null;
+		Image soundImage = null;
+		try {
+		    musicImage = ImageIO.read(new File("logo/musicon.png"));
+		    soundImage = ImageIO.read(new File("logo/soundon.png"));
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
+		
+		Rectangle soundImageBox;
+		Rectangle musicImageBox;
+
+		
+
+		// draw music box
+		g2.setColor(Color.WHITE);
+		g2.fillRect(musicBoxX, boxY, imageWidth, imageHeight);
+		g2.setColor(Color.BLACK);
+		g2.setStroke(new BasicStroke(strokeWidth));
+		g2.drawRect(musicBoxX, boxY, imageWidth, imageHeight);
+		g2.drawImage(musicImage, musicBoxX + 2, boxY + 2, imageWidth - 4, imageHeight - 4, null);
+		musicImageBox = new Rectangle(musicBoxX, boxY, imageWidth, imageHeight);
+		
+
+		// draw sound box
+		g2.setColor(Color.WHITE);
+		g2.fillRect(soundBoxX, boxY, imageWidth, imageHeight);
+		g2.setColor(Color.BLACK);
+		g2.setStroke(new BasicStroke(strokeWidth));
+		g2.drawRect(soundBoxX, boxY, imageWidth, imageHeight);
+		g2.drawImage(soundImage, soundBoxX + 2, boxY + 2, imageWidth - 4, imageHeight - 4, null);
+		soundImageBox = new Rectangle(soundBoxX, boxY, imageWidth, imageHeight);
+	}
 	/**
 	 * Draws the turn timer for both players
 	 */
@@ -420,6 +534,12 @@ public class GUI extends JPanel implements MouseListener{
 		// (casting directly to int does that for some reason)
 		mouseX = Math.floorDiv((e.getX()-leftMostPixel), squareLength);
 		mouseY = Math.floorDiv((e.getY()-margin), squareLength);
+		
+		boolean xSoundRange = (e.getX() >= soundBoxX) && (e.getX() <= imageWidth+soundBoxX);
+		boolean ySoundRange = (e.getY() >= boxY) && (e.getY() <= imageHeight+boxY);
+		
+		boolean xMusicRange = (e.getX() >= musicBoxX) && (e.getX() <= imageWidth+musicBoxX);
+		boolean yMusicRange = (e.getY() >= boxY) && (e.getY() <= imageHeight+boxY);
 
 		boolean xInRange = (mouseX >= 0) && (mouseX <= 10);
 		boolean yInRange = (mouseY >= 0) && (mouseY <= 10);
@@ -453,6 +573,22 @@ public class GUI extends JPanel implements MouseListener{
 		else {
 			mouseClickedPiece = false;
 		}
+		
+		if(xSoundRange && ySoundRange) {
+			if (soundOn) {
+	            soundOn = false;
+	        } else {
+	        	soundOn = true;
+	        }
+	    	
+	    }
+		
+		if(xMusicRange && yMusicRange) {
+	        musicOn = !musicOn;
+            playMusic(musicOn);
+	    	
+	    }
+		
 	}
 
 	@Override
