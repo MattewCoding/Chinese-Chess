@@ -43,7 +43,7 @@ public class Board {
 	public static final int DRAW = 0;
 	public static final int NA = -1;
 
-	private static Logger logDataBoard = LoggerUtility.getLogger(SubMenu.class, "html");
+	//private static Logger logDataBoard = LoggerUtility.getLogger(SubMenu.class, "html");
 
 	public Board() {
 		HashMap<Integer, Piece> blackPieces = new HashMap<Integer, Piece>();
@@ -156,11 +156,11 @@ public class Board {
     		legalMoves = movingPiece.accept(searchValidMoves);
     	}
     	Integer[] legalMove = legalMoves.get(random.nextInt(0,legalMoves.size()));
-    	Move move = new Move(movingPiece.getX(),movingPiece.getY(),legalMove[0],legalMove[1]);
+    	Move move = new Move(movingPiece, movingPiece.getX(),movingPiece.getY(),legalMove[0],legalMove[1]);
     	while(!new Moving(this,move).isLegal()) {
     		//System.out.println("Board: GenerateMoves: " + movingPiece.getX() + " " + movingPiece.getY() + " " + legalMove[0] + " " + legalMove[1]);
         	legalMove = legalMoves.get(random.nextInt(0,legalMoves.size()));
-        	move = new Move(movingPiece.getX(),movingPiece.getY(),legalMove[0],legalMove[1]);
+        	move = new Move(movingPiece, movingPiece.getX(),movingPiece.getY(),legalMove[0],legalMove[1]);
     	}
     	return move;
     }

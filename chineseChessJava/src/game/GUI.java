@@ -90,7 +90,7 @@ public class GUI extends JPanel implements MouseListener{
 	// Points
 	private PointVisitor searchValidMoves;
 
-	private static Logger logDataGUI = LoggerUtility.getLogger(SubMenu.class, "html");
+	//private static Logger logDataGUI = LoggerUtility.getLogger(SubMenu.class, "html");
 
 	public GUI() {
 		board = new Board();
@@ -106,6 +106,7 @@ public class GUI extends JPanel implements MouseListener{
 		player2 = new Profile("Computer",0,true);
 		player2.getTimer().stop();
 
+		randomPieces = board.getAllPieces();
 		searchValidMoves = new PointVisitor(board);
 
 		addMouseListener(this);
@@ -160,6 +161,7 @@ public class GUI extends JPanel implements MouseListener{
 			board.doMove(move);
 
 			updateCaptured();
+			updateNotation(move, move.getPiece());
 		}
 	}
 
@@ -173,7 +175,7 @@ public class GUI extends JPanel implements MouseListener{
 			g.drawImage(background,0,0,null);
 
 		} catch (IOException e) {
-			logDataGUI.error("Image at " + imgLocation + " was not found.");
+			//logDataGUI.error("Image at " + imgLocation + " was not found.");
 		}
 
 		// Drawing board
@@ -224,10 +226,10 @@ public class GUI extends JPanel implements MouseListener{
 		}
 	}
 
-	public void logCreationData() {
-		logDataGUI.info(board.toString());
-		logDataGUI.info("Players created: Player 1 is " + player1.getId() + " and Player 2 is " + player2.getId());
-	}
+	/*public void logCreationData() {
+		//logDataGUI.info(board.toString());
+		//logDataGUI.info("Players created: Player 1 is " + player1.getId() + " and Player 2 is " + player2.getId());
+	}*/
 
 	/**
 	 * Places the different pieces on the board
