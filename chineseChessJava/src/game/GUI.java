@@ -7,6 +7,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -32,6 +33,13 @@ import outOfGameScreens.EndGame;
 import outOfGameScreens.Profile;
 import outOfGameScreens.ScreenParameters;
 import outOfGameScreens.menus.SubMenu;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.nio.file.Paths;
 
 /**
  * This class is the panel in which the chess pieces are printed
@@ -90,7 +98,22 @@ public class GUI extends JPanel implements MouseListener{
 	// Points
 	private PointVisitor searchValidMoves;
 
+	// Music box
+	int imageWidth = 30;
+	int imageHeight = 30;
+	int musicBoxX = center - imageWidth - 5;
+	int soundBoxX = center + 5;
+	int boxY = margin - imageHeight - 5;
+
+	private boolean soundOn = true;
+	private boolean musicOn = true;
+	private String soundFilename = "music-sounds/Board-Game-Wood-Piece-Capture-Chess.wav";
+	private String musicFilename = "music-sounds/chess-pieces-60890.wav";
+	private Clip clip;
+	private Clip musicClip;
+
 	private static Logger logDataGUI = LoggerUtility.getLogger(SubMenu.class, "html");
+	private boolean debug = true;
 
 	public GUI() {
 		board = new Board();
@@ -108,6 +131,20 @@ public class GUI extends JPanel implements MouseListener{
 
 		searchValidMoves = new PointVisitor(board);
 
+		AudioInputStream audioInputStream;
+		try {
+			audioInputStream = AudioSystem.getAudioInputStream(new File(musicFilename).getAbsoluteFile());
+			musicClip = AudioSystem.getClip();
+			musicClip.open(audioInputStream);
+			musicClip.start();
+		} catch (UnsupportedAudioFileException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (LineUnavailableException e) {
+			e.printStackTrace();
+		}
+
 		addMouseListener(this);
 	}
 
@@ -115,51 +152,90 @@ public class GUI extends JPanel implements MouseListener{
 	 * Updates the state of the game
 	 */
 	public void checkPieces() {
-		if(redTurn || player2.getId()!="Computer") {
-			if(mouseClickedPiece && mouseMovingPiece) {
 
-			// Player1's turn (or the not-computer)
-
-				// Check if move is legal
-				Move move = new Move(pieceX, pieceY, mouseX, mouseY);
-				Moving moving = new Moving(board, move);
-
-				// This name is just as long as writing the right side of this equation
-				// But it's much clearer to understand why the boolean is true or false
-				boolean thePieceClickedOnIsRed = !board.getPiece(pieceX, pieceY).isBlack();
-				//logDataGUI.info( "\n(redTurn && board.tryMove(move, player1) = " + (redTurn && board.tryMove(move, player1)) + " (!redTurn && board.tryMove(move, player2)) = " + (!redTurn && board.tryMove(move, player2)) );
-
-				if(moving.isLegal() && (redTurn && board.tryMove(moving, player1)) || (!redTurn && board.tryMove(moving, player2))) {
-					if(thePieceClickedOnIsRed == true) { // Player 1's turn is over
-						player1.stopTurnTimer();
-						player2.startTurnTimer();
-					} else {
-						player2.stopTurnTimer();
-						player1.startTurnTimer();
-					}
-					redTurn = !redTurn;
-
-					board.doMove(move);
-
-					updateCaptured();
-					updateNotation(move, movingPiece);
-
-					mouseClickedPiece = false;
-				}
-				mouseMovingPiece = false;
-			}
-		} else {
+		if(debug) {
+			randomPieces = board.getAllPieces();
 			// Auto generate a move
-			Move move = board.GenerateMoves(randomPieces);
+			Move move = null;
 
-			// We know it's not red's turn, and we know it's a legal move
-			player2.stopTurnTimer();
-			player1.startTurnTimer();
-			redTurn = !redTurn;
+			try {
+				move = board.GenerateMoves(randomPieces);
+			} catch (Exception e) {
+				System.out.println("this isnt supposed to happen: ");
+				System.out.println(e.toString());
+			}
 
 			board.doMove(move);
 
 			updateCaptured();
+		} else {
+
+			if(redTurn || player2.getId()!="Computer") {
+				if(mouseClickedPiece && mouseMovingPiece) {
+
+					// Player1's turn (or the not-computer)
+
+					// Check if move is legal
+					Move move = new Move(pieceX, pieceY, mouseX, mouseY);
+					Moving moving = new Moving(board, move);
+
+					// This name is just as long as writing the right side of this equation
+					// But it's much clearer to understand why the boolean is true or false
+					boolean thePieceClickedOnIsRed = !board.getPiece(pieceX, pieceY).isBlack();
+
+					boolean redChecks = redTurn && board.tryMove(moving, player1);
+					boolean blackChecks = !redTurn && board.tryMove(moving, player2);
+
+					logDataGUI.info( "(redTurn && board.tryMove(move, player1) = " + redChecks + " (!redTurn && board.tryMove(move, player2)) = " + blackChecks );
+
+					if(moving.isLegal() && (redChecks || blackChecks)) {
+						if(thePieceClickedOnIsRed == true) { // Player 1's turn is over
+							player1.stopTurnTimer();
+							player2.startTurnTimer();
+						} else {
+							player2.stopTurnTimer();
+							player1.startTurnTimer();
+						}
+						redTurn = !redTurn;
+
+						board.doMove(move);
+
+						updateCaptured();
+						updateNotation(move, movingPiece);
+
+						mouseClickedPiece = false;
+					}
+					mouseMovingPiece = false;
+				}
+			} else {
+				randomPieces = board.getAllPieces();
+				// Auto generate a move
+				Move move = null;
+
+				try {
+					move = board.GenerateMoves(randomPieces);
+				} catch (Exception e) {
+					System.out.println("this isnt supposed to happen: ");
+					System.out.println(e.toString());
+				}
+
+				/*
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}*/
+
+				// We know it's not red's turn
+				player2.stopTurnTimer();
+				player1.startTurnTimer();
+				redTurn = !redTurn;
+
+				board.doMove(move);
+
+				updateCaptured();
+				updateNotation(move, move.getPiece());
+			}
 		}
 	}
 
@@ -173,7 +249,7 @@ public class GUI extends JPanel implements MouseListener{
 			g.drawImage(background,0,0,null);
 
 		} catch (IOException e) {
-			logDataGUI.error("Image at " + imgLocation + " was not found.");
+			//logDataGUI.error("Image at " + imgLocation + " was not found.");
 		}
 
 		// Drawing board
@@ -218,15 +294,78 @@ public class GUI extends JPanel implements MouseListener{
 		drawTurnTimer();
 		drawNotation();
 		drawCapturedBox();
+		drawMusicImages();
 
 		if(mouseClickedPiece) {
 			drawPoints();
 		}
 	}
 
-	public void logCreationData() {
-		logDataGUI.info(board.toString());
-		logDataGUI.info("Players created: Player 1 is " + player1.getId() + " and Player 2 is " + player2.getId());
+	public void playMusic(boolean play) {
+		if(play) {
+			AudioInputStream audioInputStream;
+			try {
+				audioInputStream = AudioSystem.getAudioInputStream(new File(musicFilename).getAbsoluteFile());
+				musicClip = AudioSystem.getClip();
+				musicClip.open(audioInputStream);
+				musicClip.start();
+			} catch (UnsupportedAudioFileException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (LineUnavailableException e) {
+				e.printStackTrace();
+			}
+		} else {
+			musicClip.stop();
+		}
+
+	}
+
+	public void playSound(String filename,boolean stop, boolean play) {
+		if(play) {
+			try {
+				if (stop) {
+					clip.stop();
+					return;
+				}
+				AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filename).getAbsoluteFile());
+				Clip clip = AudioSystem.getClip();
+				clip.open(audioInputStream);
+				clip.start();
+			} catch (UnsupportedAudioFileException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (LineUnavailableException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/*public void logCreationData() {
+		//logDataGUI.info(board.toString());
+		//logDataGUI.info("Players created: Player 1 is " + player1.getId() + " and Player 2 is " + player2.getId());
+	}*/
+
+
+	public void drawMusicImages() {
+		Image musicImage = null;
+		Image soundImage = null;
+		try {
+			musicImage = ImageIO.read(new File("./logo/musicon.png"));
+			soundImage = ImageIO.read(new File("./logo/soundon.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// draw music box
+		CreateRectangle.drawFilledRectangle(g2, Color.BLACK, Color.WHITE, musicBoxX, boxY, imageHeight, imageWidth);
+		g2.drawImage(musicImage, musicBoxX + 2, boxY + 2, imageWidth - 4, imageHeight - 4, null);
+
+		// draw sound box
+		CreateRectangle.drawFilledRectangle(g2, Color.BLACK, Color.WHITE, soundBoxX, boxY, imageHeight, imageWidth);
+		g2.drawImage(soundImage, soundBoxX + 2, boxY + 2, imageWidth - 4, imageHeight - 4, null);
 	}
 
 	/**
@@ -334,7 +473,7 @@ public class GUI extends JPanel implements MouseListener{
 			g2.drawImage(scaledImage, x, y,squareLength-10, squareLength-10, null);
 			if(x<7*xInitial) {
 				x  += 35;
-			}else {
+			} else {
 				y += 50;
 				x = xInitial;
 			}
@@ -419,8 +558,15 @@ public class GUI extends JPanel implements MouseListener{
 		mouseX = Math.floorDiv((e.getX()-leftMostPixel), squareLength);
 		mouseY = Math.floorDiv((e.getY()-margin), squareLength);
 
+		boolean xSoundRange = (e.getX() >= soundBoxX) && (e.getX() <= imageWidth+soundBoxX);
+		boolean ySoundRange = (e.getY() >= boxY) && (e.getY() <= imageHeight+boxY);
+
+		boolean xMusicRange = (e.getX() >= musicBoxX) && (e.getX() <= imageWidth+musicBoxX);
+		boolean yMusicRange = (e.getY() >= boxY) && (e.getY() <= imageHeight+boxY);
+
 		boolean xInRange = (mouseX >= 0) && (mouseX <= 10);
 		boolean yInRange = (mouseY >= 0) && (mouseY <= 10);
+
 
 		if(xInRange && yInRange) {
 			if(mouseClickedPiece) {
@@ -446,10 +592,18 @@ public class GUI extends JPanel implements MouseListener{
 					mouseClickedPiece = redTurn != movingPiece.isBlack();
 				}
 			}
-		}
-		// We want to click off the piece
-		else {
+		} else { // We want to click off the piece
 			mouseClickedPiece = false;
+		}
+
+		if(xSoundRange && ySoundRange) {
+			soundOn = !soundOn;
+		}
+
+		if(xMusicRange && yMusicRange) {
+			musicOn = !musicOn;
+			playMusic(musicOn);
+
 		}
 	}
 
