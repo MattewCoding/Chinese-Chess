@@ -214,10 +214,20 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 	 * @param bottomRight The min and max values of y (exclusive)
 	 */
 	public void addIfLegal(int x, int y, int[] xBounds, int[] yBounds) {
+		if(y==5) {
+			int startY = currentPiece.getY();
+			if(startY < 5) { // Going downwards
+				y++;
+			} else {
+				y--;
+			}
+		}
+		
+		Integer[] position = {x, y};
 
 		// Normally isEdible shouldn't ever throw an outOfBounds error
 		// Because isEmpty will be true before that happens
-		if(isInBound(x,y, xBounds, yBounds) && !exposesGeneral(x,y) && (isEmpty(x,y) || isEdible(x,y)) ) {
+		if(!legalMoves.contains(position) && isInBound(x,y, xBounds, yBounds) && !exposesGeneral(x,y) && (isEmpty(x,y) || isEdible(x,y)) ) {
 			addLegal(x,y);
 		}
 	}
@@ -398,13 +408,15 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 			addIfLegal(tempX, pieceY-1);
 		}
 
-		if(isInBoard(pieceX, pieceY+1) && isEmpty(pieceX, pieceY+1)) { //down
-			int tempY = pieceY+2;
+		int crossRiverY = (pieceY+1 == 5)? pieceY+1 : pieceY;
+		if(isInBoard(pieceX, crossRiverY+1) && isEmpty(pieceX, crossRiverY+1)) { //down
+			int tempY = crossRiverY+2;
 			checkLeftAndRight(pieceX, tempY);
 		}
 
-		if(isInBoard(pieceX, pieceY-1) && isEmpty(pieceX, pieceY-1)) { //up
-			int tempY = pieceY-2;
+		crossRiverY = (pieceY-1 == 5)? pieceY-1 : pieceY;
+		if(isInBoard(pieceX, crossRiverY-1) && isEmpty(pieceX, crossRiverY-1)) { //up
+			int tempY = crossRiverY-2;
 			checkLeftAndRight(pieceX, tempY);
 		}
 

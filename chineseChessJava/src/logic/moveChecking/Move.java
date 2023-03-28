@@ -143,6 +143,13 @@ public class Move {
         return dy;
     }
 
+    /**
+     * Accessed by Moving in case the piece is crossing the river
+     */
+    public void setDy(int newDy) {
+        this.dy = newDy;
+    }
+
     public boolean isHorizontal() {
         return isHorizontal;
     }

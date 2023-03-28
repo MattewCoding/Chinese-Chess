@@ -145,7 +145,7 @@ public class Board {
 	}
     
     
-    public Move GenerateMoves(List<Piece> randomPieces) throws Exception{
+    public Move GenerateMoves(List<Piece> randomPieces){
     	searchValidMoves = new PointVisitor(this);
     	ArrayList<Integer[]> legalMoves = new ArrayList<Integer[]>();
     	Piece movingPiece = null;

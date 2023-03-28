@@ -30,9 +30,14 @@ public class Moving {
 		this.board = board;
 		this.move = move;
 		this.legal = true;
+		
+		//  0. check if we're crossing the river or going into the river
+		checkCrossing();
 
-		//  1. first check if movement pattern is legal (ie horse moves 1 up 2 left)
-		CheckPiece();
+		//  1. check if movement pattern is legal (ie horse moves 1 up 2 left)
+		if (legal) {
+			checkPiece();
+		}
 		Piece currentPiece = board.getPiece(move.getOriginX(), move.getOriginY());
 		
 		//  2. Check if moving the piece exposes our general
@@ -95,7 +100,7 @@ public class Moving {
 		this.legal = true;
 
 		//  1. first check if movement pattern is legal (ie horse moves 1 up 2 left)
-		CheckPiece();
+		checkPiece();
 
 		//  2. check if we are doing an attack, and also check if the end point is blocked by a friendly piece
 		if (legal) {
@@ -124,20 +129,29 @@ public class Moving {
 			}
 		}
 	}
+	
+	private void checkCrossing() {
+		Piece temp = board.getPiece(move.getOriginX(), move.getOriginY());
+		int startY = move.getOriginY(), endY = move.getFinalY();
+		boolean crossingDown = startY < 5 && endY > 5;
+		boolean crossingUp = startY > 5 && endY < 5;
+		legal = (endY != 5);
+		
+		if(crossingDown) {
+			move.setDy(move.getDy() - 1);
+		} else if(crossingUp) {
+			move.setDy(move.getDy() + 1);
+		}
+	}
 
 	/**
 	 * Checks if the move pattern is a valid move pattern and if there's a piece present.
 	 * If not, terminates the process
 	 */
-	private void CheckPiece() {
+	private void checkPiece() {
 		Piece temp = board.getPiece(move.getOriginX(), move.getOriginY());
-
-		if (temp == null) {
-			this.legal = false;
-		} else {
-			moveChecker.setCurrentMove(move);
-			this.legal = temp.accept(moveChecker);
-		}
+		moveChecker.setCurrentMove(move);
+		this.legal = temp.accept(moveChecker);
 
 	}
 

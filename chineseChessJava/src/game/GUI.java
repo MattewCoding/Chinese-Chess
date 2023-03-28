@@ -113,7 +113,7 @@ public class GUI extends JPanel implements MouseListener{
 	private Clip musicClip;
 
 	private static Logger logDataGUI = LoggerUtility.getLogger(SubMenu.class, "html");
-	private boolean debug = true;
+	private boolean debug = false;
 
 	public GUI() {
 		board = new Board();
@@ -156,14 +156,7 @@ public class GUI extends JPanel implements MouseListener{
 		if(debug) {
 			randomPieces = board.getAllPieces();
 			// Auto generate a move
-			Move move = null;
-
-			try {
-				move = board.GenerateMoves(randomPieces);
-			} catch (Exception e) {
-				System.out.println("this isnt supposed to happen: ");
-				System.out.println(e.toString());
-			}
+			Move move = board.GenerateMoves(randomPieces);
 
 			board.doMove(move);
 
