@@ -29,7 +29,7 @@ public class Board {
 	private final int COLUMNS = 11;
 	private final int ROWS = 11;
 	private int mirror;
-    
+
     private HashMap<String, Piece> generalPositions = new HashMap<String, Piece>();
     private PointVisitor searchValidMoves;
 
@@ -43,7 +43,7 @@ public class Board {
 	public static final int DRAW = 0;
 	public static final int NA = -1;
 
-	private static Logger logDataBoard = LoggerUtility.getLogger(SubMenu.class, "html");
+	//private static Logger logDataBoard = LoggerUtility.getLogger(SubMenu.class, "html");
 
 	public Board() {
 		HashMap<Integer, Piece> blackPieces = new HashMap<Integer, Piece>();
@@ -145,13 +145,13 @@ public class Board {
 	}
     
     
-    public Move GenerateMoves(List<Piece> randomPieces) throws Exception{
+    public Move GenerateMoves(List<Piece> randomPieces){
     	searchValidMoves = new PointVisitor(this);
     	ArrayList<Integer[]> legalMoves = new ArrayList<Integer[]>();
     	Piece movingPiece = null;
 
     	Random random = new Random();
-    	while(legalMoves.size() == 0) { // Make sure the piece has any legal moves
+    	while(legalMoves.size() == 0) { // Make sure the piece can actually move
     		movingPiece = randomPieces.get(random.nextInt(randomPieces.size()));
     		legalMoves = movingPiece.accept(searchValidMoves);
     	}
@@ -178,12 +178,6 @@ public class Board {
     }
 
 
-    /**
-     * Checks to see if a move checkmates.
-     * @param moving The move the user wants to do
-     * @param player The player profile
-     * @return Whether the move is legal
-     */
 	public boolean tryMove(Moving moving, Profile player) {
 		Move move = moving.getMove();
 
@@ -209,61 +203,57 @@ public class Board {
 					System.out.println(" Illegal Move, you're in check");
 					this.undoMove(move, captured);
 					return false;
-				}
-				this.undoMove(move, captured);
-
-				//the move is legal, now let's see if it's a winning move.
-				if (blackCheck && !curr.isBlack()) {
-					if (checkMate(moving, true)) {
-						setWinner(PLAYER1_WINS);
-						//                            System.out.println("##########################CHECK MATE#############################");
-						//                            System.out.println(player.getName() + "WINS!");
-						//                            System.out.println("##########################CHECK MATE#############################");
-					}
-					//                        return true;
-
-					//the move is legal, now lets see if it's a winning move.
-				} else if (redCheck && curr.isBlack()) {
-					if (checkMate(moving, false)) {
-						setWinner(PLAYER2_WINS);
-						//                            System.out.println("##########################CHECK MATE#############################");
-						//                            System.out.println(player.getName() + "WINS!");
-						//                            System.out.println("##########################CHECK MATE#############################");
-					}
-					//                        return true;
-
-					//the move is legal, now lets see if it's a stalemate , i recoved the || separated()
-				} else if (!curr.isBlack()) {
-					if (checkMate(moving, true)) {
-						setWinner(DRAW);
-						//                            System.out.println("##########################STALE MATE#############################");
-						//                            System.out.println("ITS A DRAW");
-						//                            System.out.println("##########################STALE MATE#############################");
-					}
-					//                        return true;
-				} else if (curr.isBlack()) {
-					if (checkMate(moving, false)) {
-						setWinner(DRAW);
-						//                            System.out.println("##########################STALE MATE#############################");
-						//                            System.out.println("ITS A DRAW");
-						//                            System.out.println("##########################STALE MATE#############################");
-					}
-					//                        return true;
-				}
-
-				// if (!checkMate) {   //LEGAL MOVE AND NOT IN CHECKMATE?
-				System.out.println("Moved " + curr + " from (" + x + ", " + y + ") to (" + finalX + ", " + finalY + ")");
-				if (captured != null) {
-					player.addPieceCaptured(captured);
-					System.out.println(captured + " Captured!");
-					//MoveLogger.addMove(new Move(curr, captured, x, y, finalX, finalY));
 				} else {
-					//MoveLogger.addMove(new Move(curr, x, y, finalX, finalY));
+					//the move is legal, now let's see if it's a winning move.
+					if (blackCheck && !curr.isBlack()) {
+						if (checkMate(true)) {
+							setWinner(PLAYER1_WINS);
+							
+							//                            System.out.println("##########################CHECK MATE#############################");
+							//System.out.println(player.getId() + "WINS!");
+							//                            System.out.println("##########################CHECK MATE#############################");
+						}
+						//                        return true;
+	
+						//the move is legal, now lets see if it's a winning move.
+					} else if (redCheck && curr.isBlack()) {
+						if (checkMate(false)) {
+							setWinner(PLAYER2_WINS);
+							//                            System.out.println("##########################CHECK MATE#############################");
+							//System.out.println(player.getId() + "WINS!");
+							//                            System.out.println("##########################CHECK MATE#############################");
+						}
+						//                        return true;
+	
+						//the move is legal, now lets see if it's a stalemate , i recoved the || separated()
+					} else if (!curr.isBlack()) {
+						if (checkMate(true)) {
+							setWinner(DRAW);
+							//                            System.out.println("##########################STALE MATE#############################");
+							//                            System.out.println("ITS A DRAW");
+							//                            System.out.println("##########################STALE MATE#############################");
+						}
+						//                        return true;
+					} else if (curr.isBlack()) {
+						if (checkMate(false)) {
+							setWinner(DRAW);
+							//                            System.out.println("##########################STALE MATE#############################");
+							//                          System.out.println("ITS A DRAW");
+							//                            System.out.println("##########################STALE MATE#############################");
+						}
+						//                        return true;
+					}
+	
+					// if (!checkMate) {   //LEGAL MOVE AND NOT IN CHECKMATE?
+					System.out.println("Moved " + curr + " from (" + x + ", " + y + ") to (" + finalX + ", " + finalY + ")");
+					if (captured != null) {
+						player.addPieceCaptured(captured);
+						System.out.println(captured + " Captured!");
+						//MoveLogger.addMove(new Move(curr, captured, x, y, finalX, finalY));
+					}
+	
+					return true;
 				}
-				//DO OTHER THINGS =============
-
-				return true;
-				//   }
 
 			} else {
 				System.out.println("That's not your piece");
@@ -283,12 +273,12 @@ public class Board {
 			for (int y = 0; y < 11; y++) {
 				if (this.getPiece(x, y) != null) {
 
-					if (!redCheck && this.getPiece(x, y).isBlack() == true) {
+					if (!redCheck && this.getPiece(x, y).isBlack()) {
 						if (new Moving(this, new Move(x, y, this.getRedGeneralX(), this.getRedGeneralY()), 0).isLegal()) {
 							redCheck = true;
 							//                            System.out.println("Down is in check");
 						}
-					} else if (!blackCheck && this.getPiece(x, y).isBlack() == false) {
+					} else if (!blackCheck && !this.getPiece(x, y).isBlack()) {
 						if (new Moving(this, new Move(x, y, this.getBlackGeneralX(), this.getBlackGeneralY()), 0).isLegal()) {
 							blackCheck = true;
 							//                            System.out.println("up is in check");
@@ -300,7 +290,8 @@ public class Board {
 	}
 
 
-	private boolean checkMate(Moving moving, boolean loserPlace) {
+	private boolean checkMate(boolean loserPlace) {
+		//updateGenerals();
 		//running through every loser piece
 		for (int x = 0; x < 11; x++) {
 			for (int y = 0; y < 11; y++) {
@@ -363,7 +354,9 @@ public class Board {
 	public int getBlackGeneralY() {
 		return getGeneralBlack().getY();
 	}
+	
 
+	
 	public void updateGenerals(int newX, int newY, boolean isBlack) {
 		General redGen = getGeneralRed(), blackGen = getGeneralBlack();
 		if(isBlack) {

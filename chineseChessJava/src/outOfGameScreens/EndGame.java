@@ -1,15 +1,8 @@
 package outOfGameScreens;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.*;
 import javax.swing.border.Border;
-
-import outOfGameScreens.menus.AbstractMenu;
-import outOfGameScreens.menus.MainMenu;
-import outOfGameScreens.menus.AbstractMenu.backButtonListener;
 
 /*
  * @author Rona Nasro
@@ -19,6 +12,7 @@ public class EndGame extends JFrame {
     
 	private Profile winner;
 	private Profile loser;
+	private boolean Draw = false;
 	
 	
 	private JLabel winnerTextLabel;
@@ -58,8 +52,9 @@ public class EndGame extends JFrame {
     		winner = player2;
     		loser = player1;
     	}else {
-    		winner = player2;
-    		loser = player1;
+    		Draw = true;
+    		winner = player1;
+    		loser = player2;
     	}
         
         setSize(645,490);
@@ -101,10 +96,17 @@ public class EndGame extends JFrame {
         //styling
         winnerTextLabel.setFont(new Font("Monsserat", Font.BOLD, 25));
         winnerTextLabel.setForeground(Color.BLACK);
-        winnerLabel.setFont(new Font(winnerTextLabel.getFont().getFontName(), Font.BOLD, 30));
-        winnerLabel.setForeground(Color.GREEN);
-        loserLabel.setFont(new Font(winnerTextLabel.getFont().getFontName(), Font.BOLD, 30));
-        loserLabel.setForeground(Color.RED);
+        if(Draw) {
+        	 winnerLabel.setFont(new Font(winnerTextLabel.getFont().getFontName(), Font.BOLD, 30));
+             winnerLabel.setForeground(Color.BLUE);
+             loserLabel.setFont(new Font(winnerTextLabel.getFont().getFontName(), Font.BOLD, 30));
+             loserLabel.setForeground(Color.BLUE);
+        }else {
+        	 winnerLabel.setFont(new Font(winnerTextLabel.getFont().getFontName(), Font.BOLD, 30));
+             winnerLabel.setForeground(Color.GREEN);
+             loserLabel.setFont(new Font(winnerTextLabel.getFont().getFontName(), Font.BOLD, 30));
+             loserLabel.setForeground(Color.RED);
+        }
         winnerScore.setFont(new Font(winnerTextLabel.getFont().getFontName(), Font.BOLD, 30));
         loserScore.setFont(new Font(winnerTextLabel.getFont().getFontName(), Font.BOLD, 30));
         winnerScoreText.setFont(new Font(winnerTextLabel.getFont().getFontName(), Font.CENTER_BASELINE, 30));

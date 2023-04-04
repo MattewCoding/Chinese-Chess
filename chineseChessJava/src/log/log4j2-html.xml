@@ -10,7 +10,7 @@
 				<pattern>%d{HH:mm:ss} [%t] %-5level %logger{36} - %msg%n</pattern>
 			</PatternLayout>
 			<Policies>
-				<SizeBasedTriggeringPolicy size="1 KB"/>
+				<SizeBasedTriggeringPolicy size="10 KB"/>
 			</Policies>
 		</RollingFile>
 	</Appenders>
