@@ -25,16 +25,22 @@ public class NotationHistory {
 			currentMove = moveThisTurn;
 		}
 	}
-
+	
+	/**
+	 * Updates the notation for a move in the chess game.
+	 * @param mostRecentMove the move to update notation for
+	 * @param pieceMoved the piece that was moved in the move
+	 */
 	public void updateNotation(Move mostRecentMove, Piece pieceMoved) {
 		String pieceName = pieceMoved.getType().substring(0, 1).toUpperCase();
-		
-		// World Xiangqi Format
-		int originX = mostRecentMove.getOriginX();
-		int originY = mostRecentMove.getOriginY();
-		int finalX = mostRecentMove.getFinalX();
-		int finalY = mostRecentMove.getFinalY();
-		
+
+	    // Get the coordinates of the move
+	    int originX = mostRecentMove.getOriginX();
+	    int originY = mostRecentMove.getOriginY();
+	    int finalX = mostRecentMove.getFinalX();
+	    int finalY = mostRecentMove.getFinalY();
+
+	    // Convert the X and Y coordinates to World Xiangqi Format
 		String fileLocation = Integer.toString(11-originX); // Counting starts from the right
 		String movement, fileTarget;
 		if(originX == finalX) {
@@ -44,9 +50,15 @@ public class NotationHistory {
 			else {
 				movement = "-";
 			}
-			fileTarget = Integer.toString(Math.abs(finalY-originY)); //Abs in case moved backwards
-		}
-		else {
+	        // Determine whether the move crosses the 5th rank
+	        boolean fiveInbetween = Math.min(originY, finalY) < 5 && Math.max(originY, finalY) > 5;
+
+	        // River crossing
+	        int dy = Math.abs(finalY - originY);
+	        dy = (fiveInbetween) ? dy - 1 : dy;
+	        
+	        fileTarget = Integer.toString(dy); //Abs in case moved backwards
+	    } else {
 			movement = ".";
 			fileTarget = Integer.toString(11-finalX);
 		}

@@ -92,11 +92,12 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		return (currentPiece.isBlack() != attackedPiece.isBlack());
 	}
 
-
-	// TODO: this is broken
 	/**
-	 * Returns true if the selected piece is the only piece between the two generals, false otherwise.
-	 * @return Boolean
+	 * Returns a boolean value indicating whether the selected piece is the only piece between the two generals.
+	 *
+	 * @param newX the X-coordinate of the square to which the piece is moving
+	 * @param newY the Y-coordinate of the square to which the piece is moving
+	 * @return true if the selected piece is the only piece between the two generals, false otherwise
 	 */
 	public Boolean exposesGeneral(int newX, int newY) {
 		int generalX = currentBoard.getBlackGeneralX();

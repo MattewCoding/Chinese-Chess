@@ -77,7 +77,7 @@ public class MainMenu extends AbstractMenu {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			GameUpdater chessBoard = new GameUpdater();
+			GameUpdater chessBoard = new GameUpdater(mainScreen);
 			mainScreen.setContentPane(chessBoard);
 			mainScreen.revalidate();
 		}

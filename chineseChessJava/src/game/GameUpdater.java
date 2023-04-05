@@ -1,7 +1,11 @@
 package game;
 
 import java.awt.BorderLayout;
+
+import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import outOfGameScreens.EndGame;
 import outOfGameScreens.ScreenParameters;
 
 /**
@@ -20,8 +24,9 @@ public class GameUpdater extends JPanel implements Runnable{
 
 	private GUI gui = new GUI();
 	private boolean run = false;
+	private JFrame mainScreen;
 	
-	public GameUpdater(){
+	public GameUpdater(JFrame mainScreen){
 
 		setLayout(new BorderLayout());
 		add(BorderLayout.CENTER, gui);
@@ -30,6 +35,8 @@ public class GameUpdater extends JPanel implements Runnable{
 		Thread chronoThread = new Thread(this);
 		chronoThread.start();
 		run = true;
+		
+		this.mainScreen = mainScreen;
 	}
 	
 	@Override
@@ -47,7 +54,11 @@ public class GameUpdater extends JPanel implements Runnable{
 			if (run) {
 				gui.checkPieces();
 				gui.repaint();
-
+				if(gui.hasEnded()) {
+					EndGame endScreen = new EndGame(Board.getWinner(), gui.getPlayer1(), gui.getPlayer2());
+					mainScreen.setContentPane(endScreen);
+					mainScreen.revalidate();
+				}
 			}
 		}
 	}

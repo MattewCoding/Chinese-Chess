@@ -29,6 +29,7 @@ import javax.swing.JTextArea;
 
 import org.apache.logging.log4j.Logger;
 
+import bot.Bot;
 import game.pieces.Piece;
 import log.LoggerUtility;
 import logic.moveChecking.PointVisitor;
@@ -67,7 +68,6 @@ public class GUI extends JPanel implements MouseListener{
 	private Piece movingPiece = null;
 	private boolean mouseClickedPiece = false;
 	private boolean mouseMovingPiece = false;
-	private List<Piece> randomPieces;
 
 	// players
 	private Profile player1, player2;
@@ -97,10 +97,10 @@ public class GUI extends JPanel implements MouseListener{
 	int imageWidth = 30;
 	int imageHeight = 30;
 
-	int musicBoxX = center - imageWidth - 5;
-	int soundBoxX = center + 5;
+	int musicBoxX = center - imageWidth - 10;
+	int soundBoxX = center + 10;
 
-	int boxY = margin - imageHeight - 5;
+	int boxY = margin - imageHeight - 15;
 	
 	private boolean soundOn = true;
 	private boolean musicOn = true;
@@ -111,6 +111,8 @@ public class GUI extends JPanel implements MouseListener{
 
 	// Points
 	private PointVisitor searchValidMoves;
+	
+	private Bot bot;
 
 	//private static Logger logDataGUI = LoggerUtility.getLogger(SubMenu.class, "html");
 
@@ -128,6 +130,7 @@ public class GUI extends JPanel implements MouseListener{
 		player2 = new Profile("Computer",0,true);
 		player2.getTimer().stop();
 
+		bot = new Bot(true);
 		searchValidMoves = new PointVisitor(board);
 		
         AudioInputStream audioInputStream;
@@ -184,17 +187,7 @@ public class GUI extends JPanel implements MouseListener{
 				mouseMovingPiece = false;
 			}
 		} else {
-			randomPieces = board.getAllPieces();
-			// Auto generate a move
-			Move move = board.GenerateMoves(randomPieces);
-			Moving moving = new Moving(board, move);
-
-			while(!board.tryMove(moving,player2)) {
-				randomPieces = board.getAllPieces();
-				// Auto generate a move
-				move = board.GenerateMoves(randomPieces);
-				moving = new Moving(board, move);
-			}
+			Move move = bot.generateMove(board, player2);
 
 			player2.stopTurnTimer();
 			player1.startTurnTimer();
@@ -306,6 +299,27 @@ public class GUI extends JPanel implements MouseListener{
 			drawPoints();
 		}
 	}
+	
+	/**
+	 * Check whether the game has ended because the general is in checkmate
+	 * @return boolean Whether the game has ended
+	 */
+	public boolean hasEnded() {
+		if(Board.getWinner()!=-1) {
+			player1.calculateScore();
+			player2.calculateScore();
+			player2.stopTurnTimer();
+			player1.stopTurnTimer();
+		} return Board.getWinner()!=-1;
+	}
+	
+	public Profile getPlayer1() {
+		return player1;
+	}
+	
+	public Profile getPlayer2() {
+		return player2;
+	}
 
 	/*public void logCreationData() {
 		//logDataGUI.info(board.toString());
@@ -342,31 +356,15 @@ public class GUI extends JPanel implements MouseListener{
 		} catch (IOException e) {
 		    e.printStackTrace();
 		}
-		
-		Rectangle soundImageBox;
-		Rectangle musicImageBox;
-
-		
-
 		// draw music box
-		g2.setColor(Color.WHITE);
-		g2.fillRect(musicBoxX, boxY, imageWidth, imageHeight);
-		g2.setColor(Color.BLACK);
-		g2.setStroke(new BasicStroke(strokeWidth));
-		g2.drawRect(musicBoxX, boxY, imageWidth, imageHeight);
+		CreateRectangle.drawFilledRectangle(g2, ScreenParameters.OUTLINECOLOR, ScreenParameters.BOARDCOLOR, musicBoxX, boxY, imageHeight, imageWidth);
 		g2.drawImage(musicImage, musicBoxX + 2, boxY + 2, imageWidth - 4, imageHeight - 4, null);
-		musicImageBox = new Rectangle(musicBoxX, boxY, imageWidth, imageHeight);
-		
 
 		// draw sound box
-		g2.setColor(Color.WHITE);
-		g2.fillRect(soundBoxX, boxY, imageWidth, imageHeight);
-		g2.setColor(Color.BLACK);
-		g2.setStroke(new BasicStroke(strokeWidth));
-		g2.drawRect(soundBoxX, boxY, imageWidth, imageHeight);
+		CreateRectangle.drawFilledRectangle(g2, ScreenParameters.OUTLINECOLOR, ScreenParameters.BOARDCOLOR, soundBoxX, boxY, imageHeight, imageWidth);
 		g2.drawImage(soundImage, soundBoxX + 2, boxY + 2, imageWidth - 4, imageHeight - 4, null);
-		soundImageBox = new Rectangle(soundBoxX, boxY, imageWidth, imageHeight);
 	}
+	
 	/**
 	 * Draws the turn timer for both players
 	 */
@@ -510,14 +508,6 @@ public class GUI extends JPanel implements MouseListener{
 		int turnsFittableInBox = (int) (notationBoxSize/g2.getFontMetrics().getHeight());
 		if(pastMovesArrayList.size() > turnsFittableInBox) {
 			pastMovesArrayList.remove(0);
-		}
-		if(Board.getWinner()!=-1) {
-			player1.calculateScore();
-			player2.calculateScore();
-			player2.stopTurnTimer();
-			player1.stopTurnTimer();
-			EndGame endgame = new EndGame(Board.getWinner(),player1,player2);
-
 		}
 	}
 

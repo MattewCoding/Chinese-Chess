@@ -83,7 +83,6 @@ public class Board {
 			coords[calcX(4)][edgeYCoord] = new Horse(onBlackSide, calcX(4), edgeYCoord, pieceId++);
 			coords[calcX(3)][edgeYCoord] = new Elephant(onBlackSide, calcX(3), edgeYCoord, pieceId++);
 			coords[calcX(1)][edgeYCoord] = new Guard(onBlackSide, calcX(1), edgeYCoord, pieceId++);
-
 		}
 	}
 
@@ -162,14 +161,16 @@ public class Board {
     
     /**
      * Creates a list of all the black pieces
+     * 
+     * @param isBlack Whether we want the black pieces or the red pieces
      * @return The list of black pieces
      */
-    public List<Piece> getAllPieces() {
+    public List<Piece> getAllPieces(boolean isBlack) {
         List<Piece> pieces = new ArrayList<>();
         for(int x = 0; x < COLUMNS; x++) {
             for(int y = 0; y < ROWS; y++) {
                 Piece piece = getPiece(x, y);
-                if(piece != null && piece.isBlack()) {
+                if(piece != null && (piece.isBlack() == isBlack)) {
                     pieces.add(piece);
                 }
             }
