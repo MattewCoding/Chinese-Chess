@@ -210,6 +210,7 @@ public class EndGame extends JFrame {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
+			// TODO: Maybe don't do this?
 			dispose();
 			new GameLauncher();
 		}
