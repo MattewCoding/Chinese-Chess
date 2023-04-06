@@ -117,7 +117,7 @@ public class GUI extends JPanel implements MouseListener{
 	//private static Logger logDataGUI = LoggerUtility.getLogger(SubMenu.class, "html");
 
 	public GUI() {
-		board = new Board();
+		board = Board.getInstance();
 
 		pastMoves = new NotationHistory();
 		pastMovesTextArea = new JTextArea("");
@@ -130,7 +130,7 @@ public class GUI extends JPanel implements MouseListener{
 		player2 = new Profile("Computer",0,true);
 		player2.getTimer().stop();
 
-		bot = new Bot(true);
+		bot = new Bot(player2, true);
 		searchValidMoves = new PointVisitor(board);
 		
         AudioInputStream audioInputStream;
@@ -154,7 +154,7 @@ public class GUI extends JPanel implements MouseListener{
 	 * Updates the state of the game
 	 */
 	public void checkPieces() {
-		if(redTurn || player2.getId()!="Computer") {
+		if(redTurn || !player2.getId().equals("Computer")) {
 			if(mouseClickedPiece && mouseMovingPiece) {
 
 			// Player1's turn (or the not-computer)
@@ -188,6 +188,9 @@ public class GUI extends JPanel implements MouseListener{
 			}
 		} else {
 			Move move = bot.generateMove(board, player2);
+			
+			bot.updateBoard(board);
+			System.out.println(bot.evaluate());
 
 			player2.stopTurnTimer();
 			player1.startTurnTimer();

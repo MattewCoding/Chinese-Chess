@@ -23,6 +23,9 @@ import outOfGameScreens.Profile;
 import outOfGameScreens.menus.SubMenu;
 
 public class Board {
+	
+	// We're playing on one board, so logically there should only be one board.
+	private static Board instance = new Board();
 
 	//Columns then rows
 	private Piece[][] coords;
@@ -45,7 +48,16 @@ public class Board {
 
 	//private static Logger logDataBoard = LoggerUtility.getLogger(SubMenu.class, "html");
 
-	public Board() {
+	/**
+	 * Static method allows users to get the unique instance of the class.
+	 * 
+	 * @return the unique instance of the class.
+	 */
+	public static Board getInstance() {
+		return instance;
+	}
+
+	private Board() {
 		HashMap<Integer, Piece> blackPieces = new HashMap<Integer, Piece>();
 		HashMap<Integer, Piece> redPieces = new HashMap<Integer, Piece>();
 
@@ -178,7 +190,17 @@ public class Board {
         return pieces;
     }
 
-
+    /**
+     * Checks:
+     * <ul>
+     * 		<li>If the move puts the player in check</li>
+     * 		<li>If the player in check, checks if they have any legal moves left.
+     * 			If so, only those set of moves are permitted</li>
+     * </ul>
+     * @param moving The move the player has requested to make.
+     * @param player Who is currently moving the pieces
+     * @return Whether or not the move is legal
+     */
 	public boolean tryMove(Moving moving, Profile player) {
 		Move move = moving.getMove();
 
@@ -209,40 +231,23 @@ public class Board {
 					if (blackCheck && !curr.isBlack()) {
 						if (checkMate(true)) {
 							setWinner(PLAYER1_WINS);
-							
-							//                            System.out.println("##########################CHECK MATE#############################");
-							//System.out.println(player.getId() + "WINS!");
-							//                            System.out.println("##########################CHECK MATE#############################");
 						}
-						//                        return true;
 	
 						//the move is legal, now lets see if it's a winning move.
 					} else if (redCheck && curr.isBlack()) {
 						if (checkMate(false)) {
 							setWinner(PLAYER2_WINS);
-							//                            System.out.println("##########################CHECK MATE#############################");
-							//System.out.println(player.getId() + "WINS!");
-							//                            System.out.println("##########################CHECK MATE#############################");
 						}
-						//                        return true;
 	
 						//the move is legal, now lets see if it's a stalemate , i recoved the || separated()
 					} else if (!curr.isBlack()) {
 						if (checkMate(true)) {
 							setWinner(DRAW);
-							//                            System.out.println("##########################STALE MATE#############################");
-							//                            System.out.println("ITS A DRAW");
-							//                            System.out.println("##########################STALE MATE#############################");
 						}
-						//                        return true;
 					} else if (curr.isBlack()) {
 						if (checkMate(false)) {
 							setWinner(DRAW);
-							//                            System.out.println("##########################STALE MATE#############################");
-							//                          System.out.println("ITS A DRAW");
-							//                            System.out.println("##########################STALE MATE#############################");
 						}
-						//                        return true;
 					}
 	
 					// if (!checkMate) {   //LEGAL MOVE AND NOT IN CHECKMATE?
@@ -252,10 +257,8 @@ public class Board {
 						System.out.println(captured + " Captured!");
 						//MoveLogger.addMove(new Move(curr, captured, x, y, finalX, finalY));
 					}
-	
 					return true;
 				}
-
 			} else {
 				System.out.println("That's not your piece");
 				return false;
@@ -267,6 +270,9 @@ public class Board {
 
 	}
 
+	/**
+	 * Check whether or not we are in check
+	 */
 	private void testCheck() {
 		redCheck = false;
 		blackCheck = false;
