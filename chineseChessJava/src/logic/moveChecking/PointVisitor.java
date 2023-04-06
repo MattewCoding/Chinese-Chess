@@ -283,7 +283,9 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		// And will stop once posY is less than 0, avoiding an outOfBoundsError
 		// Because -1 >= 0 will be false before the isEmpty call
 		while(--posY >= 0 && isEmpty(pieceX, posY)) {
-			addLegal(pieceX, posY);
+			if(posY != 5) {
+				addIfLegal(pieceX, posY);
+			}
 		}
 		// Cannon has extra move: it can only eat hopping over a piece
 		while(--posY >= 0 && isEmpty(pieceX, posY)) { }
@@ -291,7 +293,9 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 
 		posY = pieceY;
 		while(++posY <= 10 && isEmpty(pieceX, posY)) {
-			addLegal(pieceX, posY);
+			if(posY != 5) {
+				addIfLegal(pieceX, posY);
+			}
 		}
 		while(++posY <= 10 && isEmpty(pieceX, posY)) { }
 		addIfLegal(pieceX, posY);
@@ -299,14 +303,14 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		// Checking horizontal movement //
 		int posX = pieceX;
 		while(--posX >= 0 && isEmpty(posX, pieceY)) {
-			addLegal(posX, pieceY);
+			addIfLegal(posX, pieceY);
 		}
 		while(--posX >= 0 && isEmpty(posX, pieceY)) { }
 		addIfLegal(posX, pieceY);
 
 		posX = pieceX;
 		while(++posX <= 10 && isEmpty(posX, pieceY)) {
-			addLegal(posX, pieceY);
+			addIfLegal(posX, pieceY);
 		}
 		while(++posX <= 10 && isEmpty(posX, pieceY)) { }
 		addIfLegal(posX, pieceY);
@@ -321,26 +325,30 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		// Checking vertical movement
 		int posY = pieceY;
 		while(--posY >= 0 && isEmpty(pieceX, posY)) {
-			addLegal(pieceX, posY);
+			if(posY != 5) {
+				addIfLegal(pieceX, posY);
+			}
 		}
 		addIfLegal(pieceX, posY); // We should also be able to eat the opponent
 
 		posY = pieceY;
 		while(++posY <= 10 && isEmpty(pieceX, posY)) {
-			addLegal(pieceX, posY);
+			if(posY != 5) {
+				addIfLegal(pieceX, posY);
+			}
 		}
 		addIfLegal(pieceX, posY);
 
 		// Checking horizontal movement
 		int posX = pieceX;
 		while(--posX >= 0 && isEmpty(posX, pieceY)) {
-			addLegal(posX, pieceY);
+			addIfLegal(posX, pieceY);
 		}
 		addIfLegal(posX, pieceY);
 
 		posX = pieceX;
 		while(++posX <= 10 && isEmpty(posX, pieceY)) {
-			addLegal(posX, pieceY);
+			addIfLegal(posX, pieceY);
 		}
 		addIfLegal(posX, pieceY);
 
