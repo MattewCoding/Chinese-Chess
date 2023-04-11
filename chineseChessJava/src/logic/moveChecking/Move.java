@@ -183,8 +183,12 @@ public class Move {
         return capturedPiece;
     }
 
+    public void setCapturedPiece(Piece capturedPiece) {
+        this.capturedPiece = capturedPiece;
+    }
+
     public String toString() {
-        return x1 + ", " + y1 + ", " + x2 + ", " + y2;
+        return piece + ": " + x1 + ", " + y1 + ", " + x2 + ", " + y2;
     }
 
 	public int getNumObstacles() {
@@ -195,5 +199,13 @@ public class Move {
 		this.numObstacles = numObstacles;
 	}
 
+	/**
+	 * Check if two moves are identical
+	 * @param move The move to compare with
+	 * @return Whether or not the moves are identical
+	 */
+	public boolean isEqual(Move move) {
+		return x1 == move.getOriginX() && y1 == move.getOriginY() && x2 == move.getFinalX() && y2 == move.getFinalY() && piece == move.getPiece();
+	}
 
 }

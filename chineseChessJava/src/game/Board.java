@@ -24,18 +24,22 @@ import outOfGameScreens.menus.SubMenu;
 
 public class Board {
 
+	// Creating
 	//Columns then rows
 	private Piece[][] coords;
 	private final int COLUMNS = 11;
 	private final int ROWS = 11;
 	private int mirror;
 
+	// Processing
     private HashMap<String, Piece> generalPositions = new HashMap<String, Piece>();
     private PointVisitor searchValidMoves;
 
+	// Winning
 	private static int winner =-1;
 	private boolean blackCheck = false; //up is in check
 	private boolean redCheck = false; //down is in check
+	
 	public static final int PLAYER1_WINS = 1;
 	public static final int PLAYER2_WINS = 2;
 	public static final int PLAYER1_TIMEOUT_WIN = 3;
@@ -43,12 +47,15 @@ public class Board {
 	public static final int DRAW = 0;
 	public static final int NA = -1;
 
+	// Hashing
+	private final int PIECE_TYPES = 7*2;
+    private final long[][][] zobristTable = new long[COLUMNS][ROWS][PIECE_TYPES];
+	private long hashValue;
+	
 	//private static Logger logDataBoard = LoggerUtility.getLogger(SubMenu.class, "html");
 
 	public Board() {
-		HashMap<Integer, Piece> blackPieces = new HashMap<Integer, Piece>();
-		HashMap<Integer, Piece> redPieces = new HashMap<Integer, Piece>();
-
+		initZobrist();
 		coords = new Piece[COLUMNS][ROWS];
 
 		int quadrant = 0, side, edgeYCoord, pieceId = 0;
@@ -83,7 +90,24 @@ public class Board {
 			coords[calcX(4)][edgeYCoord] = new Horse(onBlackSide, calcX(4), edgeYCoord, pieceId++);
 			coords[calcX(3)][edgeYCoord] = new Elephant(onBlackSide, calcX(3), edgeYCoord, pieceId++);
 			coords[calcX(1)][edgeYCoord] = new Guard(onBlackSide, calcX(1), edgeYCoord, pieceId++);
-
+		}
+	}
+	
+	/**
+	 * Create the board with the pieces in specific spots
+	 * @param presetCoords The current state of the board
+	 */
+	public Board(Piece[][] presetCoords) {
+		coords = presetCoords;
+		
+		for(int x = 0; x < ROWS; x++) {
+			for(int y = 0; y < COLUMNS; y++) {
+				Piece testPiece = getPiece(x, y);
+				if(testPiece != null && testPiece.getType() == "General") {
+					String sideString = testPiece.isBlack()? "B" : "R";
+					generalPositions.put("General-"+sideString, coords[x][y]);
+				}
+			}
 		}
 	}
 
@@ -162,14 +186,16 @@ public class Board {
     
     /**
      * Creates a list of all the black pieces
+     * 
+     * @param isBlack Whether we want the black pieces or the red pieces
      * @return The list of black pieces
      */
-    public List<Piece> getAllPieces() {
-        List<Piece> pieces = new ArrayList<>();
+    public List<Piece> getAllPieces(boolean isBlack) {
+        List<Piece> pieces = new ArrayList<Piece>();
         for(int x = 0; x < COLUMNS; x++) {
             for(int y = 0; y < ROWS; y++) {
                 Piece piece = getPiece(x, y);
-                if(piece != null && piece.isBlack()) {
+                if(piece != null && (piece.isBlack() == isBlack)) {
                     pieces.add(piece);
                 }
             }
@@ -177,7 +203,18 @@ public class Board {
         return pieces;
     }
 
-
+    /**
+     * Checks:
+     * <ul>
+     * 		<li>If the move puts the player in check</li>
+     * 		<li>If the player in check, checks if they have any legal moves left.
+     * 			If so, only those set of moves are permitted</li>
+     * </ul>
+     * @param moving The move the player has requested to make.
+     * @param player Who is currently moving the pieces
+     * @param moveTesting Whether or not we're testing if the move is legal, as opposed to test+move if legal
+     * @return Whether or not the move is legal
+     */
 	public boolean tryMove(Moving moving, Profile player) {
 		Move move = moving.getMove();
 
@@ -208,40 +245,23 @@ public class Board {
 					if (blackCheck && !curr.isBlack()) {
 						if (checkMate(true)) {
 							setWinner(PLAYER1_WINS);
-							
-							//                            System.out.println("##########################CHECK MATE#############################");
-							//System.out.println(player.getId() + "WINS!");
-							//                            System.out.println("##########################CHECK MATE#############################");
 						}
-						//                        return true;
 	
 						//the move is legal, now lets see if it's a winning move.
 					} else if (redCheck && curr.isBlack()) {
 						if (checkMate(false)) {
 							setWinner(PLAYER2_WINS);
-							//                            System.out.println("##########################CHECK MATE#############################");
-							//System.out.println(player.getId() + "WINS!");
-							//                            System.out.println("##########################CHECK MATE#############################");
 						}
-						//                        return true;
 	
 						//the move is legal, now lets see if it's a stalemate , i recoved the || separated()
 					} else if (!curr.isBlack()) {
 						if (checkMate(true)) {
 							setWinner(DRAW);
-							//                            System.out.println("##########################STALE MATE#############################");
-							//                            System.out.println("ITS A DRAW");
-							//                            System.out.println("##########################STALE MATE#############################");
 						}
-						//                        return true;
 					} else if (curr.isBlack()) {
 						if (checkMate(false)) {
 							setWinner(DRAW);
-							//                            System.out.println("##########################STALE MATE#############################");
-							//                          System.out.println("ITS A DRAW");
-							//                            System.out.println("##########################STALE MATE#############################");
 						}
-						//                        return true;
 					}
 	
 					// if (!checkMate) {   //LEGAL MOVE AND NOT IN CHECKMATE?
@@ -251,10 +271,8 @@ public class Board {
 						System.out.println(captured + " Captured!");
 						//MoveLogger.addMove(new Move(curr, captured, x, y, finalX, finalY));
 					}
-	
 					return true;
 				}
-
 			} else {
 				System.out.println("That's not your piece");
 				return false;
@@ -266,36 +284,64 @@ public class Board {
 
 	}
 
-	private void testCheck() {
+	/**
+	 * Checks if either the red or black general is in check
+	 */
+	public void testCheck() {
 		redCheck = false;
 		blackCheck = false;
+		
+		// loop through all the pieces on the board
 		for (int x = 0; x < 11; x++) {
 			for (int y = 0; y < 11; y++) {
+				// if there is a piece on this square
 				if (this.getPiece(x, y) != null) {
-
-					if (!redCheck && this.getPiece(x, y).isBlack()) {
-						if (new Moving(this, new Move(x, y, this.getRedGeneralX(), this.getRedGeneralY()), 0).isLegal()) {
+					Piece piece = this.getPiece(x, y);
+					int generalX = piece.isBlack() ? this.getRedGeneralX() : this.getBlackGeneralX();
+					int generalY = piece.isBlack() ? this.getRedGeneralY() : this.getBlackGeneralY();
+					
+					// check if this piece can move to the opposite color general's position
+					if (new Moving(this, new Move(x, y, generalX, generalY), 0).isLegal()) {
+						if (piece.isBlack()) {
 							redCheck = true;
-							//                            System.out.println("Down is in check");
-						}
-					} else if (!blackCheck && !this.getPiece(x, y).isBlack()) {
-						if (new Moving(this, new Move(x, y, this.getBlackGeneralX(), this.getBlackGeneralY()), 0).isLegal()) {
+						} else {
 							blackCheck = true;
-							//                            System.out.println("up is in check");
 						}
 					}
 				}
 			}
 		}
 	}
+	
+	/**
+	 * Returns whether or not the red general is in check
+	 * @return boolean representing whether or not the red general is in check
+	 */
+	public boolean getRedCheck() {
+	    return redCheck;
+	}
+
+	/**
+	 * Returns whether or not the black general is in check
+	 * @return boolean representing whether or not the black general is in check
+	 */
+	public boolean getBlackCheck() {
+	    return blackCheck;
+	}
 
 
-	private boolean checkMate(boolean loserPlace) {
+
+	/**
+	 * Tests whether or not we are in checkmate
+	 * @param isBlack Whose side could be in checkmate
+	 * @return Whether or not the specified side is in checkmate
+	 */
+	public boolean checkMate(boolean isBlack) {
 		//updateGenerals();
 		//running through every loser piece
 		for (int x = 0; x < 11; x++) {
 			for (int y = 0; y < 11; y++) {
-				if (this.getPiece(x, y) != null && this.getPiece(x, y).isBlack() == loserPlace) {
+				if (this.getPiece(x, y) != null && this.getPiece(x, y).isBlack() == isBlack) {
 					PointVisitor pointV = new PointVisitor(this);
 					Piece currentPiece = this.getPiece(x, y);
 					ArrayList<Integer[]> moveSet = currentPiece.accept(pointV);
@@ -310,13 +356,13 @@ public class Board {
 						testCheck(); //updates check status
 						
 						// If any of these moves were both legal, and result with us not being in check, we aren't in checkmate.
-						if (loserPlace == false) {
+						if (isBlack == false) {
 							if (!redCheck) {
 								this.undoMove(tempMove, tempCaptured);
 								return false;
 							}
 						}
-						if (loserPlace == true) {
+						if (isBlack == true) {
 							if (!blackCheck) {
 								this.undoMove(tempMove, tempCaptured);
 								return false;
@@ -349,7 +395,6 @@ public class Board {
 	public int getBlackGeneralX() {
 		return getGeneralBlack().getX();
 	}
-
 
 	public int getBlackGeneralY() {
 		return getGeneralBlack().getY();
@@ -415,16 +460,42 @@ public class Board {
 		}
 		return true;
 	}
+	
+    // Initialize the Zobrist table with random values
+    public void initZobrist() {
+        Random rand = new Random();
+        for (int x = 0; x < COLUMNS; x++) {
+            for (int y = 0; y < ROWS; y++) {
+                for (int piece = 0; piece < PIECE_TYPES; piece++) {
+                    zobristTable[x][y][piece] = rand.nextLong();
+                }
+            }
+        }
+    }
+
+    // Update the hash value for a piece at the given position
+    public void updateHash(int x, int y, int pieceType) {
+        hashValue ^= zobristTable[x][y][pieceType];
+    }
+    
+    // Get the current hash value
+    public long getHash() {
+        return hashValue;
+    }
 
 	@Override
 	public String toString() {
 		// This is a debug method to ensure correct placement
 		// of the pieces
-		for(int i =0;i<COLUMNS;i++) {
-			for(int j =0; j<ROWS;j++) {
+		for(int i =0; i<ROWS;i++) {
+			for(int j =0;j<COLUMNS;j++) {
 				String firstLetter;
-				if(coords[i][j] == null) firstLetter = "__";
-				else firstLetter = coords[i][j].toString().substring(0, 2);
+				if(coords[j][i] == null) {
+					firstLetter = "__";
+				}
+				else {
+					firstLetter = coords[j][i].toString().substring(0, 2);
+				}
 				System.out.print(firstLetter + " ");
 			}
 			System.out.println();

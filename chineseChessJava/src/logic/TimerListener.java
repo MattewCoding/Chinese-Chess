@@ -28,7 +28,11 @@ public class TimerListener extends JComponent{
 		this.elapsedTime = elapsedTime;
 	}
 
-	public TimerListener(Boolean isRed){
+	public TimerListener(Boolean isRed,String time){
+		String overwriteTime = time + ":00";
+		ScreenParameters.setBlackTime(overwriteTime);
+		ScreenParameters.setRedTime(overwriteTime);
+		
 		startTime = System.currentTimeMillis();
 
 		timer = new Timer(1, new TimerActionListener());

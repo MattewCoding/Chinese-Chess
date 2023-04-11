@@ -84,7 +84,6 @@ public abstract class AbstractMenu extends JPanel {
 		menuName.setFont(new Font(menuName.getFont().toString(), Font.BOLD, (int)(55*ScreenParameters.XREDUCE) ));
 		menuName.setHorizontalAlignment(JLabel.CENTER);
 		menuName.setOpaque(true);
-		
 	}
 	
 	/**

@@ -92,11 +92,12 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		return (currentPiece.isBlack() != attackedPiece.isBlack());
 	}
 
-
-	// TODO: this is broken
 	/**
-	 * Returns true if the selected piece is the only piece between the two generals, false otherwise.
-	 * @return Boolean
+	 * Returns a boolean value indicating whether the selected piece is the only piece between the two generals.
+	 *
+	 * @param newX the X-coordinate of the square to which the piece is moving
+	 * @param newY the Y-coordinate of the square to which the piece is moving
+	 * @return true if the selected piece is the only piece between the two generals, false otherwise
 	 */
 	public Boolean exposesGeneral(int newX, int newY) {
 		int generalX = currentBoard.getBlackGeneralX();
@@ -165,7 +166,6 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 	/**
 	 * Check if a piece is legal, but only if the move is restricted to the castle
 	 * 
-	 * @param piece The piece being moved
 	 * @param x The horizontal coordinate of the specified square
 	 * @param y The vertical coordinate of the specified square
 	 */
@@ -181,8 +181,8 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 	
 	/**
 	 * River variant
-	 * @param x
-	 * @param y
+	 * @param x The horizontal coordinate of the specified square
+	 * @param y The vertical coordinate of the specified square
 	 */
 	public void addIfLegalRiver(int x, int y) {
 		int[] xBounds = {-1,11};
@@ -228,7 +228,17 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		// Normally isEdible shouldn't ever throw an outOfBounds error
 		// Because isEmpty will be true before that happens
 		if(!legalMoves.contains(position) && isInBound(x,y, xBounds, yBounds) && !exposesGeneral(x,y) && (isEmpty(x,y) || isEdible(x,y)) ) {
-			addLegal(x,y);
+			
+			Piece piece = currentBoard.getPiece(x, y);
+			Move testMove = new Move(currentPiece, currentPiece.getX(), currentPiece.getY(), x, y);
+			currentBoard.doMove(testMove);
+			currentBoard.testCheck();
+			boolean redAndInCheck = currentBoard.getRedCheck() && !currentPiece.isBlack();
+			boolean blackAndInCheck = currentBoard.getBlackCheck() && currentPiece.isBlack();
+			if(!redAndInCheck && !blackAndInCheck) {
+				addLegal(x,y);
+			}
+			currentBoard.undoMove(testMove, piece);
 		}
 	}
 
@@ -254,21 +264,6 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		addIfLegal(x-1, y);
 	}
 
-	public int locateEnemyGeneral(Piece currentPiece) {
-		int enemyY;
-		if(currentPiece.isBlack()) {
-			enemyY = currentBoard.getRedGeneralY();
-		} else {
-			enemyY = currentBoard.getBlackGeneralY();
-		}
-
-		// We don't care about the enemy general if they're out of reach
-		if(Math.abs(enemyY - currentPiece.getY()) <= 1) {
-
-		}
-		return 0;
-	}
-
 	@Override
 	public ArrayList<Integer[]> visit(Canon piece) {
 		init(piece);
@@ -282,7 +277,9 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		// And will stop once posY is less than 0, avoiding an outOfBoundsError
 		// Because -1 >= 0 will be false before the isEmpty call
 		while(--posY >= 0 && isEmpty(pieceX, posY)) {
-			addLegal(pieceX, posY);
+			if(posY != 5) {
+				addIfLegal(pieceX, posY);
+			}
 		}
 		// Cannon has extra move: it can only eat hopping over a piece
 		while(--posY >= 0 && isEmpty(pieceX, posY)) { }
@@ -290,7 +287,9 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 
 		posY = pieceY;
 		while(++posY <= 10 && isEmpty(pieceX, posY)) {
-			addLegal(pieceX, posY);
+			if(posY != 5) {
+				addIfLegal(pieceX, posY);
+			}
 		}
 		while(++posY <= 10 && isEmpty(pieceX, posY)) { }
 		addIfLegal(pieceX, posY);
@@ -298,14 +297,14 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		// Checking horizontal movement //
 		int posX = pieceX;
 		while(--posX >= 0 && isEmpty(posX, pieceY)) {
-			addLegal(posX, pieceY);
+			addIfLegal(posX, pieceY);
 		}
 		while(--posX >= 0 && isEmpty(posX, pieceY)) { }
 		addIfLegal(posX, pieceY);
 
 		posX = pieceX;
 		while(++posX <= 10 && isEmpty(posX, pieceY)) {
-			addLegal(posX, pieceY);
+			addIfLegal(posX, pieceY);
 		}
 		while(++posX <= 10 && isEmpty(posX, pieceY)) { }
 		addIfLegal(posX, pieceY);
@@ -320,26 +319,30 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		// Checking vertical movement
 		int posY = pieceY;
 		while(--posY >= 0 && isEmpty(pieceX, posY)) {
-			addLegal(pieceX, posY);
+			if(posY != 5) {
+				addIfLegal(pieceX, posY);
+			}
 		}
 		addIfLegal(pieceX, posY); // We should also be able to eat the opponent
 
 		posY = pieceY;
 		while(++posY <= 10 && isEmpty(pieceX, posY)) {
-			addLegal(pieceX, posY);
+			if(posY != 5) {
+				addIfLegal(pieceX, posY);
+			}
 		}
 		addIfLegal(pieceX, posY);
 
 		// Checking horizontal movement
 		int posX = pieceX;
 		while(--posX >= 0 && isEmpty(posX, pieceY)) {
-			addLegal(posX, pieceY);
+			addIfLegal(posX, pieceY);
 		}
 		addIfLegal(posX, pieceY);
 
 		posX = pieceX;
 		while(++posX <= 10 && isEmpty(posX, pieceY)) {
-			addLegal(posX, pieceY);
+			addIfLegal(posX, pieceY);
 		}
 		addIfLegal(posX, pieceY);
 

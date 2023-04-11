@@ -22,11 +22,11 @@ public class DrawRect extends JPanel {
 
 	@Override
 	public Dimension getPreferredSize() {
-		// so that our GameUpdater is big enough
+		// so that our gui is big enough
 		return new Dimension(RECT_WIDTH + 2 * RECT_X, RECT_HEIGHT + 2 * RECT_Y);
 	}
 
-	// create the GameUpdater explicitly on the Swing event thread
+	// create the gui explicitly on the Swing event thread
 	private static void createAndShowGui() {
 		DrawRect mainPanel = new DrawRect();
 

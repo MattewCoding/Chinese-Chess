@@ -14,6 +14,7 @@ import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,7 @@ import javax.swing.JTextArea;
 
 import org.apache.logging.log4j.Logger;
 
+import bot.Bot;
 import game.pieces.Piece;
 import log.LoggerUtility;
 import logic.moveChecking.PointVisitor;
@@ -67,7 +69,6 @@ public class GUI extends JPanel implements MouseListener{
 	private Piece movingPiece = null;
 	private boolean mouseClickedPiece = false;
 	private boolean mouseMovingPiece = false;
-	private List<Piece> randomPieces;
 
 	// players
 	private Profile player1, player2;
@@ -86,7 +87,7 @@ public class GUI extends JPanel implements MouseListener{
 	private int leftNotationBoxX = chessboardEdge + notationMargin;
 	private int rightMostX = ScreenParameters.SCREENWIDTH - notationMargin;
 	private int topNotationY = 2*ScreenParameters.SCREENHEIGHT/5;
-
+	
 	// Captured pieces 
 	private ArrayList<Piece> capturedPieceRed;
 	private ArrayList<Piece> capturedPieceBlack;
@@ -97,25 +98,23 @@ public class GUI extends JPanel implements MouseListener{
 	int imageWidth = 30;
 	int imageHeight = 30;
 
-	int musicBoxX = center - imageWidth - 5;
-	int soundBoxX = center + 5;
+	int musicBoxX = center - imageWidth - 10;
+	int soundBoxX = center + 10;
 
-	int boxY = margin - imageHeight - 5;
-	
-	private boolean soundOn = true;
-	private boolean musicOn = true;
-	private String soundFilename = "music-sounds/sound.wav";
-	private String musicFilename = "music-sounds/music.wav";
-	private Clip clip;
-	private Clip musicClip;
+	int boxY = margin - imageHeight - 15;
 
 	// Points
 	private PointVisitor searchValidMoves;
+	
+	private Bot bot;
 
-	//private static Logger logDataGUI = LoggerUtility.getLogger(SubMenu.class, "html");
+	private static Logger logDataGUI = LoggerUtility.getLogger(SubMenu.class, "html");
 
-	public GUI() {
+	private String theme; 
+	 
+	public GUI(String player1name, String player2name, String time, String theme) {
 		board = new Board();
+		this.theme=theme;
 
 		pastMoves = new NotationHistory();
 		pastMovesTextArea = new JTextArea("");
@@ -123,26 +122,12 @@ public class GUI extends JPanel implements MouseListener{
 		capturedPieceRed = new ArrayList<Piece>();
 		capturedPieceBlack = new ArrayList<Piece>();
 
-		//timerListener = new TimerListener();
-		player1 = new Profile("Rona",0,false);
-		player2 = new Profile("Computer",0,true);
+		player1 = new Profile(player1name, 0, false, time);
+		player2 = new Profile(player2name, 0, true, time);
 		player2.getTimer().stop();
 
+		bot = new Bot(player2, true, 4);
 		searchValidMoves = new PointVisitor(board);
-		
-        AudioInputStream audioInputStream;
-		try {
-			audioInputStream = AudioSystem.getAudioInputStream(new File(musicFilename).getAbsoluteFile());
-	        musicClip = AudioSystem.getClip();
-	        musicClip.open(audioInputStream);
-	        musicClip.start();
-	    } catch (UnsupportedAudioFileException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (LineUnavailableException e) {
-			e.printStackTrace();
-		}
 
 		addMouseListener(this);
 	}
@@ -151,7 +136,7 @@ public class GUI extends JPanel implements MouseListener{
 	 * Updates the state of the game
 	 */
 	public void checkPieces() {
-		if(redTurn || player2.getId()!="Computer") {
+		if(redTurn || !player2.getId().equals("Computer")) {
 			if(mouseClickedPiece && mouseMovingPiece) {
 
 			// Player1's turn (or the not-computer)
@@ -177,24 +162,18 @@ public class GUI extends JPanel implements MouseListener{
 
 					updateCaptured();
 					updateNotation(move, movingPiece);
-					playSound(soundFilename, !soundOn ,soundOn);
+					//playSound(soundFilename, !soundOn ,soundOn);
 					
 					mouseClickedPiece = false;
 				}
 				mouseMovingPiece = false;
 			}
 		} else {
-			randomPieces = board.getAllPieces();
-			// Auto generate a move
-			Move move = board.GenerateMoves(randomPieces);
+			bot.updateBoard(board);
+			Move move = bot.generateIdealMove();
 			Moving moving = new Moving(board, move);
-
-			while(!board.tryMove(moving,player2)) {
-				randomPieces = board.getAllPieces();
-				// Auto generate a move
-				move = board.GenerateMoves(randomPieces);
-				moving = new Moving(board, move);
-			}
+			board.tryMove(moving, player2);
+			
 
 			player2.stopTurnTimer();
 			player1.startTurnTimer();
@@ -203,47 +182,20 @@ public class GUI extends JPanel implements MouseListener{
 			updateNotation(move, move.getPiece());
 		}
 	}
-	
-	public void playMusic(boolean play) {
-		if(play) {
-	        AudioInputStream audioInputStream;
-			try {
-				audioInputStream = AudioSystem.getAudioInputStream(new File(musicFilename).getAbsoluteFile());
-		        musicClip = AudioSystem.getClip();
-		        musicClip.open(audioInputStream);
-		        musicClip.start();
-		    } catch (UnsupportedAudioFileException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (LineUnavailableException e) {
-				e.printStackTrace();
-			}
-		} else {
-			musicClip.stop();
-        }
-		
-	}
-	
-	public void playSound(String filename,boolean stop, boolean play) {
-		if(play) {
-		    try {
-		    	if (stop) {
-		            clip.stop();
-		            return;
-		        }
-		        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filename).getAbsoluteFile());
-		        Clip clip = AudioSystem.getClip();
-		        clip.open(audioInputStream);
-		        clip.start();
-		    } catch (UnsupportedAudioFileException e) {
-		        e.printStackTrace();
-		    } catch (IOException e) {
-		        e.printStackTrace();
-		    } catch (LineUnavailableException e) {
-		        e.printStackTrace();
-		    }
-		}
+
+	public void playSound(String filename) {
+	    try {
+	        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filename).getAbsoluteFile());
+	        Clip clip = AudioSystem.getClip();
+	        clip.open(audioInputStream);
+	        clip.start();
+	    } catch (UnsupportedAudioFileException e) {
+	        e.printStackTrace();
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    } catch (LineUnavailableException e) {
+	        e.printStackTrace();
+	    }
 	}
 
 	@Override
@@ -254,7 +206,6 @@ public class GUI extends JPanel implements MouseListener{
 		try {
 			Image background = ImageIO.read(new File(imgLocation));
 			g.drawImage(background,0,0,null);
-
 		} catch (IOException e) {
 			//logDataGUI.error("Image at " + imgLocation + " was not found.");
 		}
@@ -292,11 +243,10 @@ public class GUI extends JPanel implements MouseListener{
 						CreateRectangle.drawFilledRectangle(g2, topLeftX, topLeftY, squareLength);
 					}
 				}
-
 			}
-
 		}
-		drawPieceImages();
+		
+		drawPieceImages(theme);
 		drawTurnTimer();
 		drawNotation();
 		drawCapturedBox();
@@ -306,16 +256,45 @@ public class GUI extends JPanel implements MouseListener{
 			drawPoints();
 		}
 	}
-
-	/*public void logCreationData() {
-		//logDataGUI.info(board.toString());
-		//logDataGUI.info("Players created: Player 1 is " + player1.getId() + " and Player 2 is " + player2.getId());
-	}*/
+	
+	/**
+	 * Check whether the game has ended because the general is in checkmate, or time has run out
+	 * @return boolean Whether the game has ended
+	 */
+	public boolean hasEnded() {
+		if(Board.getWinner()!=-1) {
+			player1.calculateScore();
+			player2.calculateScore();
+			player2.stopTurnTimer();
+			player1.stopTurnTimer();
+		}
+		
+		String timeLeft = player1.getTimer().getElapsedTime();
+		String timeRight = player2.getTimer().getElapsedTime();
+		boolean player1Out = timeLeft.equals("00:00");
+		boolean player2Out = timeRight.equals("00:00");
+		
+		return Board.getWinner()!=-1 || player1Out || player2Out;
+	}
+	
+	public Profile getPlayer1() {
+		return player1;
+	}
+	
+	public Profile getPlayer2() {
+		return player2;
+	}
+	
+	public void logCreationData() {
+		logDataGUI.info(board.toString());
+		logDataGUI.info("Players created: Player 1 is " + player1.getId() + " and Player 2 is " + player2.getId());
+	}
 
 	/**
 	 * Places the different pieces on the board
+	 * @param theme The theme of the board
 	 */
-	public void drawPieceImages() {
+	public void drawPieceImages(String theme) {
 		for(int col = 0; col<11; col++) {
 			for(int row = 0; row<11; row++) {
 				int topLeftX = leftMostPixel + col * squareLength;
@@ -324,9 +303,8 @@ public class GUI extends JPanel implements MouseListener{
 				Piece piece = pieceList[col][row];
 				if (piece != null) {
 					String fileName = piece.getImageName();
-					Image scaledImage = new ImageIcon("pictures"+ScreenParameters.PATHSEP+"chinese_"+fileName).getImage();
+					Image scaledImage = new ImageIcon(ScreenParameters.IMAGESELECT+theme+"_"+fileName).getImage();
 					g2.drawImage(scaledImage, topLeftX+5, topLeftY+5, squareLength-10, squareLength-10, null);
-
 				}
 			}
 		}
@@ -342,31 +320,15 @@ public class GUI extends JPanel implements MouseListener{
 		} catch (IOException e) {
 		    e.printStackTrace();
 		}
-		
-		Rectangle soundImageBox;
-		Rectangle musicImageBox;
-
-		
-
 		// draw music box
-		g2.setColor(Color.WHITE);
-		g2.fillRect(musicBoxX, boxY, imageWidth, imageHeight);
-		g2.setColor(Color.BLACK);
-		g2.setStroke(new BasicStroke(strokeWidth));
-		g2.drawRect(musicBoxX, boxY, imageWidth, imageHeight);
+		CreateRectangle.drawFilledRectangle(g2, ScreenParameters.OUTLINECOLOR, ScreenParameters.BOARDCOLOR, musicBoxX, boxY, imageHeight, imageWidth);
 		g2.drawImage(musicImage, musicBoxX + 2, boxY + 2, imageWidth - 4, imageHeight - 4, null);
-		musicImageBox = new Rectangle(musicBoxX, boxY, imageWidth, imageHeight);
-		
 
 		// draw sound box
-		g2.setColor(Color.WHITE);
-		g2.fillRect(soundBoxX, boxY, imageWidth, imageHeight);
-		g2.setColor(Color.BLACK);
-		g2.setStroke(new BasicStroke(strokeWidth));
-		g2.drawRect(soundBoxX, boxY, imageWidth, imageHeight);
+		CreateRectangle.drawFilledRectangle(g2, ScreenParameters.OUTLINECOLOR, ScreenParameters.BOARDCOLOR, soundBoxX, boxY, imageHeight, imageWidth);
 		g2.drawImage(soundImage, soundBoxX + 2, boxY + 2, imageWidth - 4, imageHeight - 4, null);
-		soundImageBox = new Rectangle(soundBoxX, boxY, imageWidth, imageHeight);
 	}
+	
 	/**
 	 * Draws the turn timer for both players
 	 */
@@ -434,7 +396,7 @@ public class GUI extends JPanel implements MouseListener{
 		CreateRectangle.drawFilledRectangle(g2, capturedMargin, topNotationY, leftMostPixel - 2*capturedMargin, ScreenParameters.SCREENHEIGHT/2);
 
 		drawCapturedPieces(capturedPieceBlack, deplacepiecesX+10, topNotationY+10,deplacepiecesX+10);
-		drawCapturedPieces(capturedPieceRed, deplacepiecesX+10, 2*topNotationY,deplacepiecesX+10);
+		drawCapturedPieces(capturedPieceRed, deplacepiecesX+10, 2*topNotationY-10, deplacepiecesX+10);
 	}
 
 
@@ -511,14 +473,6 @@ public class GUI extends JPanel implements MouseListener{
 		if(pastMovesArrayList.size() > turnsFittableInBox) {
 			pastMovesArrayList.remove(0);
 		}
-		if(Board.getWinner()!=-1) {
-			player1.calculateScore();
-			player2.calculateScore();
-			player2.stopTurnTimer();
-			player1.stopTurnTimer();
-			EndGame endgame = new EndGame(Board.getWinner(),player1,player2);
-
-		}
 	}
 
 	/*
@@ -576,20 +530,9 @@ public class GUI extends JPanel implements MouseListener{
 			mouseClickedPiece = false;
 		}
 		
-		if(xSoundRange && ySoundRange) {
-			if (soundOn) {
-	            soundOn = false;
-	        } else {
-	        	soundOn = true;
-	        }
-	    	
-	    }
-		
-		if(xMusicRange && yMusicRange) {
-	        musicOn = !musicOn;
-            playMusic(musicOn);
-	    	
-	    }
+		// Play the sound file
+	    String soundFilePath = "./music-sounds/Board-Game-Wood-Piece-Capture-Chess.wav";
+	    playSound(soundFilePath);
 		
 	}
 

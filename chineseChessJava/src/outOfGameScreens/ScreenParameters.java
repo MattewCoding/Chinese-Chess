@@ -27,6 +27,7 @@ public class ScreenParameters {
 	public static final int SLEEPAMOUNT = 40; // 25fps
 	
 	public static final char PATHSEP = File.separatorChar;
+	public static final String IMAGESELECT = "pictures"+PATHSEP;
 
 	private static String blackTime = "15:00";
 	private static String redTime = "15:00";
