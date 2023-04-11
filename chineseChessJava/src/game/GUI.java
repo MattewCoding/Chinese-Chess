@@ -86,7 +86,7 @@ public class GUI extends JPanel implements MouseListener{
 	private int leftNotationBoxX = chessboardEdge + notationMargin;
 	private int rightMostX = ScreenParameters.SCREENWIDTH - notationMargin;
 	private int topNotationY = 2*ScreenParameters.SCREENHEIGHT/5;
-
+	
 	// Captured pieces 
 	private ArrayList<Piece> capturedPieceRed;
 	private ArrayList<Piece> capturedPieceBlack;
@@ -117,7 +117,7 @@ public class GUI extends JPanel implements MouseListener{
 	//private static Logger logDataGUI = LoggerUtility.getLogger(SubMenu.class, "html");
 
 	public GUI() {
-		board = Board.getInstance();
+		board = new Board();
 
 		pastMoves = new NotationHistory();
 		pastMovesTextArea = new JTextArea("");
@@ -130,9 +130,10 @@ public class GUI extends JPanel implements MouseListener{
 		player2 = new Profile("Computer",0,true);
 		player2.getTimer().stop();
 
-		bot = new Bot(player2, true);
+		bot = new Bot(player2, true, 4);
 		searchValidMoves = new PointVisitor(board);
 		
+		/*
         AudioInputStream audioInputStream;
 		try {
 			audioInputStream = AudioSystem.getAudioInputStream(new File(musicFilename).getAbsoluteFile());
@@ -145,7 +146,7 @@ public class GUI extends JPanel implements MouseListener{
 			e.printStackTrace();
 		} catch (LineUnavailableException e) {
 			e.printStackTrace();
-		}
+		}*/
 
 		addMouseListener(this);
 	}
@@ -180,17 +181,18 @@ public class GUI extends JPanel implements MouseListener{
 
 					updateCaptured();
 					updateNotation(move, movingPiece);
-					playSound(soundFilename, !soundOn ,soundOn);
+					//playSound(soundFilename, !soundOn ,soundOn);
 					
 					mouseClickedPiece = false;
 				}
 				mouseMovingPiece = false;
 			}
 		} else {
-			Move move = bot.generateMove(board, player2);
-			
 			bot.updateBoard(board);
-			System.out.println(bot.evaluate());
+			Move move = bot.generateIdealMove();
+			Moving moving = new Moving(board, move);
+			board.tryMove(moving, player2);
+			
 
 			player2.stopTurnTimer();
 			player1.startTurnTimer();
@@ -435,7 +437,7 @@ public class GUI extends JPanel implements MouseListener{
 		CreateRectangle.drawFilledRectangle(g2, capturedMargin, topNotationY, leftMostPixel - 2*capturedMargin, ScreenParameters.SCREENHEIGHT/2);
 
 		drawCapturedPieces(capturedPieceBlack, deplacepiecesX+10, topNotationY+10,deplacepiecesX+10);
-		drawCapturedPieces(capturedPieceRed, deplacepiecesX+10, 2*topNotationY,deplacepiecesX+10);
+		drawCapturedPieces(capturedPieceRed, deplacepiecesX+10, 2*topNotationY-10, deplacepiecesX+10);
 	}
 
 

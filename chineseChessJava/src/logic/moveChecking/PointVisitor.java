@@ -166,7 +166,6 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 	/**
 	 * Check if a piece is legal, but only if the move is restricted to the castle
 	 * 
-	 * @param piece The piece being moved
 	 * @param x The horizontal coordinate of the specified square
 	 * @param y The vertical coordinate of the specified square
 	 */
@@ -182,8 +181,8 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 	
 	/**
 	 * River variant
-	 * @param x
-	 * @param y
+	 * @param x The horizontal coordinate of the specified square
+	 * @param y The vertical coordinate of the specified square
 	 */
 	public void addIfLegalRiver(int x, int y) {
 		int[] xBounds = {-1,11};
@@ -229,7 +228,17 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		// Normally isEdible shouldn't ever throw an outOfBounds error
 		// Because isEmpty will be true before that happens
 		if(!legalMoves.contains(position) && isInBound(x,y, xBounds, yBounds) && !exposesGeneral(x,y) && (isEmpty(x,y) || isEdible(x,y)) ) {
-			addLegal(x,y);
+			
+			Piece piece = currentBoard.getPiece(x, y);
+			Move testMove = new Move(currentPiece, currentPiece.getX(), currentPiece.getY(), x, y);
+			currentBoard.doMove(testMove);
+			currentBoard.testCheck();
+			boolean redAndInCheck = currentBoard.getRedCheck() && !currentPiece.isBlack();
+			boolean blackAndInCheck = currentBoard.getBlackCheck() && currentPiece.isBlack();
+			if(!redAndInCheck && !blackAndInCheck) {
+				addLegal(x,y);
+			}
+			currentBoard.undoMove(testMove, piece);
 		}
 	}
 
@@ -253,21 +262,6 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 	public void checkLeftAndRight(int x, int y) {
 		addIfLegal(x+1, y);
 		addIfLegal(x-1, y);
-	}
-
-	public int locateEnemyGeneral(Piece currentPiece) {
-		int enemyY;
-		if(currentPiece.isBlack()) {
-			enemyY = currentBoard.getRedGeneralY();
-		} else {
-			enemyY = currentBoard.getBlackGeneralY();
-		}
-
-		// We don't care about the enemy general if they're out of reach
-		if(Math.abs(enemyY - currentPiece.getY()) <= 1) {
-
-		}
-		return 0;
 	}
 
 	@Override

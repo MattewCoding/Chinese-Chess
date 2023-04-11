@@ -1,11 +1,9 @@
-package bot;
+package onlineTesting;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import game.Board;
@@ -17,12 +15,12 @@ import outOfGameScreens.Profile;
 
 /**
  * With special thanks to Sebastian Lague for his work on Chess AI: https://www.youtube.com/watch?v=U4ogK0MIzqk
+ * Scrapped class that generates the full list of moves possible by the player before evaluating them
  * @author Yang Mattew
  *
  */
-public class Bot {
+public class BotScrap {
 	private ArrayList<Move> bestMoves = new ArrayList<Move>();
-	private Map<Long, Integer> transpositionTable = new HashMap<>();
 
 	private boolean playingBlack;
 	private Profile bot;
@@ -40,7 +38,7 @@ public class Bot {
 	 * @param bot The bot's win/lost information
 	 * @param isBlackPlayer Which side the bot is playing
 	 */
-	public Bot(Profile bot, boolean isBlackPlayer, int maxDepth) {
+	public BotScrap(Profile bot, boolean isBlackPlayer, int maxDepth) {
 		playingBlack = isBlackPlayer;
 		currentBoard = new Board();
 		this.maxDepth = maxDepth;
@@ -86,10 +84,10 @@ public class Bot {
 
 		Random random = new Random();
 
-		System.out.println("\nBest Moves:");
+		/*
     	for(Move m : bestMoves) {
     		System.out.println(m);
-    	}
+    	}*/
 		int n = random.nextInt(bestMoves.size());
 		//System.out.println(bestMoves.get(n));
 		return bestMoves.get(n);
@@ -104,86 +102,62 @@ public class Bot {
 	 * @return How good a move is
 	 */
 	public int findIdealMove(int depth, int alpha, int beta) {
-	    long hash = currentBoard.getHash();
-	    if (transpositionTable.containsKey(hash) && depth == transpositionTable.get(hash)) {
-	        return transpositionTable.get(hash);
-	    }
+		if(depth == 0) {
+			return searchAllCaptures(alpha, beta);
+		}
 
-	    if (depth == 0) {
-	        int score = searchAllCaptures(alpha, beta);
-	        transpositionTable.put(hash, score);
-	        return score;
-	    }
+		HashMap<Integer[], ArrayList<Integer[]>> allLegalMoves = generateMoves();
 
-	    List<Piece> pieces = currentBoard.getAllPieces(playingBlack);
-	    PointVisitor searchValidMoves = new PointVisitor(currentBoard);
-	    List<Move> moves = new ArrayList<>();
+		if(allLegalMoves.isEmpty()) {
+			if(currentBoard.checkMate(playingBlack)) { // Checkmate
+				return NEGATIVE_INFINITY;
+			}
+			return 0;
+		}
 
-	    for (Piece piece : pieces) {
-	        List<Integer[]> legalMovesPiece = piece.accept(searchValidMoves);
-	        for (Integer[] legalDest : legalMovesPiece) {
-	            int pieceX = piece.getX(), pieceY = piece.getY();
-	            int destX = legalDest[0], destY = legalDest[1];
-	            Piece capturedPiece = currentBoard.getPiece(destX, destY);
-	            Move move = new Move(piece, pieceX, pieceY, destX, destY);
-	            if (capturedPiece != null) {
-	                move.setCapturedPiece(capturedPiece);
-	            }
-	            moves.add(move);
-	        }
-	    }
+		for(Integer[] pieceCoord : allLegalMoves.keySet()) {
+			Piece movingPiece = currentBoard.getPiece(pieceCoord[0], pieceCoord[1]);
+			int pieceX = movingPiece.getX(), pieceY = movingPiece.getY();
 
-	    moves.sort(new moveSortingStrategy());
+			for(Integer[] legalDest : allLegalMoves.get(pieceCoord)) {
+				int destX = legalDest[0], destY = legalDest[1];
+				Piece capturedPiece = currentBoard.getPiece(destX, destY);
+				Move testMove = new Move(movingPiece, pieceX, pieceY, destX, destY);
 
-	    int bestScore = NEGATIVE_INFINITY;
-	    for (Move move : moves) {
-	        currentBoard.doMove(move);
-	        int score;
-	        if (move.getCapturedPiece() == null) {
-	            score = -findIdealMove(depth - 1, -beta, -alpha);
-	        } else {
-	            score = 10 * move.getCapturedPiece().getWorth() - move.getPiece().getWorth() - findIdealMove(depth - 1, -beta, -alpha);
-	        }
-	        currentBoard.undoMove(move, move.getCapturedPiece());
-	        if (score > bestScore) {
-	            bestScore = score;
-	            if (bestScore > alpha) {
-	                alpha = bestScore;
-	                bestMoves.clear();
-	            }
-	            if (bestScore >= beta) {
-	                break;
-	            }
-	        }
-	    }
+				currentBoard.doMove(testMove);
+				int evaluation = (capturedPiece == null)? 0 : 10 * capturedPiece.getWorth() - movingPiece.getWorth();
+				evaluation -= findIdealMove(depth - 1, -beta, -alpha);
+				currentBoard.undoMove(testMove, capturedPiece);
 
-	    if (bestScore == NEGATIVE_INFINITY) { // Is checkmate or stalemate
-	        if (currentBoard.checkMate(playingBlack)) { // Checkmate
-	            transpositionTable.put(hash, bestScore);
-	            return bestScore;
-	        }
-	        transpositionTable.put(hash, 0);
-	        return 0;
-	    }
+				if(evaluation >= beta) {
+					// Move was too good, opponent will avoid this position
+					return beta;
+				}
 
-	    if (depth == maxDepth) {
-	        for (Move move : moves) {
-	        	Piece capturedPiece = currentBoard.getPiece(move.getFinalX(), move.getFinalY());
-	        	currentBoard.doMove(move);
-	            if (evaluate() == bestScore) {
-	                bestMoves.add(move);
-		        	currentBoard.undoMove(move, capturedPiece);
-	            } else {
-		        	currentBoard.undoMove(move, capturedPiece);
-	                break;
-	            }
-	        }
-	    }
+				// If eval > alpha, then we have a move that's better than all previous, so we don't care about the previous anymore
+				if(evaluation >= alpha) {
+					if(evaluation > alpha) {
+						alpha = evaluation;
+						bestMoves.clear();
+					}
 
-	    transpositionTable.put(hash, bestScore);
-	    return bestScore;
+					boolean isIncluded = false;
+					for(Move m: bestMoves) {
+						if(m.isEqual(testMove)) {
+							isIncluded = true;
+							break;
+						}
+					}
+					if(!isIncluded && depth == maxDepth) { // Add for first-order moves
+						bestMoves.add(testMove);
+					}
+				}
+			}
+
+		}
+
+		return alpha;
 	}
-
 
 	/**
 	 * Captures aren't generally forces, so evaluate position before capturing.
@@ -199,33 +173,26 @@ public class Bot {
 		}
 		alpha = Math.max(alpha, evaluation);
 
+
+		return 0;
+	}
+
+	/**
+	 * Generates all possible moves a piece can make for every piece available for the player
+	 * @return
+	 */
+	public HashMap<Integer[], ArrayList<Integer[]>> generateMoves() {
 		List<Piece> oneSidePieces;
-		oneSidePieces = currentBoard.getAllPieces(playingBlack);
+		oneSidePieces = currentBoard.getAllPieces(true);
 		PointVisitor searchValidMoves = new PointVisitor(currentBoard);
+		HashMap<Integer[], ArrayList<Integer[]>> allLegalMoves = new HashMap<Integer[], ArrayList<Integer[]>> ();
 
 		for(Piece movingPiece : oneSidePieces) {
 			ArrayList<Integer[]> legalMovesPiece = movingPiece.accept(searchValidMoves);
-
-			for(Integer[] legalDest : legalMovesPiece) {
-				int destX = legalDest[0], destY = legalDest[1];
-				Piece capturedPiece = currentBoard.getPiece(destX, destY);
-
-				if(capturedPiece != null) {
-					int pieceX = movingPiece.getX(), pieceY = movingPiece.getY();
-					Move testMove = new Move(movingPiece, pieceX, pieceY, destX, destY);
-
-					currentBoard.doMove(testMove);
-					evaluation = -searchAllCaptures(-beta, -alpha);
-					currentBoard.undoMove(testMove, capturedPiece);
-
-					if(evaluation >= beta) {
-						return beta;
-					}
-					alpha = Math.max(alpha, evaluation);
-				}
-			}
+			Integer[] pieceCoords = {movingPiece.getX(), movingPiece.getY()};
+			allLegalMoves.put(pieceCoords, legalMovesPiece);
 		}
-		return alpha;
+		return allLegalMoves;
 	}
 
 	/**
@@ -275,7 +242,7 @@ public class Bot {
 	public void main(String[] args) {
 		Board b = new Board();
 		Profile p = new Profile("Test", 0, true);
-		Bot bot = new Bot(p, true, 4);
+		BotScrap bot = new BotScrap(p, true, 4);
 		bot.generateIdealMove();
 		System.out.println(bestMoves.size());
 
@@ -283,15 +250,6 @@ public class Bot {
 		for(Move m : bestMoves) {
 			System.out.println(m);
 		}
-	}
-	
-	public class moveSortingStrategy implements Comparator<Move>{
-
-		@Override
-		public int compare(Move m1, Move m2) {
-            return m2.getScore() - m1.getScore();
-		}
-		
 	}
 
 }
