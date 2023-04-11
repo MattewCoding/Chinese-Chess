@@ -154,13 +154,13 @@ public class EndGame extends JFrame {
 		
 		int winTextSize = winner.getId().length() * h2;
 		int winScoreSize = String.valueOf(winner.getScore()).length() * h2;
-		winnerLabel.setBounds(center - winTextSize/4, topLabel, textBoxSize, ScreenParameters.SCREENHEIGHT/20);
+		winnerLabel.setBounds(center - winTextSize/4, topLabel, textBoxSize, ScreenParameters.SCREENHEIGHT/15);
 		winnerScoreText.setBounds(center - scoreTextSize/4, midLabel, textBoxSize, 130);
 		winnerScore.setBounds(center - winScoreSize/4, botLabel, textBoxSize, 130);
 		
 		int loseTextSize = loser.getId().length() * h2;
 		int loseScoreSize = String.valueOf(loser.getScore()).length() * h2;
-		loserLabel.setBounds(center - loseTextSize/4, topLabel, textBoxSize, ScreenParameters.SCREENHEIGHT/20);
+		loserLabel.setBounds(center - loseTextSize/4, topLabel, textBoxSize, ScreenParameters.SCREENHEIGHT/15);
 		loserScoreText.setBounds(center - scoreTextSize/4, midLabel, textBoxSize, 130);
 		loserScore.setBounds(center - loseScoreSize/4, botLabel, textBoxSize, 130);
 
@@ -210,7 +210,6 @@ public class EndGame extends JFrame {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			// TODO: Maybe don't do this?
 			dispose();
 			new GameLauncher();
 		}
@@ -242,9 +241,9 @@ public class EndGame extends JFrame {
 	}
 	
 	public static void main(String[] args) {
-		Profile player1 = new Profile("Rona",0,false);
-		Profile player2 = new Profile("Mattew",0,true);
-		new EndGame(1, player2, player2);
+		Profile player1 = new Profile("Rona", 0, false, "15:00");
+		Profile player2 = new Profile("lgLgi", 0, true, "15:00");
+		new EndGame(1, player1, player2);
 	}
 
 }

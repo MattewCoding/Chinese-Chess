@@ -55,7 +55,7 @@ public class Board {
 	//private static Logger logDataBoard = LoggerUtility.getLogger(SubMenu.class, "html");
 
 	public Board() {
-		initZobrist()
+		initZobrist();
 		coords = new Piece[COLUMNS][ROWS];
 
 		int quadrant = 0, side, edgeYCoord, pieceId = 0;

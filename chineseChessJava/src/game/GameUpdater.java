@@ -9,7 +9,7 @@ import outOfGameScreens.EndGame;
 import outOfGameScreens.ScreenParameters;
 
 /**
- * The game's main GameUpdater, where the updates happen
+ * The game's main game updater, where the updates happen
  * 
  * @author YANG Mattew, Nasro Rona
  *
@@ -22,12 +22,14 @@ public class GameUpdater extends JPanel implements Runnable{
 	private static final long serialVersionUID = 1L;
 
 
-	private GUI gui = new GUI();
+	private GUI gui;
 	private boolean run = false;
 	private JFrame mainScreen;
 	
-	public GameUpdater(JFrame mainScreen){
-
+	public GameUpdater(JFrame gameScreen, String player1name, String player2name, String time, String theme){
+		mainScreen = gameScreen;
+		
+		gui = new GUI(player1name, player2name, time, theme);
 		setLayout(new BorderLayout());
 		add(BorderLayout.CENTER, gui);
 		gui.repaint();
@@ -35,8 +37,6 @@ public class GameUpdater extends JPanel implements Runnable{
 		Thread chronoThread = new Thread(this);
 		chronoThread.start();
 		run = true;
-		
-		this.mainScreen = mainScreen;
 	}
 	
 	@Override
@@ -56,8 +56,9 @@ public class GameUpdater extends JPanel implements Runnable{
 				gui.repaint();
 				if(gui.hasEnded()) {
 					EndGame endScreen = new EndGame(Board.getWinner(), gui.getPlayer1(), gui.getPlayer2());
-					mainScreen.setContentPane(endScreen);
+					mainScreen.setContentPane(endScreen.getContentPane());
 					mainScreen.revalidate();
+					run = false;
 				}
 			}
 		}

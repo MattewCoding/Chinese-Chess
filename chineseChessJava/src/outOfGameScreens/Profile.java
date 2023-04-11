@@ -25,7 +25,7 @@ public class Profile {
 	
 	
 
-	public Profile(String id, int score, boolean place) {
+	public Profile(String id, int score, boolean place,String time) {
 		this.id = id;
 		this.score = score;
 		this.piecesCaptured = new ArrayList<Piece>();
@@ -33,7 +33,7 @@ public class Profile {
 		this.place = place;
 		
 
-		timer = new TimerListener(place);
+		timer = new TimerListener(place,time);
 	}
 
 	public void addPieceCaptured(Piece pieceCaptured) {
