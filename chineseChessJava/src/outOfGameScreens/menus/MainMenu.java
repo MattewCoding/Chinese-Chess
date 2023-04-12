@@ -3,7 +3,11 @@ package outOfGameScreens.menus;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -11,6 +15,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -106,50 +111,98 @@ public class MainMenu extends AbstractMenu  {
 		}
 
 		public JPanel createWelcomePanel() {
+			
+		    //Initialize welcome panel with a welcome message and options
+		    welcomePanel = new JPanel(new GridBagLayout());
+		    //welcomePanel.setBackground(image);
 
-			// Initialize welcome panel with a welcome message and options
-			welcomePanel = new JPanel(new GridLayout(5, 2, 10, 10));
-			welcomePanel.setBackground(boardColor);
-			welcomePanel.setPreferredSize(new Dimension(700, 450));
+		    welcomePanel.setBackground(boardColor);
+		    welcomePanel.setPreferredSize(new Dimension(700, 450));
+		    GridBagConstraints c = new GridBagConstraints();
+		    c.insets = new Insets(10, 10, 10, 10);
 
-			// Add welcome message
-			JLabel welcomeLabel = new JLabel("Hello! Welcome to the game!");
-			welcomeLabel.setFont(new Font("Arial", Font.BOLD, 20));
-			welcomeLabel.setForeground(Color.BLACK);
-			welcomePanel.add(welcomeLabel);
-			welcomePanel.add(new JLabel());
+		 // Load the original icon image
+		    ImageIcon originalIcon = new ImageIcon("./logo/xiang.jpeg");
 
-			// Add player options
-			JLabel playerLabel = new JLabel("Number of Players:");
-			playerLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-			welcomePanel.add(playerLabel);
+		    // Create a new icon with a smaller size
+		    Image scaledImage = originalIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+		    ImageIcon smallIcon = new ImageIcon(scaledImage);
 
-			playerComboBox = new JComboBox<String>(new String[] {"1", "2"});
-			playerComboBox.setFont(new Font("Arial", Font.PLAIN, 16));
-			welcomePanel.add(playerComboBox);
+		    // Set the new icon for the welcome message label
+		    JLabel welcomeLabel = new JLabel(" Welcome to the XiangQi chess game!", smallIcon, JLabel.CENTER);
 
-			// Add time options
-			JLabel timeLabel = new JLabel("Time of Game:");
-			timeLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-			welcomePanel.add(timeLabel);
+		    welcomeLabel.setFont(new Font("Arial", Font.BOLD, 30));
+		    welcomeLabel.setForeground(Color.BLACK);
+		    c.gridx = 0;
+		    c.gridy = 0;
+		    c.gridwidth = 2;
+		    welcomePanel.add(welcomeLabel, c);
 
-			timeComboBox = new JComboBox<String>(new String[] {"05", "10", "15", "20", "30"});
-			timeComboBox.setFont(new Font("Arial", Font.PLAIN, 16));
-			welcomePanel.add(timeComboBox);
+		    // Add player options
+		    JLabel playerLabel = new JLabel("Number of Players:");
+		    playerLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+		    playerLabel.setForeground(Color.BLACK);
+		    c.gridx = 0;
+		    c.gridy = 1;
+		    c.gridwidth = 1;
+		    welcomePanel.add(playerLabel, c);
 
-			// Add theme options
-			JLabel themeLabel = new JLabel("Theme:");
-			themeLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-			welcomePanel.add(themeLabel);
+		    playerComboBox = new JComboBox<String>(new String[] {"1", "2"});
+		    playerComboBox.setFont(new Font("Arial", Font.PLAIN, 20));
+		    playerComboBox.setForeground(Color.BLACK);
+		    c.gridx = 1;
+		    c.gridy = 1;
+		    c.gridwidth = 1;
+		    welcomePanel.add(playerComboBox, c);
 
-			themeComboBox = new JComboBox<String>(new String[] {"chinese", "english"});
-			themeComboBox.setFont(new Font("Arial", Font.PLAIN, 16));
-			welcomePanel.add(themeComboBox);
+		    // Add time options
+		    JLabel timeLabel = new JLabel("Time of Game:");
+		    timeLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+		    timeLabel.setForeground(Color.BLACK);
+		    c.gridx = 0;
+		    c.gridy = 2;
+		    c.gridwidth = 1;
+		    welcomePanel.add(timeLabel, c);
 
-			// Add start button
-			JButton startButton = new JButton("Start");
-			welcomePanel.add(new JLabel());
-			welcomePanel.add(startButton);
+		    timeComboBox = new JComboBox<String>(new String[] {"05", "10", "15", "20", "30"});
+		    timeComboBox.setFont(new Font("Arial", Font.PLAIN, 20));
+		    timeComboBox.setForeground(Color.BLACK);
+		    c.gridx = 1;
+		    c.gridy = 2;
+		    c.gridwidth = 1;
+		    welcomePanel.add(timeComboBox, c);
+
+		    // Add theme options
+		    JLabel themeLabel = new JLabel("Theme:");
+		    themeLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+		    themeLabel.setForeground(Color.BLACK);
+		    c.gridx = 0;
+		    c.gridy = 3;
+		    c.gridwidth = 1;
+		    welcomePanel.add(themeLabel, c);
+
+		    themeComboBox = new JComboBox<String>(new String[] {"chinese", "english"});
+		    themeComboBox.setFont(new Font("Arial", Font.PLAIN, 20));
+		    themeComboBox.setForeground(Color.BLACK);
+		    c.gridx = 1;
+		    c.gridy = 3;
+		    c.gridwidth = 1;
+		    welcomePanel.add(themeComboBox, c);
+
+		 // Add start button
+		    JButton startButton = new JButton("Start");
+		    startButton.setFont(new Font("Arial", Font.BOLD, 20));
+		    startButton.setForeground(Color.BLACK);
+		    startButton.setFocusPainted(false);
+		    startButton.setContentAreaFilled(false);
+		    startButton.setOpaque(true);
+		    startButton.setBackground(new Color(63, 81, 181));
+		    c.gridx = 1;
+		    c.gridy = 4;
+		    c.gridwidth = 1;
+		    c.anchor = GridBagConstraints.LAST_LINE_END; // align to bottom right
+		    welcomePanel.add(startButton, c);
+
 			startButton.addActionListener(new StartButtonListener());
 			return welcomePanel;
 		}
