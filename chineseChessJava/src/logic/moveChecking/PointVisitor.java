@@ -104,12 +104,13 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 		int numberOfPieces = 0;
 
 		boolean generalsInSameColumn = currentBoard.generalsAligned();
-		boolean currentPieceInSameColumn = generalX == pieceX;
+		boolean pieceSameColAsItsGeneral = generalX == pieceX;
 		boolean movingHorizontally = pieceX != newX;
 
 		boolean isGeneral = currentPiece.getType() == "General";
 		if(isGeneral) {
-			currentPieceInSameColumn = true;
+			pieceSameColAsItsGeneral = true;
+			
 			// This only matters if they move horizontally into the column of the enemy
 			// Or if the general removes a piece in front of them
 			if(movingHorizontally) {
@@ -128,7 +129,8 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 				}
 			}
 		}
-		if(generalsInSameColumn && currentPieceInSameColumn && movingHorizontally) {
+		
+		if(generalsInSameColumn && pieceSameColAsItsGeneral && (movingHorizontally || isGeneral)) {
 			int blackGeneralY = currentBoard.getBlackGeneralY();
 			int redGeneralY = currentBoard.getRedGeneralY();
 
