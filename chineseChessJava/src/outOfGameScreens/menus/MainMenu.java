@@ -256,9 +256,11 @@ public class MainMenu extends AbstractMenu  {
 					String time = (String) timeComboBox.getSelectedItem();
 					String theme = (String) themeComboBox.getSelectedItem();
 
-					GameUpdater chessBoard = new GameUpdater(mainScreen, player1name, player2name, time, theme);
-					mainScreen.setContentPane(chessBoard);
-					mainScreen.revalidate();
+					if(player1name != null && player2name != null) {
+						GameUpdater chessBoard = new GameUpdater(mainScreen, player1name, player2name, time, theme);
+						mainScreen.setContentPane(chessBoard);
+						mainScreen.revalidate();
+					}
 				}
 			}
 		}
@@ -284,7 +286,7 @@ public class MainMenu extends AbstractMenu  {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			SubMenu tutorialMenu = new SubMenu("menu"+ScreenParameters.PATHSEP+"How to Play.txt", mainScreen);
+			SubMenu tutorialMenu = new SubMenu("menu"+ScreenParameters.PATHSEP+"Apprendre.txt", mainScreen);
 			mainScreen.setContentPane(tutorialMenu.getSplitPane());
 			mainScreen.revalidate();
 
