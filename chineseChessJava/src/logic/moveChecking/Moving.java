@@ -1,6 +1,5 @@
 package logic.moveChecking;
 import game.Board;
-import game.pieces.General;
 import game.pieces.Piece;
 
 public class Moving {
@@ -131,7 +130,6 @@ public class Moving {
 	}
 	
 	private void checkCrossing() {
-		Piece temp = board.getPiece(move.getOriginX(), move.getOriginY());
 		int startY = move.getOriginY(), endY = move.getFinalY();
 		boolean crossingDown = startY < 5 && endY > 5;
 		boolean crossingUp = startY > 5 && endY < 5;

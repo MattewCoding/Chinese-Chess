@@ -7,8 +7,6 @@ import java.awt.event.MouseListener;
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import outOfGameScreens.menus.MainMenu;
-
 /*
  * @author Rona Nasro
  */

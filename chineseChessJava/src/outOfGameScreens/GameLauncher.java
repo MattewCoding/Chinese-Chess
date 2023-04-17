@@ -3,14 +3,7 @@ package outOfGameScreens;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
-import org.apache.logging.log4j.Logger;
-
-import log.LoggerUtility;
 import outOfGameScreens.menus.MainMenu;
-import outOfGameScreens.menus.SubMenu;
 
 /**
  * Launches the game by opening the main menu and setting up the frame.
