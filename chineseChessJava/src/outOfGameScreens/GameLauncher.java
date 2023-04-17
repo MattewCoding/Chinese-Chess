@@ -1,5 +1,6 @@
 package outOfGameScreens;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -47,10 +48,13 @@ public class GameLauncher extends JFrame{
 		//frame.getContentPane().add(new SubMenu("menu/How to Play.txt", this).getSplitPane());
 		
 		//This code tests the menu
-		getContentPane().add(new MainMenu(this));
+		MainMenu mainMenu = new MainMenu(this);
+		add(mainMenu.getButtonPanel());
+		add(mainMenu);
 		
 		/* This part is to make sure the frame shows up */
 		//Frame settings
+        setLayout(new BorderLayout());
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 		pack();

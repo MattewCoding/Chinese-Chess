@@ -82,14 +82,14 @@ public class Bot {
 		long endTime = System.currentTimeMillis();
 		long timeElapsed = endTime - startTime;
 
-		System.out.println("Time elapsed: " + timeElapsed + " milliseconds");
-
 		Random random = new Random();
 
 		System.out.println("\nBest Moves:");
 		for(Move m : bestMoves) {
 			System.out.println(m);
 		}
+
+		System.out.println("Time elapsed: " + timeElapsed + " milliseconds");
 		int n = random.nextInt(bestMoves.size());
 		//System.out.println(bestMoves.get(n));
 		return bestMoves.get(n);
@@ -138,15 +138,16 @@ public class Bot {
 		int bestScore = NEGATIVE_INFINITY;
 		for (Move move : moves) {
 			currentBoard.doMove(move);
-	        int score;
+			int evaluation;
 			if (move.getCapturedPiece() == null) {
-	            score = -findIdealMove(depth - 1, -beta, -alpha);
+				evaluation = -findIdealMove(depth - 1, -beta, -alpha);
 	        } else {
-	            score = 10 * move.getCapturedPiece().getWorth() - move.getPiece().getWorth() - findIdealMove(depth - 1, -beta, -alpha);
+	        	evaluation = 10 * move.getCapturedPiece().getWorth() - move.getPiece().getWorth() - findIdealMove(depth - 1, -beta, -alpha);
 	        }
 			currentBoard.undoMove(move, move.getCapturedPiece());
 
-			bestScore = Math.max(score, bestScore);
+			//System.out.println(evaluation + " v. " + bestScore + " v. " + alpha);
+			bestScore = Math.max(evaluation, bestScore);
 			if (bestScore >= beta) {
 				// Move was too good, opponent will avoid this position
 				return beta;
@@ -155,9 +156,10 @@ public class Bot {
 			if (bestScore >= alpha) {
 				if(bestScore > alpha) {
 					alpha = bestScore;
-					bestMoves.clear();
+					if(depth == maxDepth) {
+						bestMoves.clear();
+					}
 				}
-
 				if(!bestMoves.contains(move) && depth == maxDepth) { // Add for first-order moves
 					bestMoves.add(move);
 				}
@@ -314,7 +316,8 @@ public class Bot {
 		public int evaluateMove(Move move) {
 			Piece capturedPiece = moveSortingBoard.getPiece(move.getFinalX(), move.getFinalY());
 			moveSortingBoard.doMove(move);
-			int evaluation = evaluate();
+			int capturingOffset = (capturedPiece == null)? 0 : 10 * move.getCapturedPiece().getWorth() - move.getPiece().getWorth();
+			int evaluation = capturingOffset + evaluate();
 			moveSortingBoard.undoMove(move, capturedPiece);
 			return evaluation;
 		}
