@@ -66,7 +66,6 @@ public class GameUpdater extends JPanel implements Runnable{
 			}
 		}
 		while (end) {
-			System.out.println("closed: " + endScreen.closed());
 			if(endScreen.closed()) {
 				mainScreen.dispose();
 				end = false;
