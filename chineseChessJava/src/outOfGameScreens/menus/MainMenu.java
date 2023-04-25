@@ -150,7 +150,7 @@ public class MainMenu extends AbstractMenu  {
 			c.insets = new Insets(10, 10, 10, 10);
 
 			// Load the original icon image
-			ImageIcon originalIcon = new ImageIcon("./logo/xiang.jpeg");
+			ImageIcon originalIcon = new ImageIcon("./logo/chess.png");
 
 			// Create a new icon with a smaller size
 			Image scaledImage = originalIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
