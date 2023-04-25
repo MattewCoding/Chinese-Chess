@@ -242,7 +242,7 @@ public class Board {
 				} else {
 					//the move is legal, now let's see if it's a winning move.
 					if (blackCheck && !curr.isBlack()) {
-						if (checkMate(true)) {
+						if (checkMate(true) ) {
 							setWinner(PLAYER1_WINS);
 						}
 	
