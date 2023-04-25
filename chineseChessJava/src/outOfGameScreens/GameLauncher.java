@@ -3,14 +3,7 @@ package outOfGameScreens;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
-import org.apache.logging.log4j.Logger;
-
-import log.LoggerUtility;
 import outOfGameScreens.menus.MainMenu;
-import outOfGameScreens.menus.SubMenu;
 
 /**
  * Launches the game by opening the main menu and setting up the frame.
@@ -38,14 +31,6 @@ public class GameLauncher extends JFrame{
 	 */
 	public GameLauncher() {
 		super("Chinese Chess");
-		//GameUpdater chessBoard = new GameUpdater();
-		
-		/*  This part is for testing the various screens bc we dont have the main menu screen */
-		//  This code is for creating the board
-		//frame.getContentPane().add(chessBoard);
-		
-		//  This code tests the sub-menus
-		//frame.getContentPane().add(new SubMenu("menu/How to Play.txt", this).getSplitPane());
 		
 		//This code tests the menu
 		MainMenu mainMenu = new MainMenu(this);

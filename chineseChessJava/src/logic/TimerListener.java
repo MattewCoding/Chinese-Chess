@@ -2,8 +2,6 @@ package logic;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.concurrent.TimeUnit;
-
 import javax.swing.JComponent;
 import javax.swing.Timer;
 
@@ -17,6 +15,10 @@ import outOfGameScreens.ScreenParameters;
 
 public class TimerListener extends JComponent{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	Timer timer;
 	private long pausedTime;
 	private long startTime;

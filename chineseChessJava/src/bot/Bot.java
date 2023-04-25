@@ -8,8 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.logging.log4j.Logger;
+
 import game.Board;
 import game.pieces.Piece;
+import log.LoggerUtility;
 import logic.moveChecking.Move;
 import logic.moveChecking.Moving;
 import logic.moveChecking.PointVisitor;
@@ -21,6 +24,8 @@ import outOfGameScreens.Profile;
  *
  */
 public class Bot {
+	private static Logger logDataBot = LoggerUtility.getLogger(Bot.class, "html");
+	
 	private ArrayList<Move> bestMoves = new ArrayList<Move>();
 	private Map<Long, Integer> transpositionTable = new HashMap<>();
 
@@ -84,12 +89,12 @@ public class Bot {
 
 		Random random = new Random();
 
-		System.out.println("\nBest Moves:");
+		logDataBot.info("Best Moves:");
 		for(Move m : bestMoves) {
-			System.out.println(m);
+			logDataBot.info(m);
 		}
 
-		System.out.println("Time elapsed: " + timeElapsed + " milliseconds");
+		logDataBot.info("Time elapsed: " + timeElapsed + " milliseconds");
 		int n = random.nextInt(bestMoves.size());
 		//System.out.println(bestMoves.get(n));
 		return bestMoves.get(n);

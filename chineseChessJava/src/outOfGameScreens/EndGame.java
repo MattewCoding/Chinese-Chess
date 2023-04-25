@@ -7,8 +7,6 @@ import java.awt.event.MouseListener;
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import outOfGameScreens.menus.MainMenu;
-
 /*
  * @author Rona Nasro
  */
@@ -43,8 +41,10 @@ public class EndGame extends JFrame {
 	private int center = ScreenParameters.SCREENWIDTH/4;
 
 	protected Color boardColor = ScreenParameters.BOARDCOLOR;
+	
+	private boolean isClosed = false;
 
-	public EndGame(int winnerState,Profile player1, Profile player2){
+	public EndGame(int winnerState, Profile player1, Profile player2){
 		int h1 = (int) (70*ScreenParameters.YREDUCE);
 		int h2 = (int) (50*ScreenParameters.YREDUCE);
 		int h3 = (int) (30*ScreenParameters.YREDUCE);
@@ -203,13 +203,17 @@ public class EndGame extends JFrame {
 
 		setResizable(false);
 		setLocationRelativeTo(null);
-		setVisible(true);
 	}
 	
-	private class panel4Listener implements MouseListener{
+	public boolean closed() {
+		return isClosed;
+	}
+	
+	private class panel4Listener implements MouseListener {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
+			isClosed = true;
 			dispose();
 			new GameLauncher();
 		}

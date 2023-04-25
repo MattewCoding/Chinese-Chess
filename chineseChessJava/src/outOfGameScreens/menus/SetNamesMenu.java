@@ -7,9 +7,6 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import outOfGameScreens.SliderButtonCombo;
-import outOfGameScreens.menus.OptionsMenu.optionListListener;
-
 public class SetNamesMenu extends AbstractMenu {
 
 	private static final long serialVersionUID = 1L;

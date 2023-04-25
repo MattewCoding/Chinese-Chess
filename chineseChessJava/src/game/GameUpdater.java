@@ -24,7 +24,9 @@ public class GameUpdater extends JPanel implements Runnable{
 
 	private GUI gui;
 	private boolean run = false;
+	private boolean end = false;
 	private JFrame mainScreen;
+	private EndGame endScreen;
 	
 	public GameUpdater(JFrame gameScreen, String player1name, String player2name, String time, String theme){
 		mainScreen = gameScreen;
@@ -55,11 +57,18 @@ public class GameUpdater extends JPanel implements Runnable{
 				gui.checkPieces();
 				gui.repaint();
 				if(gui.hasEnded()) {
-					EndGame endScreen = new EndGame(Board.getWinner(), gui.getPlayer1(), gui.getPlayer2());
+					endScreen = new EndGame(Board.getWinner(), gui.getPlayer1(), gui.getPlayer2());
 					mainScreen.setContentPane(endScreen.getContentPane());
 					mainScreen.revalidate();
 					run = false;
+					end = true;
 				}
+			}
+		}
+		while (end) {
+			if(endScreen.closed()) {
+				mainScreen.dispose();
+				end = false;
 			}
 		}
 	}

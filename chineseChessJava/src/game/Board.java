@@ -20,7 +20,6 @@ import logic.moveChecking.Move;
 import logic.moveChecking.Moving;
 import logic.moveChecking.PointVisitor;
 import outOfGameScreens.Profile;
-import outOfGameScreens.menus.SubMenu;
 
 public class Board {
 
@@ -52,7 +51,7 @@ public class Board {
     private final long[][][] zobristTable = new long[COLUMNS][ROWS][PIECE_TYPES];
 	private long hashValue;
 	
-	//private static Logger logDataBoard = LoggerUtility.getLogger(SubMenu.class, "html");
+	private static Logger logDataBoard = LoggerUtility.getLogger(Board.class, "html");
 
 	public Board() {
 		initZobrist();
@@ -232,18 +231,18 @@ public class Board {
 				this.doMove(move);
 				testCheck();
 				if (curr.isBlack() && blackCheck) {
-					System.out.println(" Illegal Move, you're in check");
+					logDataBoard.info(" Illegal Move, you're in check");
 					this.undoMove(move, captured);
 					return false;
 				}
 				if (!curr.isBlack() && redCheck) {
-					System.out.println(" Illegal Move, you're in check");
+					logDataBoard.info(" Illegal Move, you're in check");
 					this.undoMove(move, captured);
 					return false;
 				} else {
 					//the move is legal, now let's see if it's a winning move.
 					if (blackCheck && !curr.isBlack()) {
-						if (checkMate(true)) {
+						if (checkMate(true) ) {
 							setWinner(PLAYER1_WINS);
 						}
 	
@@ -265,20 +264,21 @@ public class Board {
 					}
 	
 					// if (!checkMate) {   //LEGAL MOVE AND NOT IN CHECKMATE?
-					System.out.println("Moved " + curr + " from (" + x + ", " + y + ") to (" + finalX + ", " + finalY + ")");
+					//System.out.println("Moved " + curr + " from (" + x + ", " + y + ") to (" + finalX + ", " + finalY + ")");
+					logDataBoard.info("Moved " + curr + " from (" + x + ", " + y + ") to (" + finalX + ", " + finalY + ")");
 					if (captured != null) {
 						player.addPieceCaptured(captured);
-						System.out.println(captured + " Captured!");
+						logDataBoard.info(captured + " Captured!");
 						//MoveLogger.addMove(new Move(curr, captured, x, y, finalX, finalY));
 					}
 					return true;
 				}
 			} else {
-				System.out.println("That's not your piece");
+				logDataBoard.info("That's not your piece");
 				return false;
 			}
 		}
-		System.out.println("Illegal Move");
+		logDataBoard.info("Illegal Move");
 		return false;
 
 

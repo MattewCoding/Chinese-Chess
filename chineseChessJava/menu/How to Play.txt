@@ -1,33 +1,32 @@
-Échecs chinois
-Les échecs chinois, également appelés Xiangqi, sont un jeu de plateau de stratégie pour deux joueurs, ou un joueur contre un bot. Le jeu représente unebataille entre deux armées, séparées par une rivière, avec un palais de chaque côté de la rivière.Une armée est représentée par des pions rouges, tandis que l'autre est représentée par des pionsnoirs. Les rouges commencent à se déplacer en premier, et alternent avec les noirs jusqu'à ce quele jeu aboutisse à un match nul ou qu'un joueur gagne.
+Chinese Chess 
+Chinese Chess is a two-player board game that represents a battle between two armies, separated by a river, with a palace on each side of the river. One army is represented by red pieces, while the other is represented by black pieces. The red player moves first, and then players take turns until the game ends in a draw or one player wins.The game is played on a board that is similar in shape and size to the board used in Western Chess, but it is divided by a river in the middle.Each player has 16 pieces that are placed on the board at the beginning of the game. The pieces are arranged in a specific pattern, with the generals (kings) placed in the center of the back row. The objective of the game is to checkmate the opponent's general. Unlike in Western Chess, the game does not end in a draw if a stalemate is reached. The game is typically played with a timer, and each player has a set amount of time to make their moves. If a player's time runs out, they lose the game. Chinese Chess is a popular game in many parts of the world, particularly in East Asia. It is often played in parks, cafes, and other public spaces, and there are many professional players who compete in tournaments and championships. The game has a rich history and is thought to have originated in China more than a thousand years ago. It has undergone many changes and adaptations over the centuries, but it remains a beloved and challenging game of strategy and skill.
 
 The game
-Players take turns moving pieces around until one player is unable to move their king.
+The game is won by putting the opponent's king into checkmate, which means that the king is under attack and cannot escape capture on the next turn. Players move their pieces around the board, trying to attack the opponent's pieces and protect their own pieces.
 
-Moving
-On your turn, to move a piece, click on the piece in question. Small circles will appear in the squares where the piece is allowed to move. Clicking once in any of these squares will result in the piece moving, as well as the end of your turn.
-
+Moving Pieces
+On your turn, click on the piece you want to move. Small circles will appear in the squares where the piece is allowed to move. Click once in any of these squares to move the piece, and your turn will end.
 
 Pieces
-Chaque joueur commence avec seize pièces circulaires. Les pièces du joueur 1 sont entièrement noires, tandis que les pièces du joueur 2 sont rouges à l'intérieur. Les pièces d'échecs portent chacune le nom d'un grade militaire chinois, avec leur caractère chinois affiché sur leurs pièces d'échecs respectives.
+Each player starts with sixteen circular pieces. The pieces of player 1 are entirely black, while the pieces of player 2 have red insides. The chess pieces are named after Chinese military ranks, with their Chinese character displayed on their respective pieces.
 
-  Soldat
-Le soldat ne peut avancer que d'un point, jusqu'à ce qu'il ait traversé la rivière, où il pourra ensuite se déplacer horizontalement ou avancer d'une case. Le soldat, contrairement à son équivalent international, n'est pas promu lorsqu'il atteint la fin du tableau.
+Soldier
+The soldiers are the most numerous pieces in the game, and their main role is to protect the other pieces. They are also important for controlling the center of the board and for launching attacks on the enemy's pieces. Once a soldier crosses the river, it becomes more mobile and can attack from different angles.
 
-  Cheval
-Le cheval se déplace d'abord d'un point verticalement ou horizontalement, puis d'un point en diagonale, dans cette ordre précis, tant que sa trajectoire est libre. Les chevaux deviennent plus forts en fin de partie car il y a moins de pièces sur le plateau, ce qui leur permet de se déplacer plus librement.
+Horse
+The horse moves first one point vertically or horizontally, and then one point diagonally, in that order, as long as its path is clear. Horses become stronger in the endgame because there are fewer pieces on the board, allowing them to move more freely.
 
-  Chariot
-Le chariot peut se déplacer verticalement et horizontalement de n'importe quel nombre de points, tant que leur chemin est libre, c'est-à-dire qu'aucune pièce ne bloque leur mouvement vertical ou horizontal vers leur destination.
+Chariot
+The chariot can move vertically and horizontally any number of points, as long as its path is clear, meaning that no piece is blocking its vertical or horizontal movement towards its destination.
 
-  Éléphant
-Les éléphants doivent se déplacer de deux points en diagonale, et ne se déplacent que tant que leur chemin est libre, c'est-à-dire qu'ils ne peuvent pas sauter par-dessus une pièce. En outre, ils ne peuvent pas non plus sauter par-dessus la rivière, et sont donc confinés sur leur côté. Les éléphants sont généralement utilisés pour protéger le général et les autres éléphants.
+Elephant
+Elephants move two points diagonally and can only move if their path is clear, meaning that they cannot jump over a piece. They also cannot cross the river and are therefore confined to their own side. Elephants are usually used to protect the general and other elephants.
 
-  Garde
-Les gardes sont limités au palais, sauf qu'ils ne peuvent se déplacer en diagonale que d'un point.
+Guard
+The guards are limited to the palace and can only move diagonally one point.
 
-  Artillerie
-Les artilleries se déplacent de manière identique au char, c'est-à-dire qu'ils peuvent se déplacer verticalement et horizontalement de n'importe quel nombre de points, tant que leur chemin est libre, c'est-à-dire qu'aucune pièce ne bloque leur mouvement vertical ou horizontal vers leur destination. Leur différence réside dans la manière dont ils capturent les pièces. L'artillerie ne peut capturer des pièces de couleur opposée que verticalement ou horizontalement à partir de lui, mais seulement s'il est derrière une autre pièce de n'importe quelle couleur.
+Cannon
+The cannons move similarly to the chariot, meaning that they can move vertically and horizontally any number of points, as long as their path is clear. The difference between the cannon and the chariot is that the cannon captures pieces differently. The cannon can only capture pieces of the opposite color vertically or horizontally from itself, but only if it is behind another piece of any color.
 
-  Commandant
-Les commandants sont confinés au palais, et ne peuvent se déplacer verticalement ou horizontalement que d'un point. Les commandants ne peuvent pas non plus se "voir", c'est-à-dire qu'ils ne doivent pas avoir de chemin vertical libre entre eux.
+General
+The general is confined to the palace and can only move vertically or horizontally one point. The generals also cannot "see" each other, meaning that there cannot be a clear vertical path between them. If a player puts the opponent's general into checkmate, they win the game.

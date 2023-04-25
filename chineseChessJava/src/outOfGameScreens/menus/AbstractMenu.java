@@ -1,5 +1,6 @@
 package outOfGameScreens.menus;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -119,7 +120,10 @@ public abstract class AbstractMenu extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			mainScreen.setContentPane(new MainMenu(mainScreen));
+			MainMenu mainMenu = new MainMenu(mainScreen);
+			mainScreen.setContentPane(mainMenu.getButtonPanel());
+			mainScreen.add(mainMenu);
+			mainScreen.setLayout(new BorderLayout());
 			mainScreen.revalidate();
 		}
 

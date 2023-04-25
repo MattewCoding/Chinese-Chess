@@ -13,7 +13,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -151,7 +150,7 @@ public class MainMenu extends AbstractMenu  {
 			c.insets = new Insets(10, 10, 10, 10);
 
 			// Load the original icon image
-			ImageIcon originalIcon = new ImageIcon("./logo/xiang.jpeg");
+			ImageIcon originalIcon = new ImageIcon("./logo/chess.png");
 
 			// Create a new icon with a smaller size
 			Image scaledImage = originalIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
@@ -256,9 +255,11 @@ public class MainMenu extends AbstractMenu  {
 					String time = (String) timeComboBox.getSelectedItem();
 					String theme = (String) themeComboBox.getSelectedItem();
 
-					GameUpdater chessBoard = new GameUpdater(mainScreen, player1name, player2name, time, theme);
-					mainScreen.setContentPane(chessBoard);
-					mainScreen.revalidate();
+					if(player1name != null && player2name != null) {
+						GameUpdater chessBoard = new GameUpdater(mainScreen, player1name, player2name, time, theme);
+						mainScreen.setContentPane(chessBoard);
+						mainScreen.revalidate();
+					}
 				}
 			}
 		}
@@ -284,7 +285,7 @@ public class MainMenu extends AbstractMenu  {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			SubMenu tutorialMenu = new SubMenu("menu"+ScreenParameters.PATHSEP+"How to Play.txt", mainScreen);
+			SubMenu tutorialMenu = new SubMenu("menu"+ScreenParameters.PATHSEP+"Apprendre.txt", mainScreen);
 			mainScreen.setContentPane(tutorialMenu.getSplitPane());
 			mainScreen.revalidate();
 
