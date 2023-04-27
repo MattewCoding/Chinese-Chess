@@ -36,31 +36,31 @@ public class SliderButtonCombo extends JPanel{
 	public SliderButtonCombo(String option) {
 		this.option = option;
 		if(option == "music") {
-			optionValue = ScreenParameters.getMusicVolume();
+			optionValue = ScreenParam.getMusicVolume();
 		}
 		if(option == "sound") {
-			optionValue = ScreenParameters.getSoundVolume();
+			optionValue = ScreenParam.getSoundVolume();
 		}
 		volumeSlider =new JSlider(JSlider.HORIZONTAL, 0, 100, optionValue);
 		volumeSlider.addChangeListener(new volumeSliderListener());
-		volumeSlider.setBackground(ScreenParameters.BOARDCOLOR);
+		volumeSlider.setBackground(ScreenParam.BOARDCOLOR);
 		
 		volumeAmount = new JTextField(3);
 		volumeAmount.addActionListener(new volumeAmountListener());
 		volumeAmount.setText(Integer.toString(optionValue));
-		volumeAmount.setFont(new Font(volumeAmount.getFont().toString(), Font.PLAIN, (int)(24*ScreenParameters.XREDUCE)));
+		volumeAmount.setFont(new Font(volumeAmount.getFont().toString(), Font.PLAIN, (int)(24*ScreenParam.XREDUCE)));
 		
 		add(BorderLayout.WEST, volumeSlider);
 		add(BorderLayout.WEST, volumeAmount);
-		setBackground(ScreenParameters.BOARDCOLOR);
+		setBackground(ScreenParam.BOARDCOLOR);
 	}
 	
 	public void setVolume(int newValue) {
 		if(option == "music") {
-			ScreenParameters.setMusicVolume(newValue);
+			ScreenParam.setMusicVolume(newValue);
 		}
 		if(option == "sound") {
-			ScreenParameters.setSoundVolume(newValue);
+			ScreenParam.setSoundVolume(newValue);
 		}
 	}
 	

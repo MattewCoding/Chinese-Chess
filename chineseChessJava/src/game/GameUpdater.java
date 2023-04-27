@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import outOfGameScreens.EndGame;
-import outOfGameScreens.ScreenParameters;
+import outOfGameScreens.ScreenParam;
 
 /**
  * The game's main game updater, where the updates happen
@@ -47,7 +47,7 @@ public class GameUpdater extends JPanel implements Runnable{
 		// Every 40ms, check if anything has been clicked
 		while(run) {
 			try {
-				Thread.sleep(ScreenParameters.SLEEPAMOUNT);
+				Thread.sleep(ScreenParam.SLEEPAMOUNT);
 			} catch (InterruptedException e) {
 				System.out.println(e.getMessage());
 			}

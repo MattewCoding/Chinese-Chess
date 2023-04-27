@@ -18,7 +18,7 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.logging.log4j.Logger;
 
 import log.LoggerUtility;
-import outOfGameScreens.ScreenParameters;
+import outOfGameScreens.ScreenParam;
 
 /**
  * Used to create the submenus that need to show information
@@ -90,10 +90,10 @@ public class SubMenu extends AbstractMenu {
 		// To use TextArea, which can word wrap
 		contentLabel = new JTextArea(contentArrayList.get(0));
 		contentLabel.setAlignmentY(JTextArea.TOP_ALIGNMENT);
-		contentLabel.setBorder(new EmptyBorder(20, (int)(50*ScreenParameters.XREDUCE), 10, 50)); //order is: top, left, bottom, right
+		contentLabel.setBorder(new EmptyBorder(20, (int)(50*ScreenParam.XREDUCE), 10, 50)); //order is: top, left, bottom, right
 		contentLabel.setBackground(boardColor);
 		contentLabel.setEditable(false);
-		contentLabel.setFont(new Font(contentLabel.getFont().toString(), Font.PLAIN, (int)(28*ScreenParameters.XREDUCE) ));
+		contentLabel.setFont(new Font(contentLabel.getFont().toString(), Font.PLAIN, (int)(28*ScreenParam.XREDUCE) ));
 		contentLabel.setLineWrap(true);
 		contentLabel.setWrapStyleWord(true);
 		

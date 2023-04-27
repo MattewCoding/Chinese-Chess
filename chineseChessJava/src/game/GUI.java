@@ -14,6 +14,8 @@ import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +36,12 @@ import bot.Bot;
 import game.pieces.Piece;
 import log.LoggerUtility;
 import logic.moveChecking.PointVisitor;
+import logic.boardChecking.BoardManager;
 import logic.moveChecking.Move;
 import logic.moveChecking.Moving;
 import outOfGameScreens.EndGame;
 import outOfGameScreens.Profile;
-import outOfGameScreens.ScreenParameters;
+import outOfGameScreens.ScreenParam;
 import outOfGameScreens.menus.SubMenu;
 
 /**
@@ -53,9 +56,9 @@ public class GUI extends JPanel implements MouseListener{
 	// Looks visually pleasing if the board is centered
 	// and tall enough to fit most of the screen
 	// but not too big to take up all of the screen
-	int center = ScreenParameters.SCREENWIDTH/2;
-	int margin = ScreenParameters.SCREENHEIGHT/18;
-	int squareLength = (ScreenParameters.SCREENHEIGHT-margin*3)/11; // x3 to leave more space at bottom of screen
+	int center = ScreenParam.SCREENWIDTH/2;
+	int margin = ScreenParam.SCREENHEIGHT/18;
+	int squareLength = (ScreenParam.SCREENHEIGHT-margin*3)/11; // x3 to leave more space at bottom of screen
 
 	int leftMostPixel = (int) (center-squareLength*(5.5));
 	int chessboardEdge = leftMostPixel + 11 * squareLength;
@@ -83,15 +86,15 @@ public class GUI extends JPanel implements MouseListener{
 	private JTextArea pastMovesTextArea;
 	private ArrayList<String> pastMovesArrayList;
 	private NotationHistory pastMoves;
-	private int notationMargin = (int) (15 * ScreenParameters.XREDUCE);
+	private int notationMargin = (int) (15 * ScreenParam.XREDUCE);
 	private int leftNotationBoxX = chessboardEdge + notationMargin;
-	private int rightMostX = ScreenParameters.SCREENWIDTH - notationMargin;
-	private int topNotationY = 2*ScreenParameters.SCREENHEIGHT/5;
+	private int rightMostX = ScreenParam.SCREENWIDTH - notationMargin;
+	private int topNotationY = 2*ScreenParam.SCREENHEIGHT/5;
 	
 	// Captured pieces 
 	private ArrayList<Piece> capturedPieceRed;
 	private ArrayList<Piece> capturedPieceBlack;
-	private int capturedMargin = (int) (15 * ScreenParameters.XREDUCE);
+	private int capturedMargin = (int) (15 * ScreenParam.XREDUCE);
 	private int deplacepiecesX = capturedMargin;
 	
 	//music box
@@ -105,8 +108,8 @@ public class GUI extends JPanel implements MouseListener{
 	
 	private boolean soundOn = true;
 	private boolean musicOn = true;
-	private String soundFilename = "music-sounds/sound.wav";
-	private String musicFilename = "music-sounds/music.wav";
+	private String soundFilename = "src/music-sounds/sound.wav";
+	private String musicFilename = "src/music-sounds/music.wav";
 	private Clip clip;
 	private Clip musicClip;
 
@@ -158,10 +161,9 @@ public class GUI extends JPanel implements MouseListener{
 	 * Updates the state of the game
 	 */
 	public void checkPieces() {
+		// Player1's turn (or the not-computer)
 		if(redTurn || !player2.getId().equals("Computer")) {
 			if(mouseClickedPiece && mouseMovingPiece) {
-
-			// Player1's turn (or the not-computer)
 
 				// Check if move is legal
 				Move move = new Move(pieceX, pieceY, mouseX, mouseY);
@@ -172,7 +174,7 @@ public class GUI extends JPanel implements MouseListener{
 				boolean thePieceClickedOnIsRed = !board.getPiece(pieceX, pieceY).isBlack();
 				//logDataGUI.info( "\n(redTurn && board.tryMove(move, player1) = " + (redTurn && board.tryMove(move, player1)) + " (!redTurn && board.tryMove(move, player2)) = " + (!redTurn && board.tryMove(move, player2)) );
 
-				if(moving.isLegal() && (redTurn && board.tryMove(moving, player1)) || (!redTurn && board.tryMove(moving, player2))) {
+				if(moving.isLegal() && (redTurn && BoardManager.tryMove(board, moving, player1)) || (!redTurn && BoardManager.tryMove(board, moving, player2))) {
 					if(thePieceClickedOnIsRed == true) { // Player 1's turn is over
 						player1.stopTurnTimer();
 						player2.startTurnTimer();
@@ -195,7 +197,7 @@ public class GUI extends JPanel implements MouseListener{
 			bot.updateBoard(board);
 			Move move = bot.generateIdealMove();
 			Moving moving = new Moving(board, move);
-			board.tryMove(moving, player2);
+			BoardManager.tryMove(board, moving, player2);
 			playSound(soundFilename, !soundOn ,soundOn);
 
 			
@@ -214,7 +216,7 @@ public class GUI extends JPanel implements MouseListener{
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		//Image background
-		String imgLocation = "images"+ScreenParameters.PATHSEP+"wood-background.jpg";
+		String imgLocation = "src/images"+ScreenParam.PATHSEP+"wood-background.jpg";
 		try {
 			Image background = ImageIO.read(new File(imgLocation));
 			g.drawImage(background,0,0,null);
@@ -227,14 +229,15 @@ public class GUI extends JPanel implements MouseListener{
 		// Small screen sizes do not need thick lines to distinguish squares
 		g2 = (Graphics2D) g;
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		if(ScreenParameters.SCREENWIDTH >= 1920) {
+		if(ScreenParam.SCREENWIDTH >= 1920) {
 			strokeWidth = 4;
 		} else {
-			if(ScreenParameters.SCREENWIDTH >= 1080){
+			if(ScreenParam.SCREENWIDTH >= 1080){
 				strokeWidth = 2;
 			}
 		}
 		g2.setStroke(new BasicStroke(strokeWidth));
+		
 		for(int row = 0; row<11; row++) {
 			for(int col = 0; col<11; col++) {
 				// Fill creates rectangle overlapping outline
@@ -249,7 +252,7 @@ public class GUI extends JPanel implements MouseListener{
 				}
 				else {
 					if((row<3 || row > 7) && (col>=3 && col<= 7)) { // Palace
-						CreateRectangle.drawFilledRectangle(g2, ScreenParameters.OUTLINECOLOR, ScreenParameters.PALACECOLOR, topLeftX, topLeftY, squareLength);
+						CreateRectangle.drawFilledRectangle(g2, ScreenParam.OUTLINECOLOR, ScreenParam.PALACECOLOR, topLeftX, topLeftY, squareLength);
 					}
 					else {
 						CreateRectangle.drawFilledRectangle(g2, topLeftX, topLeftY, squareLength);
@@ -357,7 +360,7 @@ public class GUI extends JPanel implements MouseListener{
 				Piece piece = pieceList[col][row];
 				if (piece != null) {
 					String fileName = piece.getImageName();
-					Image scaledImage = new ImageIcon(ScreenParameters.IMAGESELECT+theme+"_"+fileName).getImage();
+					Image scaledImage = new ImageIcon(ScreenParam.IMAGESELECT+theme+"_"+fileName).getImage();
 					g2.drawImage(scaledImage, topLeftX+5, topLeftY+5, squareLength-10, squareLength-10, null);
 				}
 			}
@@ -369,26 +372,26 @@ public class GUI extends JPanel implements MouseListener{
 		Image soundImage = null;
 		try {
 			if(musicOn) {
-				musicImage = ImageIO.read(new File("logo/musicon.png"));
+				musicImage = ImageIO.read(new File("src/images/logo/musicon.png"));
 			}else {
-				musicImage = ImageIO.read(new File("logo/musicoff.png"));
+				musicImage = ImageIO.read(new File("src/images/logo/musicoff.png"));
 			}
 			
 			if(soundOn) {
-				soundImage = ImageIO.read(new File("logo/soundon.png"));
+				soundImage = ImageIO.read(new File("src/images/logo/soundon.png"));
 			}else {
-				soundImage = ImageIO.read(new File("logo/soundoff.png"));
+				soundImage = ImageIO.read(new File("src/images/logo/soundoff.png"));
 			}
 			
 		} catch (IOException e) {
 		    e.printStackTrace();
 		}
 		// draw music box
-		CreateRectangle.drawFilledRectangle(g2, ScreenParameters.OUTLINECOLOR, ScreenParameters.BOARDCOLOR, musicBoxX, boxY, imageHeight, imageWidth);
+		CreateRectangle.drawFilledRectangle(g2, ScreenParam.OUTLINECOLOR, ScreenParam.BOARDCOLOR, musicBoxX, boxY, imageHeight, imageWidth);
 		g2.drawImage(musicImage, musicBoxX + 2, boxY + 2, imageWidth - 4, imageHeight - 4, null);
 
 		// draw sound box
-		CreateRectangle.drawFilledRectangle(g2, ScreenParameters.OUTLINECOLOR, ScreenParameters.BOARDCOLOR, soundBoxX, boxY, imageHeight, imageWidth);
+		CreateRectangle.drawFilledRectangle(g2, ScreenParam.OUTLINECOLOR, ScreenParam.BOARDCOLOR, soundBoxX, boxY, imageHeight, imageWidth);
 		g2.drawImage(soundImage, soundBoxX + 2, boxY + 2, imageWidth - 4, imageHeight - 4, null);
 	}
 	/**
@@ -398,7 +401,7 @@ public class GUI extends JPanel implements MouseListener{
 		//Rectangle calculations
 		int widthTurnTimer = 270;
 		int timerRedLeftX = 50;
-		int timerBlackLeftX = ScreenParameters.SCREENWIDTH-(timerRedLeftX+widthTurnTimer);
+		int timerBlackLeftX = ScreenParam.SCREENWIDTH-(timerRedLeftX+widthTurnTimer);
 
 		String p1ID = player1.getId();
 		String p2ID = player2.getId();
@@ -432,10 +435,10 @@ public class GUI extends JPanel implements MouseListener{
 	 * Draws the notation history onto the board on the left
 	 */
 	public void drawNotation() {
-		CreateRectangle.drawFilledRectangle(g2, leftNotationBoxX, topNotationY, rightMostX - chessboardEdge - 2*notationMargin, ScreenParameters.SCREENHEIGHT/2);
+		CreateRectangle.drawFilledRectangle(g2, leftNotationBoxX, topNotationY, rightMostX - chessboardEdge - 2*notationMargin, ScreenParam.SCREENHEIGHT/2);
 
-		g2.setFont(new Font(getFont().getFontName(), Font.PLAIN, (int)(36*ScreenParameters.XREDUCE)));
-		g2.setColor(ScreenParameters.OUTLINECOLOR);
+		g2.setFont(new Font(getFont().getFontName(), Font.PLAIN, (int)(36*ScreenParam.XREDUCE)));
+		g2.setColor(ScreenParam.OUTLINECOLOR);
 		drawString(pastMovesTextArea.getText(), leftNotationBoxX + notationMargin, topNotationY);
 	}
 
@@ -455,7 +458,7 @@ public class GUI extends JPanel implements MouseListener{
 	 * Places the captured pieces onto the board on the right
 	 */
 	public void drawCapturedBox() {
-		CreateRectangle.drawFilledRectangle(g2, capturedMargin, topNotationY, leftMostPixel - 2*capturedMargin, ScreenParameters.SCREENHEIGHT/2);
+		CreateRectangle.drawFilledRectangle(g2, capturedMargin, topNotationY, leftMostPixel - 2*capturedMargin, ScreenParam.SCREENHEIGHT/2);
 
 		drawCapturedPieces(capturedPieceBlack, deplacepiecesX+10, topNotationY+10,deplacepiecesX+10);
 		drawCapturedPieces(capturedPieceRed, deplacepiecesX+10, 2*topNotationY-10, deplacepiecesX+10);
@@ -472,7 +475,8 @@ public class GUI extends JPanel implements MouseListener{
 	public void drawCapturedPieces(ArrayList<Piece> capturedPiece, int x, int y, int xInitial) {
 		for(Piece captured : capturedPiece) {
 			String fileName = captured.getImageName();
-			Image scaledImage = new ImageIcon("pictures/chinese_"+fileName).getImage();
+			Image scaledImage = new ImageIcon("./src/pieces/chinese_"+fileName).getImage();
+			
 			g2.drawImage(scaledImage, x, y,squareLength-10, squareLength-10, null);
 			if(x<7*xInitial) {
 				x  += 35;
@@ -530,7 +534,7 @@ public class GUI extends JPanel implements MouseListener{
 			pastMovesArrayList.add(recentMove);
 		}
 
-		int notationBoxSize = ScreenParameters.SCREENHEIGHT/2;
+		int notationBoxSize = ScreenParam.SCREENHEIGHT/2;
 		int turnsFittableInBox = (int) (notationBoxSize/g2.getFontMetrics().getHeight());
 		if(pastMovesArrayList.size() > turnsFittableInBox) {
 			pastMovesArrayList.remove(0);

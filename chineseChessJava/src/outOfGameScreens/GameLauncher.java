@@ -45,7 +45,7 @@ public class GameLauncher extends JFrame{
 		pack();
 		
 		// Have program fill up screen
-		setMinimumSize(new Dimension(ScreenParameters.SCREENWIDTH, ScreenParameters.SCREENHEIGHT));
+		setMinimumSize(new Dimension(ScreenParam.SCREENWIDTH, ScreenParam.SCREENHEIGHT));
 		setVisible(true);
 	}
 	
