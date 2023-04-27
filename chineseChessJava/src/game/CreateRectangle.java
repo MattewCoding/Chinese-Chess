@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
-import outOfGameScreens.ScreenParameters;
+import outOfGameScreens.ScreenParam;
 
 /**
  * This utility class allows the creation of rectangles in the game screen.
@@ -22,7 +22,7 @@ public class CreateRectangle {
 	 * @param length The amount of pixels the rectangle extends positively over the x and y axis
 	 */
 	public static void drawFilledRectangle(Graphics2D g2, int topX, int topY, int length) {
-		drawFilledRectangle(g2, ScreenParameters.OUTLINECOLOR, ScreenParameters.BOARDCOLOR, topX, topY, length, length);
+		drawFilledRectangle(g2, ScreenParam.OUTLINECOLOR, ScreenParam.BOARDCOLOR, topX, topY, length, length);
 	}
 	
 	/**
@@ -34,7 +34,7 @@ public class CreateRectangle {
 	 * @param height The amount of pixels the rectangle extends positively over the y-axis
 	 */
 	public static void drawFilledRectangle(Graphics2D g2, int topX, int topY, int length, int height) {
-		drawFilledRectangle(g2, ScreenParameters.OUTLINECOLOR, ScreenParameters.BOARDCOLOR, topX, topY, length, height);
+		drawFilledRectangle(g2, ScreenParam.OUTLINECOLOR, ScreenParam.BOARDCOLOR, topX, topY, length, height);
 	}
 	
 	/**

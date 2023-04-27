@@ -9,9 +9,8 @@ public class Soldier extends Piece {
     //private Side curSide;
 
 
-    public Soldier(boolean place, int x, int y, int id) {
-        super(place, x, y, id, 1);
-        this.type = "Soldier";
+    public Soldier(boolean place, int x, int y) {
+        super(place, x, y, 1, "Soldier");
     }
     
     public void crossRiver() {

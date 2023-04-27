@@ -16,7 +16,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
-import outOfGameScreens.ScreenParameters;
+import outOfGameScreens.ScreenParam;
 
 /**
  * An abstract class that regroups the general functionalities of the menus:
@@ -42,10 +42,10 @@ public abstract class AbstractMenu extends JPanel {
 
 	protected JScrollPane contentScroll;
 	
-	protected Color boardColor = ScreenParameters.BOARDCOLOR;
+	protected Color boardColor = ScreenParam.BOARDCOLOR;
 	
-	private int screenWidth = ScreenParameters.SCREENWIDTH;
-	private int screenHeight = ScreenParameters.SCREENHEIGHT;
+	private int screenWidth = ScreenParam.SCREENWIDTH;
+	private int screenHeight = ScreenParam.SCREENHEIGHT;
 	
 	/**
 	 * Creates the JComponents necessary for arranging and displaying the information correctly.
@@ -82,7 +82,7 @@ public abstract class AbstractMenu extends JPanel {
 	public void setTitle(String title) {
 		menuName = new JLabel(title);
 		menuName.setBackground(boardColor);
-		menuName.setFont(new Font(menuName.getFont().toString(), Font.BOLD, (int)(55*ScreenParameters.XREDUCE) ));
+		menuName.setFont(new Font(menuName.getFont().toString(), Font.BOLD, (int)(55*ScreenParam.XREDUCE) ));
 		menuName.setHorizontalAlignment(JLabel.CENTER);
 		menuName.setOpaque(true);
 	}
@@ -96,7 +96,7 @@ public abstract class AbstractMenu extends JPanel {
 		optionList = new JList<String>(optionArrayList);
 		optionList.setBorder(new EmptyBorder(0, 5, 0, 10)); //order is: top, left, bottom, right
 		optionList.setBackground(boardColor);
-		optionList.setFont(new Font(optionList.getFont().toString(), Font.ITALIC, (int)(36*ScreenParameters.XREDUCE) ));
+		optionList.setFont(new Font(optionList.getFont().toString(), Font.ITALIC, (int)(36*ScreenParam.XREDUCE) ));
 		
 		optionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		optionList.setSelectedIndex(0);
@@ -111,8 +111,8 @@ public abstract class AbstractMenu extends JPanel {
 	public JButton setBackButtonOptions() {
 		backButton = new JButton("Back to main menu");
 		backButton.addActionListener(new backButtonListener());
-		backButton.setFont(new Font(backButton.getFont().toString(), Font.PLAIN, (int)(24*ScreenParameters.XREDUCE) ));
-		backButton.setBackground(ScreenParameters.BOARDCOLOR);
+		backButton.setFont(new Font(backButton.getFont().toString(), Font.PLAIN, (int)(24*ScreenParam.XREDUCE) ));
+		backButton.setBackground(ScreenParam.BOARDCOLOR);
 		return backButton;
 	}
 

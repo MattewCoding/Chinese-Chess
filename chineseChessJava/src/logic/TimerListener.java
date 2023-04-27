@@ -5,7 +5,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JComponent;
 import javax.swing.Timer;
 
-import outOfGameScreens.ScreenParameters;
+import outOfGameScreens.ScreenParam;
 
 /**
  * Timer to keep track of time elapsed and update timer GameUpdater (*going to be modified*)
@@ -32,8 +32,8 @@ public class TimerListener extends JComponent{
 
 	public TimerListener(Boolean isRed,String time){
 		String overwriteTime = time + ":00";
-		ScreenParameters.setBlackTime(overwriteTime);
-		ScreenParameters.setRedTime(overwriteTime);
+		ScreenParam.setBlackTime(overwriteTime);
+		ScreenParam.setRedTime(overwriteTime);
 		
 		startTime = System.currentTimeMillis();
 
@@ -41,7 +41,7 @@ public class TimerListener extends JComponent{
 		timer.start();
 		
 		// In case the players have different times
-		elapsedTime = isRed? ScreenParameters.getRedTime() : ScreenParameters.getBlackTime();
+		elapsedTime = isRed? ScreenParam.getRedTime() : ScreenParam.getBlackTime();
 		fullMinutes = Integer.parseInt(elapsedTime.substring(0, 2));
 		fullSeconds = Integer.parseInt(elapsedTime.substring(3, 5));
 

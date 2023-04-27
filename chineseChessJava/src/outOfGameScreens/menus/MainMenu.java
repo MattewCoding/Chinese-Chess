@@ -21,7 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import game.GameUpdater;
-import outOfGameScreens.ScreenParameters;
+import outOfGameScreens.ScreenParam;
 
 /**
  * The main menu of the program, where the user can access the submenus
@@ -40,29 +40,31 @@ public class MainMenu extends AbstractMenu  {
 	private JPanel buttonPanel;
 	private String player1name= null;
 	private String player2name = "Computer";
+	
+	private String menuContent = "src"+ScreenParam.PATHSEP+"outofGameScreens"+ScreenParam.PATHSEP+"menuContent"+ScreenParam.PATHSEP;
 
 	public MainMenu(JFrame menuScreen) {
 		mainScreen=menuScreen;
 		createButtonPanel();
 		setOpaque(true);
-		setBounds(0,0,ScreenParameters.SCREENWIDTH,ScreenParameters.SCREENHEIGHT);
+		setBounds(0,0,ScreenParam.SCREENWIDTH,ScreenParam.SCREENHEIGHT);
 	}
 	
 	@Override
 	protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-		String imgLocation = "logo"+ScreenParameters.PATHSEP+"chineseboardlogo.jpeg";
+		String imgLocation = "src"+ScreenParam.PATHSEP+"images"+ScreenParam.PATHSEP+"logo"+ScreenParam.PATHSEP+"chineseboardlogo.jpeg";
         ImageIcon imageIcon = new ImageIcon(imgLocation);
         Image image = imageIcon.getImage();
-        g.drawImage(image, 0, 0, ScreenParameters.SCREENWIDTH, ScreenParameters.SCREENHEIGHT, this);
+        g.drawImage(image, 0, 0, ScreenParam.SCREENWIDTH, ScreenParam.SCREENHEIGHT, this);
     }
 	
 	public void createButtonPanel() {
 		int widthButtonPanel = 600;
-		int heightButtonPanel = 2*ScreenParameters.SCREENHEIGHT/3;
+		int heightButtonPanel = 2*ScreenParam.SCREENHEIGHT/3;
 		
-		int xButtonPanel = (ScreenParameters.SCREENWIDTH - widthButtonPanel)/2;
-		int yButtonPanel = (int) (50 * ScreenParameters.YREDUCE);
+		int xButtonPanel = (ScreenParam.SCREENWIDTH - widthButtonPanel)/2;
+		int yButtonPanel = (int) (50 * ScreenParam.YREDUCE);
 		
 		buttonPanel = new JPanel(new GridLayout(0,1,0,20));
 		buttonPanel.setBounds(xButtonPanel, yButtonPanel, widthButtonPanel, heightButtonPanel);
@@ -92,7 +94,7 @@ public class MainMenu extends AbstractMenu  {
 		quitButton.setMnemonic(KeyEvent.VK_Q);
 
 		for(JButton button : menuButtons) {
-			button.setFont(new Font(button.getFont().toString(), Font.PLAIN, (int)(24*ScreenParameters.XREDUCE) ));
+			button.setFont(new Font(button.getFont().toString(), Font.PLAIN, (int)(24*ScreenParam.XREDUCE) ));
 			button.setPreferredSize(new Dimension(300,100));
 			button.setBackground(new Color(226,192,106));
 			button.setBorderPainted(false);
@@ -111,14 +113,14 @@ public class MainMenu extends AbstractMenu  {
 		private Image backgroundImage;
 	    
 	    public BackgroundImage() {
-			String imgLocation = "logo"+ScreenParameters.PATHSEP+"chineseboardlogo.jpeg";
+			String imgLocation = "src"+ScreenParam.PATHSEP+"images"+ScreenParam.PATHSEP+"logo"+ScreenParam.PATHSEP+"chineseboardlogo.jpeg";
 	        backgroundImage = new ImageIcon(imgLocation).getImage();
 	    }
 	    
 	    @Override
 	    protected void paintComponent(Graphics g) {
 	        super.paintComponent(g);
-	        g.drawImage(backgroundImage, 0, 0, ScreenParameters.SCREENWIDTH, ScreenParameters.SCREENHEIGHT, null);
+	        g.drawImage(backgroundImage, 0, 0, ScreenParam.SCREENWIDTH, ScreenParam.SCREENHEIGHT, null);
 	    }
 	}
 
@@ -150,7 +152,7 @@ public class MainMenu extends AbstractMenu  {
 			c.insets = new Insets(10, 10, 10, 10);
 
 			// Load the original icon image
-			ImageIcon originalIcon = new ImageIcon("./logo/chess.png");
+			ImageIcon originalIcon = new ImageIcon("./src/images/logo/chess.png");
 
 			// Create a new icon with a smaller size
 			Image scaledImage = originalIcon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
@@ -285,7 +287,7 @@ public class MainMenu extends AbstractMenu  {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			SubMenu tutorialMenu = new SubMenu("menu"+ScreenParameters.PATHSEP+"Apprendre.txt", mainScreen);
+			SubMenu tutorialMenu = new SubMenu(menuContent+"Apprendre.txt", mainScreen);
 			mainScreen.setContentPane(tutorialMenu.getSplitPane());
 			mainScreen.revalidate();
 
@@ -297,7 +299,7 @@ public class MainMenu extends AbstractMenu  {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			SubMenu strategyMenu = new SubMenu("menu"+ScreenParameters.PATHSEP+"Strategies.txt", mainScreen);
+			SubMenu strategyMenu = new SubMenu(menuContent+"Strategies.txt", mainScreen);
 			mainScreen.setContentPane(strategyMenu.getSplitPane());
 			mainScreen.revalidate();
 
@@ -309,7 +311,7 @@ public class MainMenu extends AbstractMenu  {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			SubMenu notationMenu = new SubMenu("menu"+ScreenParameters.PATHSEP+"Notation.txt", mainScreen);
+			SubMenu notationMenu = new SubMenu(menuContent+"Notation.txt", mainScreen);
 			mainScreen.setContentPane(notationMenu.getSplitPane());
 			mainScreen.revalidate();
 

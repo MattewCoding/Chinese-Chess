@@ -14,7 +14,7 @@ public abstract class Piece {
     private boolean captured;
     private int x;
     private int y;
-    private int id;
+    private String imageName;
     protected int worth;
 
     /**
@@ -22,13 +22,19 @@ public abstract class Piece {
      *
      * for the isBlack if black it is true if red it is false.
      */
-    public Piece(boolean place, int x, int y, int id, int worth) {
+    public Piece(boolean place, int x, int y, int worth, String type) {
         this.isBlack = place;
         this.setCaptured(false);
         this.x = x;
         this.y = y;
-        this.id = id;
+        this.type = type;
+        
         this.worth = worth;
+        
+        imageName = "";
+        imageName += (isBlack)? "black_" : "red_";
+        imageName += type.toLowerCase();
+        imageName += ".png";
     }
     
     /**
@@ -92,10 +98,6 @@ public abstract class Piece {
 		this.y = y;
 	}
 	
-	public int getId() {
-		return id;
-	}
-	
 	public int getWorth() {
 		return worth;
 	}
@@ -111,16 +113,7 @@ public abstract class Piece {
      * @return fileName the file location of the piece's image relative to src/../
      */
     public String getImageName() {
-        String fileName = "";
-        if (isBlack)
-            fileName += "black_";
-        else
-            fileName += "red_";
-        
-        fileName += type.toLowerCase();
-
-        fileName += ".png";
-        return fileName;
+    	return imageName;
     }
 
     public String toString() {

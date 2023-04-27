@@ -7,9 +7,8 @@ import logic.moveChecking.PieceVisitor;
  */
 public class Guard extends Piece {
 
-    public Guard(boolean place, int x, int y, int id) {
-        super(place, x, y, id, 2);
-        this.type = "Guard";
+    public Guard(boolean place, int x, int y) {
+        super(place, x, y, 2, "Guard");
     }
 
 	@Override

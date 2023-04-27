@@ -1,0 +1,32 @@
+Chinese Chess 
+Chinese Chess is a two-player board game that represents a battle between two armies, separated by a river, with a palace on each side of the river. One army is represented by red pieces, while the other is represented by black pieces. The red player moves first, and then players take turns until the game ends in a draw or one player wins.The game is played on a board that is similar in shape and size to the board used in Western Chess, but it is divided by a river in the middle.Each player has 16 pieces that are placed on the board at the beginning of the game. The pieces are arranged in a specific pattern, with the generals (kings) placed in the center of the back row. The objective of the game is to checkmate the opponent's general. Unlike in Western Chess, the game does not end in a draw if a stalemate is reached. The game is typically played with a timer, and each player has a set amount of time to make their moves. If a player's time runs out, they lose the game. Chinese Chess is a popular game in many parts of the world, particularly in East Asia. It is often played in parks, cafes, and other public spaces, and there are many professional players who compete in tournaments and championships. The game has a rich history and is thought to have originated in China more than a thousand years ago. It has undergone many changes and adaptations over the centuries, but it remains a beloved and challenging game of strategy and skill.
+
+The game
+The game is won by putting the opponent's king into checkmate, which means that the king is under attack and cannot escape capture on the next turn. Players move their pieces around the board, trying to attack the opponent's pieces and protect their own pieces.
+
+Moving Pieces
+On your turn, click on the piece you want to move. Small circles will appear in the squares where the piece is allowed to move. Click once in any of these squares to move the piece, and your turn will end.
+
+Pieces
+Each player starts with sixteen circular pieces. The pieces of player 1 are entirely black, while the pieces of player 2 have red insides. The chess pieces are named after Chinese military ranks, with their Chinese character displayed on their respective pieces.
+
+Soldier
+The soldiers are the most numerous pieces in the game, and their main role is to protect the other pieces. They are also important for controlling the center of the board and for launching attacks on the enemy's pieces. Once a soldier crosses the river, it becomes more mobile and can attack from different angles.
+
+Horse
+The horse moves first one point vertically or horizontally, and then one point diagonally, in that order, as long as its path is clear. Horses become stronger in the endgame because there are fewer pieces on the board, allowing them to move more freely.
+
+Chariot
+The chariot can move vertically and horizontally any number of points, as long as its path is clear, meaning that no piece is blocking its vertical or horizontal movement towards its destination.
+
+Elephant
+Elephants move two points diagonally and can only move if their path is clear, meaning that they cannot jump over a piece. They also cannot cross the river and are therefore confined to their own side. Elephants are usually used to protect the general and other elephants.
+
+Guard
+The guards are limited to the palace and can only move diagonally one point.
+
+Cannon
+The cannons move similarly to the chariot, meaning that they can move vertically and horizontally any number of points, as long as their path is clear. The difference between the cannon and the chariot is that the cannon captures pieces differently. The cannon can only capture pieces of the opposite color vertically or horizontally from itself, but only if it is behind another piece of any color.
+
+General
+The general is confined to the palace and can only move vertically or horizontally one point. The generals also cannot "see" each other, meaning that there cannot be a clear vertical path between them. If a player puts the opponent's general into checkmate, they win the game.

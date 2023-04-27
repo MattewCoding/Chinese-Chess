@@ -1,6 +1,7 @@
 package logic.moveChecking;
 import game.Board;
 import game.pieces.Piece;
+import logic.boardChecking.BoardManager;
 
 public class Moving {
 	private Board board;
@@ -43,11 +44,11 @@ public class Moving {
 		if (legal) {
 			if(currentPiece.getType() == "General") {
 				// Simulate the general move to test validity
-				board.updateGenerals(move.getFinalX(), move.getFinalY(), currentPiece.isBlack());
-				legal = board.approveGenerals(move);
-				board.updateGenerals(move.getOriginX(), move.getOriginY(), currentPiece.isBlack());
+				board = BoardManager.updateGenerals(board, move.getFinalX(), move.getFinalY(), currentPiece.isBlack());
+				legal = BoardManager.approveGenerals(board, move);
+				board = BoardManager.updateGenerals(board, move.getOriginX(), move.getOriginY(), currentPiece.isBlack());
 			} else {
-				legal = board.approveGenerals(move);
+				legal = BoardManager.approveGenerals(board, move);
 			}
 		}
 		//System.out.println("Moving: Moving: " + legal);

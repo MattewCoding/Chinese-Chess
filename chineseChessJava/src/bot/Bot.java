@@ -7,14 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
 import org.apache.logging.log4j.Logger;
 
 import game.Board;
 import game.pieces.Piece;
 import log.LoggerUtility;
+import logic.boardChecking.BoardManager;
 import logic.moveChecking.Move;
-import logic.moveChecking.Moving;
 import logic.moveChecking.PointVisitor;
 import outOfGameScreens.Profile;
 
@@ -24,19 +23,32 @@ import outOfGameScreens.Profile;
  *
  */
 public class Bot {
+
 	private static Logger logDataBot = LoggerUtility.getLogger(Bot.class, "html");
-	
+
+	/**
+	 * The most optimal moves that the bot can make (there can be more than one, esp. at the beginning of the game)
+	 */
 	private ArrayList<Move> bestMoves = new ArrayList<Move>();
+
+	/**
+	 * A list of positions and their calculated advantage
+	 */
 	private Map<Long, Integer> transpositionTable = new HashMap<>();
 
 	private boolean playingBlack;
-	private Profile bot;
+
+	/**
+	 * The amount of moves we want to look ahead
+	 */
 	private int maxDepth;
 
-	// This board is a separte instance of the game board, used to calculate future moves
+	/**
+	 * This board is a separte instance of the game board, used to calculate future moves
+	 */
 	private Board currentBoard;
 
-	// It's impossible to get -1000 in advantage even with the order modifiers (maxBase = 60 * maxModifier = 10)
+	// It's impossible to get -1000 in advantage even with the order modifiers
 	private final static int NEGATIVE_INFINITY = -1000;
 	private final static int POSITIVE_INFINITY = 1000;
 
@@ -48,29 +60,10 @@ public class Bot {
 	public Bot(Profile bot, boolean isBlackPlayer, int maxDepth) {
 		playingBlack = isBlackPlayer;
 		currentBoard = new Board();
+		
+		// 0 breaks searchAllCaptures because it requires a previous move and here there is no previous move because we haven't made any
+		assert maxDepth > 0;
 		this.maxDepth = maxDepth;
-	}
-
-	/**
-	 * Generates a random move
-	 * @param currentBoard The current state of the currentBoard
-	 * @param player The bot player
-	 * @return
-	 */
-	public Move generateMove(Board board, Profile player) {
-		List<Piece> randomPieces;
-		randomPieces = board.getAllPieces(true);
-		// Auto generate a move
-		Move move = board.GenerateMoves(randomPieces);
-		Moving moving = new Moving(board, move);
-
-		while(!board.tryMove(moving,player)) {
-			randomPieces = board.getAllPieces(true);
-			// Auto generate a move
-			move = board.GenerateMoves(randomPieces);
-			moving = new Moving(board, move);
-		}
-		return move;
 	}
 
 	/**
@@ -80,23 +73,22 @@ public class Bot {
 	public Move generateIdealMove() {
 		long startTime = System.currentTimeMillis();
 
-
-		bestMoves.clear();
-		findIdealMove(maxDepth, NEGATIVE_INFINITY, POSITIVE_INFINITY);
-
 		long endTime = System.currentTimeMillis();
-		long timeElapsed = endTime - startTime;
 
-		Random random = new Random();
+		// We need to clear the previously calculated optimal moves to find
+		// The new optimal moves
+		bestMoves.clear();
+		findIdealMove(maxDepth, NEGATIVE_INFINITY, POSITIVE_INFINITY, null);
+		endTime = System.currentTimeMillis();
 
-		logDataBot.info("Best Moves:");
 		for(Move m : bestMoves) {
 			logDataBot.info(m);
 		}
-
+		long timeElapsed = endTime - startTime;
 		logDataBot.info("Time elapsed: " + timeElapsed + " milliseconds");
-		int n = random.nextInt(bestMoves.size());
-		//System.out.println(bestMoves.get(n));
+
+		// Since all moves are equally optimal, we simply pick a random one
+		int n = new Random().nextInt(bestMoves.size());
 		return bestMoves.get(n);
 	}
 
@@ -108,51 +100,57 @@ public class Bot {
 	 * @param beta The opponent's best possible score
 	 * @return How good a move is
 	 */
-	public int findIdealMove(int depth, int alpha, int beta) {
+	public int findIdealMove(int depth, int alpha, int beta, Move previousMove) {
+
+		// Check if we haven't already calculated the advantage for this position
 		long hash = currentBoard.getHash();
 		if (transpositionTable.containsKey(hash) && depth == transpositionTable.get(hash)) {
 			return transpositionTable.get(hash);
 		}
 
+		// Once we've reached how far we want to look ahead, we simply need to calculate the advantage
 		if (depth == 0) {
-			int score = evaluate();
-			transpositionTable.put(hash, score);
-			return score;
+			int advantage = searchAllCaptures(alpha, beta, previousMove);
+			transpositionTable.put(hash, advantage);
+			return advantage;
 		}
 
-		List<Piece> pieces = currentBoard.getAllPieces(playingBlack);
+		// We need to search through all the possible moves we can make in order to find the best one
+		List<Piece> pieces = BoardManager.getAllPieces(currentBoard, playingBlack);
 		PointVisitor searchValidMoves = new PointVisitor(currentBoard);
 		List<Move> moves = new ArrayList<>();
-
 		for (Piece piece : pieces) {
 			List<Integer[]> legalMovesPiece = piece.accept(searchValidMoves);
 			for (Integer[] legalDest : legalMovesPiece) {
 				int pieceX = piece.getX(), pieceY = piece.getY();
 				int destX = legalDest[0], destY = legalDest[1];
 				Piece capturedPiece = currentBoard.getPiece(destX, destY);
-				Move move = new Move(piece, pieceX, pieceY, destX, destY);
-				if (capturedPiece != null) {
-					move.setCapturedPiece(capturedPiece);
-				}
+				Move move = new Move(piece, capturedPiece, pieceX, pieceY, destX, destY);
 				moves.add(move);
 			}
 		}
 
+		// We don't know which moves are better, but we can take a guess
 		moves.sort(new moveSortingStrategy(currentBoard));
 
 		int bestScore = NEGATIVE_INFINITY;
 		for (Move move : moves) {
-			currentBoard.doMove(move);
-			int evaluation;
-			if (move.getCapturedPiece() == null) {
-				evaluation = -findIdealMove(depth - 1, -beta, -alpha);
-	        } else {
-	        	evaluation = 10 * move.getCapturedPiece().getWorth() - move.getPiece().getWorth() - findIdealMove(depth - 1, -beta, -alpha);
-	        }
-			currentBoard.undoMove(move, move.getCapturedPiece());
 
-			//System.out.println(evaluation + " v. " + bestScore + " v. " + alpha);
-			bestScore = Math.max(evaluation, bestScore);
+			// Calculate the advantage from doing this move
+			currentBoard = BoardManager.doMove(currentBoard, move);
+
+			Piece piece = move.getPiece();
+			currentBoard.updateHash(move.getOriginX(), move.getOriginY(), piece.getType());
+			currentBoard.updateHash(move.getFinalX(), move.getFinalY(), piece.getType());
+
+			int advantage = -findIdealMove(depth - 1, -beta, -alpha, move);
+
+			currentBoard = BoardManager.undoMove(currentBoard, move, move.getCapturedPiece());
+			String capturedName = (move.getCapturedPiece() == null)? "" : move.getCapturedPiece().getType();
+			currentBoard.updateHash(move.getFinalX(), move.getFinalY(), capturedName);
+			currentBoard.updateHash(move.getOriginX(), move.getOriginY(), piece.getType());
+
+			bestScore = Math.max(advantage, bestScore);
 			if (bestScore >= beta) {
 				// Move was too good, opponent will avoid this position
 				return beta;
@@ -162,6 +160,7 @@ public class Bot {
 				if(bestScore > alpha) {
 					alpha = bestScore;
 					if(depth == maxDepth) {
+						// Found a new set of best moves, so we need to start over
 						bestMoves.clear();
 					}
 				}
@@ -171,14 +170,19 @@ public class Bot {
 			}
 		}
 
-		if (bestScore == NEGATIVE_INFINITY) { // Is checkmate or stalemate
-			if (currentBoard.checkMate(playingBlack)) { // Checkmate
+		// Is checkmate or stalemate
+		// This only happens if the move set was empty
+		// (the lowest possible advantage will never be as low as negative infinity)
+		if (bestScore == NEGATIVE_INFINITY) {
+			if (BoardManager.checkMate(currentBoard, playingBlack)) { // Is checkmate
 				transpositionTable.put(hash, bestScore);
 				return bestScore;
 			}
 			transpositionTable.put(hash, 0);
 			return 0;
 		}
+
+		// Add the associated position to the table for future referencing
 		transpositionTable.put(hash, bestScore);
 
 		return bestScore;
@@ -186,23 +190,26 @@ public class Bot {
 
 
 	/**
-	 * Captures aren't generally forces, so evaluate position before capturing.
+	 * Captures aren't generally forced, so evaluate position before capturing.
 	 * Otherwise check captures; if no good captures, rate unfavorably the position
 	 * @param alpha The current player's best possible score
 	 * @param beta The opponent's best possible score
 	 * @return The adjusted advantage of the move
 	 */
-	public int searchAllCaptures(int alpha, int beta) {
-		int evaluation = evaluate();
+	public int searchAllCaptures(int alpha, int beta, Move previousMove) {
+		int evaluation = evaluate(previousMove);
 		if(evaluation >= beta) {
+			// Move is already good enough
 			return beta;
 		}
 		alpha = Math.max(alpha, evaluation);
 
+		// We want to see the places that our pieces can move to, and thus capture
 		List<Piece> oneSidePieces;
-		oneSidePieces = currentBoard.getAllPieces(playingBlack);
+		oneSidePieces = BoardManager.getAllPieces(currentBoard, playingBlack);
 		PointVisitor searchValidMoves = new PointVisitor(currentBoard);
 
+		// For each piece we check all of its positions
 		for(Piece movingPiece : oneSidePieces) {
 			ArrayList<Integer[]> legalMovesPiece = movingPiece.accept(searchValidMoves);
 
@@ -210,13 +217,15 @@ public class Bot {
 				int destX = legalDest[0], destY = legalDest[1];
 				Piece capturedPiece = currentBoard.getPiece(destX, destY);
 
+				// If we can capture, we recursively check if doing this is advantageous
+				// i.e. does eating this put ourselves in danger?
 				if(capturedPiece != null) {
 					int pieceX = movingPiece.getX(), pieceY = movingPiece.getY();
 					Move testMove = new Move(movingPiece, pieceX, pieceY, destX, destY);
 
-					currentBoard.doMove(testMove);
-					evaluation = -searchAllCaptures(-beta, -alpha);
-					currentBoard.undoMove(testMove, capturedPiece);
+					currentBoard = BoardManager.doMove(currentBoard, testMove);
+					evaluation = -searchAllCaptures(-beta, -alpha, testMove);
+					currentBoard = BoardManager.undoMove(currentBoard, testMove, capturedPiece);
 
 					if(evaluation >= beta) {
 						return beta;
@@ -229,18 +238,29 @@ public class Bot {
 	}
 
 	/**
-	 * A rudamentary way of determining who has the advantage and by how much
-	 * @return How much of a (dis)advantage the bot is at
+	 * Calculates the evaluation of the current board state after a given move.
+	 * The evaluation is based on the worth of pieces on each side, whether the opponent
+	 * general is in check, and the benefit gained by capturing a piece or checking the opponent.
+	 *
+	 * @param move The move to evaluate
+	 * @return The evaluation of the current board state, with the perspective of the player to move.
 	 */
-	public int evaluate() {
+	public int evaluate(Move move) {
+		// Calculate the worth of pieces on each side
 		int redEval = getWorth(false);
 		int blackEval = getWorth(true);
 
-		int evaluation = redEval - blackEval;
+		// See if we're checking the opponent general
+		currentBoard = BoardManager.testCheck(currentBoard);
+		boolean isCheck = move.getPiece().isBlack()? currentBoard.getRedCheck() : currentBoard.getBlackCheck();
+
+		// Add up the various benefits to see if this move is really advantageous
+		int capturingOffset = (move.getCapturedPiece() == null)? 0 : 10 * move.getCapturedPiece().getWorth() - move.getPiece().getWorth();
+		int checking = isCheck? 100 : 0;
+		int evaluation = - capturingOffset - checking + redEval - blackEval;
 		int perspective = (playingBlack)? -1 : 1;
 
 		return evaluation * perspective;
-
 	}
 
 	/**
@@ -251,7 +271,7 @@ public class Bot {
 	public int getWorth(boolean isBlack) {
 		int worth = 0;
 		List<Piece> randomPieces;
-		randomPieces = currentBoard.getAllPieces(isBlack);
+		randomPieces = BoardManager.getAllPieces(currentBoard, isBlack);
 		for(Piece piece : randomPieces) {
 			worth += piece.getWorth();
 		}
@@ -263,6 +283,8 @@ public class Bot {
 	 * @param newBoardStatus The new state of the currentBoard
 	 */
 	public void updateBoard(Board newBoardStatus) {
+		// Simply doing an assign won't work because we want the new board to have a different address
+		// i.e. newBoardStatus and currentBoard should be independent from one another
 		Piece[][] newBoardLayout = newBoardStatus.getCoords();
 		Piece[][] updateBoard = new Piece[newBoardLayout.length][];
 		for (int i = 0; i < newBoardLayout.length; i++) {
@@ -271,9 +293,18 @@ public class Bot {
 		currentBoard = new Board(updateBoard);
 	}
 
+	/**
+	 * Sort the moves by making reasonable guesses, by implementing Comparator to rank guesses.
+	 * The idea is that since alpha-beta pruning ignores worse moves found later on,
+	 * by starting with potentially optimal moves, we can eliminate more worse guesses.
+	 * @author Yang Mattew
+	 *
+	 */
 	public class moveSortingStrategy implements Comparator<Move>{
 
-		// This board is a separte instance of the game board, used to calculate future moves
+		/**
+		 * This board is a separte instance of the game board, used to calculate future moves.
+		 */
 		private Board moveSortingBoard;
 
 		public moveSortingStrategy(Board board) {
@@ -289,21 +320,6 @@ public class Bot {
 		}
 
 		/**
-		 * A rudamentary way of determining who has the advantage and by how much
-		 * @return How much of a (dis)advantage the bot is at
-		 */
-		public int evaluate() {
-			int redEval = getWorth(false);
-			int blackEval = getWorth(true);
-
-			int evaluation = redEval - blackEval;
-			int perspective = (playingBlack)? -1 : 1;
-
-			return evaluation * perspective;
-
-		}
-
-		/**
 		 * How much our pieces combined are worth
 		 * @param isBlack Whose pieces we're counting
 		 * @return The combined worth of our pieces
@@ -311,19 +327,25 @@ public class Bot {
 		public int getWorth(boolean isBlack) {
 			int worth = 0;
 			List<Piece> randomPieces;
-			randomPieces = currentBoard.getAllPieces(isBlack);
+			randomPieces = BoardManager.getAllPieces(currentBoard, isBlack);
 			for(Piece piece : randomPieces) {
 				worth += piece.getWorth();
 			}
 			return worth;
 		}
 
+		/**
+		 * Calculates the evaluation of the current board state after a given move.
+		 * This is equivalent to findIdealMove(0, NEGATIVE_INFINITY, POSITIVE_INFINITY, null)
+		 *
+		 * @param move The move to evaluate
+		 * @return The evaluation of the current board state, with the perspective of the player to move.
+		 */
 		public int evaluateMove(Move move) {
 			Piece capturedPiece = moveSortingBoard.getPiece(move.getFinalX(), move.getFinalY());
-			moveSortingBoard.doMove(move);
-			int capturingOffset = (capturedPiece == null)? 0 : 10 * move.getCapturedPiece().getWorth() - move.getPiece().getWorth();
-			int evaluation = capturingOffset + evaluate();
-			moveSortingBoard.undoMove(move, capturedPiece);
+			moveSortingBoard = BoardManager.doMove(moveSortingBoard, move);
+			int evaluation = evaluate(move);
+			moveSortingBoard = BoardManager.undoMove(moveSortingBoard, move, capturedPiece);
 			return evaluation;
 		}
 

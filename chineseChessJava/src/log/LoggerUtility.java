@@ -6,7 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 
-import outOfGameScreens.ScreenParameters;
+import outOfGameScreens.ScreenParam;
 
 /**
  * Utility class used to generate Log4j logger.
@@ -18,7 +18,7 @@ import outOfGameScreens.ScreenParameters;
  * @author Tianxiao.Liu@u-cergy.fr & Yang Mattew
  */
 public class LoggerUtility {
-	private static final char PATHSEP = ScreenParameters.PATHSEP;
+	private static final char PATHSEP = ScreenParam.PATHSEP;
 	private static final String FILELOCATION = "."+PATHSEP+"src"+PATHSEP+"log"+PATHSEP;
 	
 	private static final File CONSOLE_LOG_CONFIG = new File(FILELOCATION+"log4j2-console.xml");

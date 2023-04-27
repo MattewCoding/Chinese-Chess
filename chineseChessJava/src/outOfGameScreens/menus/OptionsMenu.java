@@ -18,7 +18,7 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.logging.log4j.Logger;
 
 import log.LoggerUtility;
-import outOfGameScreens.ScreenParameters;
+import outOfGameScreens.ScreenParam;
 import outOfGameScreens.SliderButtonCombo;
 
 /**
@@ -82,11 +82,11 @@ public class OptionsMenu extends AbstractMenu {
 
 		blackTimerText.setEditable(false);
 		blackTimerText.setBackground(boardColor);
-		blackTimerText.setFont(new Font(blackTimerText.getFont().toString(), Font.PLAIN, (int)(24*ScreenParameters.XREDUCE)));
+		blackTimerText.setFont(new Font(blackTimerText.getFont().toString(), Font.PLAIN, (int)(24*ScreenParam.XREDUCE)));
 
 		redTimerText.setEditable(false);
 		redTimerText.setBackground(boardColor);
-		redTimerText.setFont(new Font(redTimerText.getFont().toString(), Font.PLAIN, (int)(24*ScreenParameters.XREDUCE)));
+		redTimerText.setFont(new Font(redTimerText.getFont().toString(), Font.PLAIN, (int)(24*ScreenParam.XREDUCE)));
 
 		// I'd make a HashMap associating a JTextArea to their JTextFields but it doesn't want to work for some reason
 		blackTime = new ArrayList<JTextField>(Arrays.asList(blackMinute, blackSecond));
@@ -98,7 +98,7 @@ public class OptionsMenu extends AbstractMenu {
 		Boolean isBlack = true;
 
 		for(JTextField timerComponent : blackTime) {
-			timerComponent.setFont(new Font(timerComponent.getFont().toString(), Font.PLAIN, (int)(24*ScreenParameters.XREDUCE)));
+			timerComponent.setFont(new Font(timerComponent.getFont().toString(), Font.PLAIN, (int)(24*ScreenParam.XREDUCE)));
 			timerComponent.addActionListener(new timeListener(timerPos, isBlack));
 			timePanel.add(timerComponent, JPanel.CENTER_ALIGNMENT);
 			timerPos++;
@@ -109,7 +109,7 @@ public class OptionsMenu extends AbstractMenu {
 		timePanel.add(redTimerText, JPanel.CENTER_ALIGNMENT);
 
 		for(JTextField timerComponent : redTime) {
-			timerComponent.setFont(new Font(timerComponent.getFont().toString(), Font.PLAIN, (int)(24*ScreenParameters.XREDUCE)));
+			timerComponent.setFont(new Font(timerComponent.getFont().toString(), Font.PLAIN, (int)(24*ScreenParam.XREDUCE)));
 			timerComponent.addActionListener(new timeListener(timerPos, isBlack));
 			timePanel.add(timerComponent, JPanel.CENTER_ALIGNMENT);
 			timerPos++;
@@ -179,25 +179,25 @@ public class OptionsMenu extends AbstractMenu {
 			int decalage = isBlack? 0 : 2;
 			switch(decalage + timerPosition) {
 			case 0:
-				overwriteTime = amountString + ":" + ScreenParameters.getBlackTime().substring(3,5);
+				overwriteTime = amountString + ":" + ScreenParam.getBlackTime().substring(3,5);
 				break;
 			case 1:
-				overwriteTime = ScreenParameters.getBlackTime().substring(0,2) + ":" + amountString;
+				overwriteTime = ScreenParam.getBlackTime().substring(0,2) + ":" + amountString;
 				break;
 			case 2:
-				overwriteTime = amountString + ":" + ScreenParameters.getRedTime().substring(3,5);
+				overwriteTime = amountString + ":" + ScreenParam.getRedTime().substring(3,5);
 				break;
 			case 3:
-				overwriteTime = ScreenParameters.getRedTime().substring(0,2) + ":" + amountString;
+				overwriteTime = ScreenParam.getRedTime().substring(0,2) + ":" + amountString;
 				break;
 			}
 
 			overwriteTime += ":000";
 			if(isBlack) { //First two timers therefore black's timers
-				ScreenParameters.setBlackTime(overwriteTime);
+				ScreenParam.setBlackTime(overwriteTime);
 			}
 			else { //Red's timers
-				ScreenParameters.setRedTime(overwriteTime);
+				ScreenParam.setRedTime(overwriteTime);
 			}
 			logData.info(amountString+" "+overwriteTime);
 		}

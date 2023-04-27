@@ -10,6 +10,7 @@ import game.pieces.Guard;
 import game.pieces.Horse;
 import game.pieces.Piece;
 import game.pieces.Soldier;
+import logic.boardChecking.BoardManager;
 
 /**
  * This class will determine all of the legal moves a piece can make.
@@ -233,14 +234,14 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 			
 			Piece piece = currentBoard.getPiece(x, y);
 			Move testMove = new Move(currentPiece, currentPiece.getX(), currentPiece.getY(), x, y);
-			currentBoard.doMove(testMove);
-			currentBoard.testCheck();
+			BoardManager.doMove(currentBoard, testMove);
+			currentBoard = BoardManager.testCheck(currentBoard);
 			boolean redAndInCheck = currentBoard.getRedCheck() && !currentPiece.isBlack();
 			boolean blackAndInCheck = currentBoard.getBlackCheck() && currentPiece.isBlack();
 			if(!redAndInCheck && !blackAndInCheck) {
 				addLegal(x,y);
 			}
-			currentBoard.undoMove(testMove, piece);
+			BoardManager.undoMove(currentBoard, testMove, piece);
 		}
 	}
 

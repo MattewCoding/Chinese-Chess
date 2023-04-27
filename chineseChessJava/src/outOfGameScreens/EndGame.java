@@ -38,16 +38,16 @@ public class EndGame extends JFrame {
 	private Container c ;
 
 	private final int textBoxSize = 500;
-	private int center = ScreenParameters.SCREENWIDTH/4;
+	private int center = ScreenParam.SCREENWIDTH/4;
 
-	protected Color boardColor = ScreenParameters.BOARDCOLOR;
+	protected Color boardColor = ScreenParam.BOARDCOLOR;
 	
 	private boolean isClosed = false;
 
 	public EndGame(int winnerState, Profile player1, Profile player2){
-		int h1 = (int) (70*ScreenParameters.YREDUCE);
-		int h2 = (int) (50*ScreenParameters.YREDUCE);
-		int h3 = (int) (30*ScreenParameters.YREDUCE);
+		int h1 = (int) (70*ScreenParam.YREDUCE);
+		int h2 = (int) (50*ScreenParam.YREDUCE);
+		int h3 = (int) (30*ScreenParam.YREDUCE);
 
 		if(winnerState== 1) {
 			winner = player1;
@@ -61,7 +61,7 @@ public class EndGame extends JFrame {
 			loser = player2;
 		}
 
-		setSize(ScreenParameters.SCREENWIDTH, ScreenParameters.SCREENHEIGHT);
+		setSize(ScreenParam.SCREENWIDTH, ScreenParam.SCREENHEIGHT);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLayout(null);
 
@@ -80,16 +80,16 @@ public class EndGame extends JFrame {
 		panel4.addMouseListener(new panel4Listener());
 		panel4.setLayout(null);
 		
-		int panel3Height = ScreenParameters.SCREENHEIGHT/4;
+		int panel3Height = ScreenParam.SCREENHEIGHT/4;
 		
-		int winPanelHeight = 11*ScreenParameters.SCREENHEIGHT/20;
+		int winPanelHeight = 11*ScreenParam.SCREENHEIGHT/20;
 		int xPosPanel4 = panel3Height+winPanelHeight;
-		int panel4Height = ScreenParameters.SCREENHEIGHT - xPosPanel4;
+		int panel4Height = ScreenParam.SCREENHEIGHT - xPosPanel4;
 		
-		panel.setBounds(0, panel3Height, ScreenParameters.SCREENWIDTH/2, winPanelHeight); // Left screen
-		panel2.setBounds(ScreenParameters.SCREENWIDTH/2, panel3Height, ScreenParameters.SCREENWIDTH/2, winPanelHeight); // Right screen
-		panel3.setBounds(0, 0, ScreenParameters.SCREENWIDTH, panel3Height); // Top screen
-		panel4.setBounds(0, xPosPanel4, ScreenParameters.SCREENWIDTH, panel4Height); // Bottom screen
+		panel.setBounds(0, panel3Height, ScreenParam.SCREENWIDTH/2, winPanelHeight); // Left screen
+		panel2.setBounds(ScreenParam.SCREENWIDTH/2, panel3Height, ScreenParam.SCREENWIDTH/2, winPanelHeight); // Right screen
+		panel3.setBounds(0, 0, ScreenParam.SCREENWIDTH, panel3Height); // Top screen
+		panel4.setBounds(0, xPosPanel4, ScreenParam.SCREENWIDTH, panel4Height); // Bottom screen
 
 		Border br = BorderFactory.createLineBorder(Color.black);
 
@@ -139,28 +139,28 @@ public class EndGame extends JFrame {
 
 		//settings Bounds
 		int estWinTextSize = winText.length() * h1;
-		winnerTextLabel.setBounds(ScreenParameters.SCREENWIDTH/2 - estWinTextSize/4, 0, ScreenParameters.SCREENWIDTH, panel3Height);
+		winnerTextLabel.setBounds(ScreenParam.SCREENWIDTH/2 - estWinTextSize/4, 0, ScreenParam.SCREENWIDTH, panel3Height);
 
 		int estBackTextSize = backText.length() * h2;
-		backTextLabel.setBounds(ScreenParameters.SCREENWIDTH/2 - estBackTextSize/4, 0, ScreenParameters.SCREENWIDTH, panel4Height);
+		backTextLabel.setBounds(ScreenParam.SCREENWIDTH/2 - estBackTextSize/4, 0, ScreenParam.SCREENWIDTH, panel4Height);
 		
 		int scoreTextSize = "Your Score ".length() * h2;
 		int timingTextSize = "Timing ".length() * h3;
-		int topLabel = (int) (70 * ScreenParameters.YREDUCE);
-		int midLabel = (int) (140 * ScreenParameters.YREDUCE);
-		int botLabel = (int) (210 * ScreenParameters.YREDUCE);
-		int timerTopLabel = (int) (300 * ScreenParameters.YREDUCE);
-		int timerBotLabel = (int) (350 * ScreenParameters.YREDUCE);
+		int topLabel = (int) (70 * ScreenParam.YREDUCE);
+		int midLabel = (int) (140 * ScreenParam.YREDUCE);
+		int botLabel = (int) (210 * ScreenParam.YREDUCE);
+		int timerTopLabel = (int) (300 * ScreenParam.YREDUCE);
+		int timerBotLabel = (int) (350 * ScreenParam.YREDUCE);
 		
 		int winTextSize = winner.getId().length() * h2;
 		int winScoreSize = String.valueOf(winner.getScore()).length() * h2;
-		winnerLabel.setBounds(center - winTextSize/4, topLabel, textBoxSize, ScreenParameters.SCREENHEIGHT/15);
+		winnerLabel.setBounds(center - winTextSize/4, topLabel, textBoxSize, ScreenParam.SCREENHEIGHT/15);
 		winnerScoreText.setBounds(center - scoreTextSize/4, midLabel, textBoxSize, 130);
 		winnerScore.setBounds(center - winScoreSize/4, botLabel, textBoxSize, 130);
 		
 		int loseTextSize = loser.getId().length() * h2;
 		int loseScoreSize = String.valueOf(loser.getScore()).length() * h2;
-		loserLabel.setBounds(center - loseTextSize/4, topLabel, textBoxSize, ScreenParameters.SCREENHEIGHT/15);
+		loserLabel.setBounds(center - loseTextSize/4, topLabel, textBoxSize, ScreenParam.SCREENHEIGHT/15);
 		loserScoreText.setBounds(center - scoreTextSize/4, midLabel, textBoxSize, 130);
 		loserScore.setBounds(center - loseScoreSize/4, botLabel, textBoxSize, 130);
 
