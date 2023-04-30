@@ -4,6 +4,7 @@ import logic.moveChecking.PieceVisitor;
 
 /**
  * Chariot Piece
+ * @author NASRO Rona
  */
 
 public class Chariot extends Piece{

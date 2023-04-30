@@ -1,6 +1,7 @@
 package logic.boardChecking;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
@@ -13,6 +14,10 @@ import logic.moveChecking.Move;
 import logic.moveChecking.Moving;
 import logic.moveChecking.PointVisitor;
 import outOfGameScreens.Profile;
+
+/*
+ *  @author NASRO Rona, YANG Mattew
+ */
 
 public class BoardManager {
 	
@@ -107,15 +112,15 @@ public class BoardManager {
 
 			if (curr.isBlack() == player.getPlayerPlace()) {
 				board = doMove(board, move);
-				testCheck(board);
+				board = testCheck(board);
 				if (curr.isBlack() && board.getBlackCheck()) {
 					logDataBoard.info(" Illegal Move, you're in check");
-					undoMove(board, move, captured);
+					board = undoMove(board, move, captured);
 					return false;
 				}
 				if (!curr.isBlack() && board.getRedCheck()) {
 					logDataBoard.info(" Illegal Move, you're in check");
-					undoMove(board, move, captured);
+					board = undoMove(board, move, captured);
 					return false;
 				} else {
 					//the move is legal, now let's see if it's a winning move.
@@ -140,15 +145,14 @@ public class BoardManager {
 							Board.setWinner(DRAW);
 						}
 					}
-	
-					// if (!checkMate) {   //LEGAL MOVE AND NOT IN CHECKMATE?
-					//System.out.println("Moved " + curr + " from (" + x + ", " + y + ") to (" + finalX + ", " + finalY + ")");
+
 					logDataBoard.info("Moved " + curr + " from (" + x + ", " + y + ") to (" + finalX + ", " + finalY + ")");
 					if (captured != null) {
 						player.addPieceCaptured(captured);
 						logDataBoard.info(captured + " Captured!");
-						//MoveLogger.addMove(new Move(curr, captured, x, y, finalX, finalY));
 					}
+					board.updateHash(x, y, curr.getType());
+					board.updateHash(finalX, finalY, curr.getType());
 					return true;
 				}
 			} else {
@@ -181,23 +185,23 @@ public class BoardManager {
 						Piece tempCaptured = board.getPiece(i, j);
 
 						// Attempt the move
-						doMove(board, tempMove); //doing the temporary move
-						testCheck(board); //updates check status
+						board = doMove(board, tempMove); //doing the temporary move
+						board = testCheck(board); //updates check status
 
 						// If any of these moves were both legal, and result with us not being in check, we aren't in checkmate.
 						if (isBlack == false) {
 							if (!board.getRedCheck()) {
-								undoMove(board, tempMove, tempCaptured);
+								board = undoMove(board, tempMove, tempCaptured);
 								return false;
 							}
 						}
 						if (isBlack == true) {
 							if (!board.getBlackCheck()) {
-								undoMove(board, tempMove, tempCaptured);
+								board = undoMove(board, tempMove, tempCaptured);
 								return false;
 							}
 						}
-						undoMove(board, tempMove, tempCaptured);
+						board = undoMove(board, tempMove, tempCaptured);
 					}
 				}
 			}
@@ -224,9 +228,9 @@ public class BoardManager {
 					// check if this piece can move to the opposite color general's position
 					if (new Moving(board, new Move(x, y, generalX, generalY), 0).isLegal()) {
 						if (piece.isBlack()) {
-							board.setRedCheck(false);
+							board.setRedCheck(true);
 						} else {
-							board.setBlackCheck(false);
+							board.setBlackCheck(true);
 						}
 					}
 				}

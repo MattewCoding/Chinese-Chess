@@ -56,14 +56,14 @@ public class GUI extends JPanel implements MouseListener{
 	// Looks visually pleasing if the board is centered
 	// and tall enough to fit most of the screen
 	// but not too big to take up all of the screen
-	int center = ScreenParam.SCREENWIDTH/2;
-	int margin = ScreenParam.SCREENHEIGHT/18;
-	int squareLength = (ScreenParam.SCREENHEIGHT-margin*3)/11; // x3 to leave more space at bottom of screen
+	private int center = ScreenParam.SCREENWIDTH/2;
+	private int margin = ScreenParam.SCREENHEIGHT/18;
+	private int squareLength = (ScreenParam.SCREENHEIGHT-margin*3)/11; // x3 to leave more space at bottom of screen
 
-	int leftMostPixel = (int) (center-squareLength*(5.5));
-	int chessboardEdge = leftMostPixel + 11 * squareLength;
+	private int leftMostPixel = (int) (center-squareLength*(5.5));
+	private int chessboardEdge = leftMostPixel + 11 * squareLength;
 
-	int fontMarginY = 75;
+	private int fontMarginY = 75;
 
 	// Mouse stuff
 	private int mouseX = 0,mouseY = 0, pieceX = 0, pieceY = 0;
@@ -73,7 +73,7 @@ public class GUI extends JPanel implements MouseListener{
 	private boolean mouseClickedPiece = false;
 	private boolean mouseMovingPiece = false;
 
-	// players
+	// Players
 	private Profile player1, player2;
 	private boolean redTurn = true;
 
@@ -81,6 +81,21 @@ public class GUI extends JPanel implements MouseListener{
 	private int strokeWidth = 1;
 	private Board board;
 	private Graphics2D g2;
+	
+	// Captured pieces 
+	private ArrayList<Piece> capturedPieceRed;
+	private ArrayList<Piece> capturedPieceBlack;
+	private int capturedMargin = (int) (15 * ScreenParam.XREDUCE);
+	private int deplacepiecesX = capturedMargin;
+	
+	// Music and Audio
+	private int imageWidth = 30;
+	private int imageHeight = 30;
+
+	private int musicBoxX = center - imageWidth - 10;
+	private int soundBoxX = center + 10;
+
+	private int boxY = margin - imageHeight - 15;
 
 	// Notation history
 	private JTextArea pastMovesTextArea;
@@ -91,21 +106,6 @@ public class GUI extends JPanel implements MouseListener{
 	private int rightMostX = ScreenParam.SCREENWIDTH - notationMargin;
 	private int topNotationY = 2*ScreenParam.SCREENHEIGHT/5;
 	
-	// Captured pieces 
-	private ArrayList<Piece> capturedPieceRed;
-	private ArrayList<Piece> capturedPieceBlack;
-	private int capturedMargin = (int) (15 * ScreenParam.XREDUCE);
-	private int deplacepiecesX = capturedMargin;
-	
-	//music box
-	int imageWidth = 30;
-	int imageHeight = 30;
-
-	int musicBoxX = center - imageWidth - 10;
-	int soundBoxX = center + 10;
-
-	int boxY = margin - imageHeight - 15;
-	
 	private boolean soundOn = true;
 	private boolean musicOn = true;
 	private String soundFilename = "src/music-sounds/sound.wav";
@@ -113,6 +113,11 @@ public class GUI extends JPanel implements MouseListener{
 	private Clip clip;
 	private Clip musicClip;
 
+	// Surrender and Turn timer
+	private int widthTurnTimer = 270;
+	private int topButtonLeftX = 50;
+	private int surrBoxHeight = 35;
+	private int topButtonTopY = 150;
 
 	// Points
 	private PointVisitor searchValidMoves;
@@ -121,10 +126,19 @@ public class GUI extends JPanel implements MouseListener{
 
 	private static Logger logDataGUI = LoggerUtility.getLogger(SubMenu.class, "html");
 
-	private String theme; 
-	 
-	public GUI(String player1name, String player2name, String time, String theme) {
+	private String theme;
+	
+	/**
+	 * Creates the main elements for the game board
+	 * @param player1name Player 1's name
+	 * @param player2name Player 2's name
+	 * @param time1 Player 1's amount of starting time in minutes
+	 * @param time2 Player 2's amount of starting time in minutes
+	 * @param theme The chosen theme for the Xiangqi pieces
+	 */
+	public GUI(String player1name, String player2name, String time1, String time2, String theme) {
 		board = new Board();
+		
 		this.theme=theme;
 
 		pastMoves = new NotationHistory();
@@ -133,8 +147,8 @@ public class GUI extends JPanel implements MouseListener{
 		capturedPieceRed = new ArrayList<Piece>();
 		capturedPieceBlack = new ArrayList<Piece>();
 
-		player1 = new Profile(player1name, 0, false, time);
-		player2 = new Profile(player2name, 0, true, time);
+		player1 = new Profile(player1name, 0, false, time1);
+		player2 = new Profile(player2name, 0, true, time2);
 		player2.getTimer().stop();
 
 		bot = new Bot(player2, true, 4);
@@ -155,6 +169,13 @@ public class GUI extends JPanel implements MouseListener{
 		}
 
 		addMouseListener(this);
+		
+		logCreationData();
+	}
+	
+	public void logCreationData() {
+		logDataGUI.info(board.toString());
+		logDataGUI.info("Players created: Player 1 is " + player1.getId() + " and Player 2 is " + player2.getId());
 	}
 
 	/**
@@ -162,7 +183,7 @@ public class GUI extends JPanel implements MouseListener{
 	 */
 	public void checkPieces() {
 		// Player1's turn (or the not-computer)
-		if(redTurn || !player2.getId().equals("Computer")) {
+		if(redTurn || !player2.getId().equals("Computer Enemy")) {
 			if(mouseClickedPiece && mouseMovingPiece) {
 
 				// Check if move is legal
@@ -186,7 +207,6 @@ public class GUI extends JPanel implements MouseListener{
 
 					updateCaptured();
 					updateNotation(move, movingPiece);
-					//playSound(soundFilename, !soundOn ,soundOn);
 					playSound(soundFilename, !soundOn ,soundOn);
 					mouseClickedPiece = false;
 					
@@ -199,8 +219,6 @@ public class GUI extends JPanel implements MouseListener{
 			Moving moving = new Moving(board, move);
 			BoardManager.tryMove(board, moving, player2);
 			playSound(soundFilename, !soundOn ,soundOn);
-
-			
 
 			player2.stopTurnTimer();
 			player1.startTurnTimer();
@@ -260,12 +278,13 @@ public class GUI extends JPanel implements MouseListener{
 				}
 			}
 		}
-		
-		drawPieceImages(theme);
-		drawTurnTimer();
-		drawNotation();
+
 		drawCapturedBox();
 		drawMusicImages();
+		drawNotation();
+		drawPieceImages(theme);
+		drawSurrender();
+		drawTurnTimer();
 
 		if(mouseClickedPiece) {
 			drawPoints();
@@ -289,84 +308,44 @@ public class GUI extends JPanel implements MouseListener{
 		boolean player1Out = timeLeft.equals("00:00");
 		boolean player2Out = timeRight.equals("00:00");
 		
-		return Board.getWinner()!=-1 || player1Out || player2Out;
+		return Board.getWinner() != -1 || player1Out || player2Out;
 	}
-	
-	public Profile getPlayer1() {
-		return player1;
-	}
-	
-	public Profile getPlayer2() {
-		return player2;
-	}
-	
-	public void logCreationData() {
-		logDataGUI.info(board.toString());
-		logDataGUI.info("Players created: Player 1 is " + player1.getId() + " and Player 2 is " + player2.getId());
-	}
-	
-	
-	public void playMusic(boolean play) {
-		if(play) {
-	        AudioInputStream audioInputStream;
-			try {
-				audioInputStream = AudioSystem.getAudioInputStream(new File(musicFilename).getAbsoluteFile());
-		        musicClip = AudioSystem.getClip();
-		        musicClip.open(audioInputStream);
-		        musicClip.start();
-		    } catch (UnsupportedAudioFileException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (LineUnavailableException e) {
-				e.printStackTrace();
-			}
-		} else {
-			musicClip.stop();
-        }
-		
-	}
-	
-	public void playSound(String filename,boolean stop, boolean play) {
-		if(play) {
-		    try {
-		    	if (stop) {
-		            clip.stop();
-		            return;
-		        }
-		        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filename).getAbsoluteFile());
-		        Clip clip = AudioSystem.getClip();
-		        clip.open(audioInputStream);
-		        clip.start();
-		    } catch (UnsupportedAudioFileException e) {
-		        e.printStackTrace();
-		    } catch (IOException e) {
-		        e.printStackTrace();
-		    } catch (LineUnavailableException e) {
-		        e.printStackTrace();
-		    }
-		}
-	}
+
 	/**
-	 * Places the different pieces on the board
-	 * @param theme The theme of the board
+	 * Places the captured pieces onto the board on the right
 	 */
-	public void drawPieceImages(String theme) {
-		for(int col = 0; col<11; col++) {
-			for(int row = 0; row<11; row++) {
-				int topLeftX = leftMostPixel + col * squareLength;
-				int topLeftY = margin + row * squareLength;
-				Piece[][] pieceList = board.getCoords();
-				Piece piece = pieceList[col][row];
-				if (piece != null) {
-					String fileName = piece.getImageName();
-					Image scaledImage = new ImageIcon(ScreenParam.IMAGESELECT+theme+"_"+fileName).getImage();
-					g2.drawImage(scaledImage, topLeftX+5, topLeftY+5, squareLength-10, squareLength-10, null);
-				}
+	public void drawCapturedBox() {
+		CreateRectangle.drawFilledRectangle(g2, capturedMargin, topNotationY, leftMostPixel - 2*capturedMargin, ScreenParam.SCREENHEIGHT/2);
+
+		drawCapturedPieces(capturedPieceBlack, deplacepiecesX+10, topNotationY+10,deplacepiecesX+10);
+		drawCapturedPieces(capturedPieceRed, deplacepiecesX+10, 2*topNotationY-10, deplacepiecesX+10);
+	}
+
+	/**
+	 * Draw all the captured pieces
+	 * @param capturedPiece The list of the captured pieces
+	 * @param x The horizontal position of the initial drawing
+	 * @param y The vertical position of the initial drawing
+	 * @param xInitial The initial x-coordinate that will be compared to add the x coordinate to the next line
+	 */
+	public void drawCapturedPieces(ArrayList<Piece> capturedPiece, int x, int y, int xInitial) {
+		for(Piece captured : capturedPiece) {
+			String fileName = captured.getImageName();
+			Image scaledImage = new ImageIcon("./src/images/pieces/chinese_"+fileName).getImage();
+			
+			g2.drawImage(scaledImage, x, y,squareLength-10, squareLength-10, null);
+			if(x<7*xInitial) {
+				x  += 35;
+			}else {
+				y += 50;
+				x = xInitial;
 			}
 		}
 	}
 
+	/**
+	 * Draw the icons that you can click on to toggle the music and sound
+	 */
 	public void drawMusicImages() {
 		Image musicImage = null;
 		Image soundImage = null;
@@ -394,42 +373,6 @@ public class GUI extends JPanel implements MouseListener{
 		CreateRectangle.drawFilledRectangle(g2, ScreenParam.OUTLINECOLOR, ScreenParam.BOARDCOLOR, soundBoxX, boxY, imageHeight, imageWidth);
 		g2.drawImage(soundImage, soundBoxX + 2, boxY + 2, imageWidth - 4, imageHeight - 4, null);
 	}
-	/**
-	 * Draws the turn timer for both players
-	 */
-	public void drawTurnTimer(){
-		//Rectangle calculations
-		int widthTurnTimer = 270;
-		int timerRedLeftX = 50;
-		int timerBlackLeftX = ScreenParam.SCREENWIDTH-(timerRedLeftX+widthTurnTimer);
-
-		String p1ID = player1.getId();
-		String p2ID = player2.getId();
-		String timeLeft = player1.getTimer().getElapsedTime();
-		String timeRight = player2.getTimer().getElapsedTime();
-
-		g2.setFont(new Font(getFont().getFontName(), Font.BOLD, 30));
-		FontMetrics metrics = g2.getFontMetrics(getFont());
-
-		// Determine the X coordinate for the text
-		// You know, I'm not actually sure why we need to multiply the string width
-		// By 4/3, (it should be 1/2), but if it works...
-		int timerRedPlayerX = timerRedLeftX + widthTurnTimer/2 - 4*metrics.stringWidth(p1ID)/3;
-		int timerBlackPlayerX = timerBlackLeftX + widthTurnTimer/2 - 4*metrics.stringWidth(p2ID)/3;
-
-		int timerRedCountX = timerRedLeftX + widthTurnTimer/2 - 4*metrics.stringWidth(timeLeft)/3;
-		int timerBlackCountX = timerBlackLeftX + widthTurnTimer/2 - 4*metrics.stringWidth(timeRight)/3;
-
-		CreateRectangle.drawFilledRectangle(g2, timerRedLeftX, 50, widthTurnTimer, 90);
-		CreateRectangle.drawFilledRectangle(g2, timerBlackLeftX, 50, widthTurnTimer, 90);
-
-		g2.setColor(Color.black);
-		g2.drawString(p1ID, timerRedPlayerX, 75);
-		g2.drawString(p2ID, timerBlackPlayerX, 75);
-		g2.drawString(timeLeft, timerRedCountX, 118);
-		g2.drawString(timeRight, timerBlackCountX, 118);
-
-	}
 
 	/**
 	 * Draws the notation history onto the board on the left
@@ -448,43 +391,94 @@ public class GUI extends JPanel implements MouseListener{
 	 * @param x The left x-position of the text
 	 * @param y The top y-position of the text
 	 */
-	private void drawString(String text, int x, int y) {
+	public void drawString(String text, int x, int y) {
 		for (String line : pastMovesArrayList) {
 			g2.drawString(line, x, y += g2.getFontMetrics().getHeight());
 		}
 	}
-
+	
 	/**
-	 * Places the captured pieces onto the board on the right
+	 * Places the different pieces on the board
+	 * @param theme The theme of the board
 	 */
-	public void drawCapturedBox() {
-		CreateRectangle.drawFilledRectangle(g2, capturedMargin, topNotationY, leftMostPixel - 2*capturedMargin, ScreenParam.SCREENHEIGHT/2);
-
-		drawCapturedPieces(capturedPieceBlack, deplacepiecesX+10, topNotationY+10,deplacepiecesX+10);
-		drawCapturedPieces(capturedPieceRed, deplacepiecesX+10, 2*topNotationY-10, deplacepiecesX+10);
-	}
-
-
-	/**
-	 * Draw all the captured pieces
-	 * @param capturedPiece The list of the captured pieces
-	 * @param x The horizontal position of the initial drawing
-	 * @param y The vertical position of the initial drawing
-	 * @param xInitial The initial x-coordinate that will be compared to add the x coordinate to the next line
-	 */
-	public void drawCapturedPieces(ArrayList<Piece> capturedPiece, int x, int y, int xInitial) {
-		for(Piece captured : capturedPiece) {
-			String fileName = captured.getImageName();
-			Image scaledImage = new ImageIcon("./src/pieces/chinese_"+fileName).getImage();
-			
-			g2.drawImage(scaledImage, x, y,squareLength-10, squareLength-10, null);
-			if(x<7*xInitial) {
-				x  += 35;
-			}else {
-				y += 50;
-				x = xInitial;
+	public void drawPieceImages(String theme) {
+		for(int col = 0; col<11; col++) {
+			for(int row = 0; row<11; row++) {
+				int topLeftX = leftMostPixel + col * squareLength;
+				int topLeftY = margin + row * squareLength;
+				Piece[][] pieceList = board.getCoords();
+				Piece piece = pieceList[col][row];
+				if (piece != null) {
+					String fileName = piece.getImageName();
+					Image scaledImage = new ImageIcon(ScreenParam.IMAGESELECT+theme+"_"+fileName).getImage();
+					g2.drawImage(scaledImage, topLeftX+5, topLeftY+5, squareLength-10, squareLength-10, null);
+				}
 			}
 		}
+	}
+	
+	/**
+	 * Draws the button the player uses to surrender
+	 */
+	public void drawSurrender(){
+		//Rectangle calculation
+		int surrBlackLeftX = ScreenParam.SCREENWIDTH -(topButtonLeftX + widthTurnTimer);
+
+		g2.setFont(new Font(getFont().getFontName(), Font.BOLD, 25));
+		FontMetrics metrics = g2.getFontMetrics(getFont());
+		String surr = "Surrender";
+		int offset = 7*metrics.stringWidth(surr)/6; // 7/6 is weird but it works...
+		
+		int surrRedPlayerX = topButtonLeftX + widthTurnTimer/2 - offset;
+		CreateRectangle.drawFilledRectangle(g2, topButtonLeftX, topButtonTopY, widthTurnTimer, surrBoxHeight);
+		g2.setColor(Color.black);
+		g2.drawString(surr, surrRedPlayerX, 177);
+		
+		if(!player2.getId().equals("Computer Enemy")) {
+			int surrBlackPlayerX = surrBlackLeftX + widthTurnTimer/2 - offset;
+			CreateRectangle.drawFilledRectangle(g2, surrBlackLeftX, topButtonTopY, widthTurnTimer, surrBoxHeight);
+			g2.setColor(Color.black);
+			g2.drawString(surr, surrBlackPlayerX, 177);
+		}
+
+	}
+	
+	/**
+	 * Draws the turn timer for both players
+	 */
+	public void drawTurnTimer(){
+		//Rectangle calculation
+		int timerBlackLeftX = ScreenParam.SCREENWIDTH -(topButtonLeftX + widthTurnTimer);
+
+		String p1ID = player1.getId();
+		String p2ID = player2.getId();
+		String timeLeft = player1.getTimer().getElapsedTime();
+		String timeRight = player2.getTimer().getElapsedTime();
+
+		CreateRectangle.drawFilledRectangle(g2, topButtonLeftX, 50, widthTurnTimer, 90);
+		CreateRectangle.drawFilledRectangle(g2, timerBlackLeftX, 50, widthTurnTimer, 90);
+
+		g2.setFont(new Font(getFont().getFontName(), Font.BOLD, 25));
+		FontMetrics metrics = g2.getFontMetrics(getFont());
+
+		// Determine the X coordinate for the text
+		// I'm not actually sure why we need to multiply the string width
+		// By 9/8, (it should be 1), but if it works...
+		int timerRedPlayerX = topButtonLeftX + widthTurnTimer/2 - 9*metrics.stringWidth(p1ID)/8;
+		int timerBlackPlayerX = timerBlackLeftX + widthTurnTimer/2 - 9*metrics.stringWidth(p2ID)/8;
+
+		g2.setColor(Color.black);
+		g2.drawString(p1ID, timerRedPlayerX, 75);
+		g2.drawString(p2ID, timerBlackPlayerX, 75);
+
+		g2.setFont(new Font(getFont().getFontName(), Font.BOLD, 40));
+		metrics = g2.getFontMetrics(getFont());
+		int timerRedCountX = topButtonLeftX + widthTurnTimer/2 - 5*metrics.stringWidth(timeLeft)/3;
+		int timerBlackCountX = timerBlackLeftX + widthTurnTimer/2 - 5*metrics.stringWidth(timeRight)/3;
+		
+		g2.drawString(timeLeft, timerRedCountX, 118);
+		g2.drawString(timeRight, timerBlackCountX, 118);
+
 	}
 
 	/**
@@ -548,20 +542,76 @@ public class GUI extends JPanel implements MouseListener{
 		capturedPieceBlack = player1.getPiecesCaptured();
 		capturedPieceRed = player2.getPiecesCaptured();
 	}
+	
+	/**
+	 * Play the music chosen for this game
+	 * @param play Whether to start or stop the music
+	 */
+	public void playMusic(boolean play) {
+		if(play) {
+	        AudioInputStream audioInputStream;
+			try {
+				audioInputStream = AudioSystem.getAudioInputStream(new File(musicFilename).getAbsoluteFile());
+		        musicClip = AudioSystem.getClip();
+		        musicClip.open(audioInputStream);
+		        musicClip.start();
+		    } catch (UnsupportedAudioFileException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (LineUnavailableException e) {
+				e.printStackTrace();
+			}
+		} else {
+			musicClip.stop();
+        }
+		
+	}
+	
+	/**
+	 * Play the sound to move or capture a piece
+	 * @param filename The location of the sound file
+	 * @param stop Whether to stop the music
+	 * @param play Whether to play the music
+	 */
+	public void playSound(String filename, boolean stop, boolean play) {
+		if(play) {
+		    try {
+		    	if (stop) {
+		            clip.stop();
+		            return;
+		        }
+		        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(filename).getAbsoluteFile());
+		        Clip clip = AudioSystem.getClip();
+		        clip.open(audioInputStream);
+		        clip.start();
+		    } catch (UnsupportedAudioFileException e) {
+		        e.printStackTrace();
+		    } catch (IOException e) {
+		        e.printStackTrace();
+		    } catch (LineUnavailableException e) {
+		        e.printStackTrace();
+		    }
+		}
+	}
+	
+	public Profile getPlayer1() {
+		return player1;
+	}
+	
+	public Profile getPlayer2() {
+		return player2;
+	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+
+		/** Mouse detecting pieces **/
 
 		// floorDiv makes sure that negative numbers between -1 and 0 get rounded down to -1 and not 0
 		// (casting directly to int does that for some reason)
 		mouseX = Math.floorDiv((e.getX()-leftMostPixel), squareLength);
 		mouseY = Math.floorDiv((e.getY()-margin), squareLength);
-		
-		boolean xSoundRange = (e.getX() >= soundBoxX) && (e.getX() <= imageWidth+soundBoxX);
-		boolean ySoundRange = (e.getY() >= boxY) && (e.getY() <= imageHeight+boxY);
-		
-		boolean xMusicRange = (e.getX() >= musicBoxX) && (e.getX() <= imageWidth+musicBoxX);
-		boolean yMusicRange = (e.getY() >= boxY) && (e.getY() <= imageHeight+boxY);
 
 		boolean xInRange = (mouseX >= 0) && (mouseX <= 10);
 		boolean yInRange = (mouseY >= 0) && (mouseY <= 10);
@@ -595,21 +645,39 @@ public class GUI extends JPanel implements MouseListener{
 		else {
 			mouseClickedPiece = false;
 		}
-		if(xSoundRange && ySoundRange) {
-			if (soundOn) {
-	            soundOn = false;
-	        } else {
-	        	soundOn = true;
-	        }
-	    	
-	    }
 		
+		/** Mouse detecting audio change **/
+		
+		boolean xSoundRange = (e.getX() >= soundBoxX) && (e.getX() <= imageWidth+soundBoxX);
+		boolean ySoundRange = (e.getY() >= boxY) && (e.getY() <= imageHeight+boxY);
+		
+		boolean xMusicRange = (e.getX() >= musicBoxX) && (e.getX() <= imageWidth+musicBoxX);
+		boolean yMusicRange = (e.getY() >= boxY) && (e.getY() <= imageHeight+boxY);
+		
+		if(xSoundRange && ySoundRange) {
+			soundOn = !soundOn;
+	    }
 		if(xMusicRange && yMusicRange) {
 	        musicOn = !musicOn;
             playMusic(musicOn);
-	    	
 	    }
 		
+		/** Mouse detecting surrendering **/
+		
+		boolean xBlackSurrRange = e.getX() >= topButtonLeftX && e.getX() <= topButtonLeftX + widthTurnTimer;
+		boolean yBlackSurrRange = e.getY() >= topButtonTopY && e.getY() <= topButtonTopY + surrBoxHeight;
+		if(xBlackSurrRange && yBlackSurrRange) {
+			Board.setWinner(BoardManager.PLAYER1_WINS);
+		}
+
+		if(!player2.getId().equals("Computer Enemy")) {
+			int topButtonRightX = ScreenParam.SCREENWIDTH -(topButtonLeftX + widthTurnTimer);
+			boolean xRedSurrRange = e.getX() >= topButtonRightX && e.getX() <= topButtonRightX + widthTurnTimer;
+			boolean yRedSurrRange = e.getY() >= topButtonTopY && e.getY() <= topButtonTopY + surrBoxHeight;
+			if(xRedSurrRange && yRedSurrRange) {
+				Board.setWinner(BoardManager.PLAYER2_WINS);
+			}
+		}
 	}
 
 	@Override

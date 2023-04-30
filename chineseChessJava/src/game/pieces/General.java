@@ -4,6 +4,7 @@ import logic.moveChecking.PieceVisitor;
 
 /**
  * General Piece
+ * @author NASRO Rona
  */
 public class General extends Piece {
     public General(boolean place, int x, int y) {

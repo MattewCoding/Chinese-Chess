@@ -4,6 +4,7 @@ import logic.moveChecking.PieceVisitor;
 
 /**
  * Cannon Piece
+ * @author NASRO Rona
  */
 public class Canon extends Piece {
     public Canon(boolean place, int x, int y) {

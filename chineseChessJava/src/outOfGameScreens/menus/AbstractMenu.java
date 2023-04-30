@@ -2,8 +2,11 @@ package outOfGameScreens.menus;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
@@ -16,6 +19,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
+
+import outOfGameScreens.GameLauncher;
 import outOfGameScreens.ScreenParam;
 
 /**
@@ -34,7 +39,7 @@ public abstract class AbstractMenu extends JPanel {
 	protected JSplitPane menuSideBar;
 	protected JFrame mainScreen;
 	
-	//Swing attributes created here
+	//Swing attributes created in the abstract class
 	protected JLabel menuName;
 	protected JList<String> optionList;
 	protected JButton backButton = setBackButtonOptions();
@@ -121,10 +126,11 @@ public abstract class AbstractMenu extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			MainMenu mainMenu = new MainMenu(mainScreen);
-			mainScreen.setContentPane(mainMenu.getButtonPanel());
-			mainScreen.add(mainMenu);
-			mainScreen.setLayout(new BorderLayout());
+			mainScreen.getContentPane().removeAll();
+			mainScreen.getContentPane().add(mainMenu.getButtonPanel());
+			mainScreen.getContentPane().add(mainMenu);
 			mainScreen.revalidate();
+			mainScreen.repaint();
 		}
 
 	}

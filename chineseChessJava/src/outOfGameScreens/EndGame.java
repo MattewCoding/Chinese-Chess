@@ -37,7 +37,7 @@ public class EndGame extends JFrame {
 
 	private Container c ;
 
-	private final int textBoxSize = 500;
+	private final int textBoxSize = ScreenParam.SCREENWIDTH/2;
 	private int center = ScreenParam.SCREENWIDTH/4;
 
 	protected Color boardColor = ScreenParam.BOARDCOLOR;
@@ -205,6 +205,10 @@ public class EndGame extends JFrame {
 		setLocationRelativeTo(null);
 	}
 	
+	/**
+	 * Check if we're finished viewing this screen
+	 * @return
+	 */
 	public boolean closed() {
 		return isClosed;
 	}
@@ -215,7 +219,6 @@ public class EndGame extends JFrame {
 		public void mouseClicked(MouseEvent e) {
 			isClosed = true;
 			dispose();
-			new GameLauncher();
 		}
 
 		@Override

@@ -4,6 +4,7 @@ import logic.moveChecking.PieceVisitor;
 
 /**
  * Elephant Piece
+ * @author NASRO Rona
  */
 public class Elephant extends Piece {
     public Elephant(boolean place, int x, int y) {

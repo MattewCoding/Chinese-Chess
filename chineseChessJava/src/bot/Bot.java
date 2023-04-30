@@ -44,7 +44,7 @@ public class Bot {
 	private int maxDepth;
 
 	/**
-	 * This board is a separte instance of the game board, used to calculate future moves
+	 * This board is a separate instance of the game board, used to calculate future moves
 	 */
 	private Board currentBoard;
 
@@ -146,8 +146,7 @@ public class Bot {
 			int advantage = -findIdealMove(depth - 1, -beta, -alpha, move);
 
 			currentBoard = BoardManager.undoMove(currentBoard, move, move.getCapturedPiece());
-			String capturedName = (move.getCapturedPiece() == null)? "" : move.getCapturedPiece().getType();
-			currentBoard.updateHash(move.getFinalX(), move.getFinalY(), capturedName);
+			currentBoard.updateHash(move.getFinalX(), move.getFinalY(), piece.getType());
 			currentBoard.updateHash(move.getOriginX(), move.getOriginY(), piece.getType());
 
 			bestScore = Math.max(advantage, bestScore);

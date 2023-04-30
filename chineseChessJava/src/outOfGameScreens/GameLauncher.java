@@ -3,6 +3,8 @@ package outOfGameScreens;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+
 import outOfGameScreens.menus.MainMenu;
 
 /**
@@ -31,15 +33,16 @@ public class GameLauncher extends JFrame{
 	 */
 	public GameLauncher() {
 		super("Chinese Chess");
+        setLayout(new BorderLayout());
+        getContentPane().removeAll();
 		
 		//This code tests the menu
 		MainMenu mainMenu = new MainMenu(this);
-		add(mainMenu.getButtonPanel());
-		add(mainMenu);
+		getContentPane().add(mainMenu.getButtonPanel());
+		getContentPane().add(mainMenu);
 		
 		/* This part is to make sure the frame shows up */
 		//Frame settings
-        setLayout(new BorderLayout());
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
 		pack();

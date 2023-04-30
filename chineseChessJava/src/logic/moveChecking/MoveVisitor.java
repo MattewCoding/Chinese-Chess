@@ -10,7 +10,7 @@ import game.pieces.Soldier;
 
 /**
  * This class will check if a given move is a move that this piece can generally make. For example, elephants can move diagonally two spaces. In a way, this is what defines a piece.
- * @author Yang Mattew
+ * @author Yang Mattew, Nasro Rona
  */
 public class MoveVisitor implements PieceVisitor<Boolean> {
 
