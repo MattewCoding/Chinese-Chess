@@ -475,7 +475,7 @@ public class GUI extends JPanel implements MouseListener{
 	public void drawCapturedPieces(ArrayList<Piece> capturedPiece, int x, int y, int xInitial) {
 		for(Piece captured : capturedPiece) {
 			String fileName = captured.getImageName();
-			Image scaledImage = new ImageIcon("./src/pieces/chinese_"+fileName).getImage();
+			Image scaledImage = new ImageIcon("./src/images/pieces/chinese_"+fileName).getImage();
 			
 			g2.drawImage(scaledImage, x, y,squareLength-10, squareLength-10, null);
 			if(x<7*xInitial) {

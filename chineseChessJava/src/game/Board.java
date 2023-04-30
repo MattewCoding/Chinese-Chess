@@ -21,6 +21,10 @@ import logic.moveChecking.Moving;
 import logic.moveChecking.PointVisitor;
 import outOfGameScreens.Profile;
 
+/*
+ *  @author NASRO Rona. Yang Mattew
+ */
+
 public class Board {
 
 	// Creating

@@ -82,7 +82,7 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 	}
 
 	/**
-	 * Returns true if the specifed square has an opponent piece
+	 * Returns true if the specified square has an opponent piece
 	 * @param piece The piece being moved
 	 * @param x The horizontal coordinate of the specified square
 	 * @param y The vertical coordinate of the specified square
@@ -234,14 +234,14 @@ public class PointVisitor implements PieceVisitor<ArrayList<Integer[]>>{
 			
 			Piece piece = currentBoard.getPiece(x, y);
 			Move testMove = new Move(currentPiece, currentPiece.getX(), currentPiece.getY(), x, y);
-			BoardManager.doMove(currentBoard, testMove);
+			currentBoard = BoardManager.doMove(currentBoard, testMove);
 			currentBoard = BoardManager.testCheck(currentBoard);
 			boolean redAndInCheck = currentBoard.getRedCheck() && !currentPiece.isBlack();
 			boolean blackAndInCheck = currentBoard.getBlackCheck() && currentPiece.isBlack();
 			if(!redAndInCheck && !blackAndInCheck) {
 				addLegal(x,y);
 			}
-			BoardManager.undoMove(currentBoard, testMove, piece);
+			currentBoard = BoardManager.undoMove(currentBoard, testMove, piece);
 		}
 	}
 

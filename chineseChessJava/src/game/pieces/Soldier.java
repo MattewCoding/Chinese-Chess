@@ -4,6 +4,7 @@ import logic.moveChecking.PieceVisitor;
 
 /**
  * Soldier Piece
+ *  @author NASRO Rona
  */
 public class Soldier extends Piece {
     //private Side curSide;

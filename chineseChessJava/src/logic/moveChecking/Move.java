@@ -7,6 +7,7 @@ import game.pieces.Piece;
  * It does not actually carry out moves or check for their validity.
  * It simply just represents the details of a move, namely the original and final
  * x and y cooridnates (note, these are not indecies on the board array. They are coordinates which are translated to indecies by the board object.)
+ *  @author NASRO Rona
  *
  */
 

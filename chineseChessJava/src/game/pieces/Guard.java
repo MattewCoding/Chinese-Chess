@@ -4,6 +4,7 @@ import logic.moveChecking.PieceVisitor;
 
 /**
  * Guard Piece
+ * @author NASRO Rona
  */
 public class Guard extends Piece {
 

@@ -25,6 +25,8 @@ public class Moving {
 	 *
 	 * @param board the current board object
 	 * @param move  the move to be validated
+	 * 
+	 *  @author NASRO Rona
 	 */
 	public Moving(Board board, Move move) {
 		this.board = board;

@@ -71,23 +71,20 @@ public class MainMenu extends AbstractMenu  {
 		buttonPanel.setOpaque(false);
 
 		// Add play button that shows the welcome panel
-		JButton playButton = new JButton("Jouer");
-		JButton optionButton = new JButton("Options");
-		JButton tutorialButton = new JButton("Apprendre");
+		JButton playButton = new JButton("Play");
+		JButton tutorialButton = new JButton("Learn How to Play");
 		JButton stratsButton = new JButton("Strategies");
 		JButton notationButton = new JButton("Notation");
 		JButton quitButton = new JButton("Quit");
-		JButton[] menuButtons = {playButton, optionButton, tutorialButton, stratsButton, notationButton, quitButton};
+		JButton[] menuButtons = {playButton, tutorialButton, stratsButton, notationButton, quitButton};
 
 		playButton.addActionListener(new PlayButtonListener());
-		optionButton.addActionListener(new OptionButtonListener());
 		tutorialButton.addActionListener(new TutorialButtonListener());
 		stratsButton.addActionListener(new StrategyButtonListener());
 		notationButton.addActionListener(new NotationButtonListener());
 		quitButton.addActionListener(new QuitButtonListener());
 
 		playButton.setMnemonic(KeyEvent.VK_P);
-		optionButton.setMnemonic(KeyEvent.VK_O);
 		tutorialButton.setMnemonic(KeyEvent.VK_T);
 		stratsButton.setMnemonic(KeyEvent.VK_S);
 		notationButton.setMnemonic(KeyEvent.VK_N);
@@ -270,24 +267,11 @@ public class MainMenu extends AbstractMenu  {
 
 
 
-
-
-	public class OptionButtonListener implements ActionListener{
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			OptionsMenu options = new OptionsMenu(mainScreen);
-			mainScreen.setContentPane(options.getSplitPane());
-			mainScreen.revalidate();
-		}
-
-	}
-
 	public class TutorialButtonListener implements ActionListener{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			SubMenu tutorialMenu = new SubMenu(menuContent+"Apprendre.txt", mainScreen);
+			SubMenu tutorialMenu = new SubMenu(menuContent+"How to Play.txt", mainScreen);
 			mainScreen.setContentPane(tutorialMenu.getSplitPane());
 			mainScreen.revalidate();
 

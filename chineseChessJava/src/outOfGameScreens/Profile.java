@@ -1,15 +1,16 @@
 package outOfGameScreens;
 
 import java.awt.Color;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+
 import java.util.ArrayList;
 
 import game.pieces.Piece;
 import logic.TimerListener;
+
+/*
+ * this class has the basic information about a player such as his color,id, score,timing and winning state
+ * @author NASRO Rona
+ */
 
 public class Profile {
 	private String id;
@@ -18,8 +19,6 @@ public class Profile {
 	private Color color;
 	private ArrayList<Piece> piecesCaptured;
 	private boolean checkmateStatus;
-	private BufferedWriter sw;
-	private BufferedReader sr, br;
 	private TimerListener timer;
    
 	
@@ -96,50 +95,6 @@ public class Profile {
 		this.checkmateStatus = checkmateStatus; // comment
 	}
 
-	public void stringWriter() {
-		String line = null;
-		try {
-			br = new BufferedReader(new FileReader("Scores.txt"));
-			String lineToRemove = String.valueOf(score);
-			while ((line = br.readLine()) != null) {
-				if (line == id) {
-					line.replace(br.readLine(), lineToRemove);
-				}
-			}
-			sw.write(id);
-			sw.write("\n" + score);
-			sw.close();
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	public String readerScore(String name) {
-		String Line;
-		String result = null;
-		try {
-			sr = new BufferedReader(new FileReader("Scores.txt"));
-
-			while ((Line = sr.readLine()) != null) {
-				if (Line == this.id) {
-					result = sr.readLine();
-				}
-			}
-			sr.close();
-
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return result;
-
-	}
 
 	public boolean getPlayerPlace() {
 		return place;
