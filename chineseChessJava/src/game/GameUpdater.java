@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 
 import outOfGameScreens.EndGame;
 import outOfGameScreens.ScreenParam;
+import outOfGameScreens.menus.MainMenu;
 
 /**
  * The game's main game updater, where the updates happen
@@ -58,16 +59,29 @@ public class GameUpdater extends JPanel implements Runnable{
 				gui.repaint();
 				if(gui.hasEnded()) {
 					endScreen = new EndGame(Board.getWinner(), gui.getPlayer1(), gui.getPlayer2());
-					mainScreen.setContentPane(endScreen.getContentPane());
-					mainScreen.revalidate();
+					mainScreen.getContentPane().removeAll();
+					mainScreen.getContentPane().add(endScreen.getContentPane());
+					mainScreen.getContentPane().revalidate();
 					run = false;
 					end = true;
 				}
 			}
 		}
 		while (end) {
+			try {
+				Thread.sleep(ScreenParam.SLEEPAMOUNT);
+			} catch (InterruptedException e) {
+				System.out.println(e.getMessage());
+			}
+			
 			if(endScreen.closed()) {
-				mainScreen.dispose();
+				MainMenu mainMenu = new MainMenu(mainScreen);
+				mainScreen.getContentPane().removeAll();
+				mainScreen.getContentPane().add(mainMenu.getButtonPanel());
+				mainScreen.getContentPane().add(mainMenu);
+				mainScreen.revalidate();
+				mainScreen.repaint();
+				
 				end = false;
 			}
 		}

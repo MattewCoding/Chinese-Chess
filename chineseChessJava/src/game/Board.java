@@ -36,28 +36,22 @@ public class Board {
 
 	// Processing
 	private HashMap<String, Piece> generalPositions = new HashMap<String, Piece>();
-	private PointVisitor searchValidMoves;
-
 	// Winning
 	private static int winner =-1;
 	private boolean blackCheck = false; //up is in check
 	private boolean redCheck = false; //down is in check
 
-	// Hashing
-	private final int PIECE_TYPES = 8;
 	private final HashMap<String, Integer> piece_number_asso = new HashMap<String, Integer>();
-	private final long[][][] zobristTable = new long[COLUMNS][ROWS][PIECE_TYPES];
 	private long hashValue = 0L;
 
 	private static Logger logDataBoard = LoggerUtility.getLogger(Board.class, "html");
 
 	public Board() {
 		initHashMap();
-		initZobrist();
 		
 		coords = new Piece[COLUMNS][ROWS];
 
-		int quadrant = 0, side, edgeYCoord, pieceId = 0;
+		int quadrant = 0, side, edgeYCoord;
 		boolean onBlackSide;
 		for(;quadrant < 4; quadrant++) {
 			onBlackSide = (quadrant>1);
@@ -110,7 +104,6 @@ public class Board {
 	 */
 	public Board(Piece[][] presetCoords) {
 		initHashMap();
-		initZobrist();
 		coords = presetCoords;
 
 		for(int x = 0; x < ROWS; x++) {
@@ -223,6 +216,7 @@ public class Board {
 	public String toString() {
 		// This is a debug method to ensure correct placement
 		// of the pieces
+		String res = "";
 		for(int i =0; i<ROWS;i++) {
 			for(int j =0;j<COLUMNS;j++) {
 				String firstLetter;
@@ -232,27 +226,11 @@ public class Board {
 				else {
 					firstLetter = coords[j][i].toString().substring(0, 2);
 				}
-				System.out.print(firstLetter + " ");
+				res += firstLetter + " ";
 			}
-			System.out.println();
+			res += "\n";
 		}
-		return "";
-	}
-
-	// Initialize the Zobrist table with random values
-	public void initZobrist() {
-		Random rand = new Random();
-		for (int x = 0; x < COLUMNS; x++) {
-			for (int y = 0; y < ROWS; y++) {
-				for (int piece = 0; piece < PIECE_TYPES; piece++) {
-					zobristTable[x][y][piece] = rand.nextLong();
-				}
-			}
-		}
-	}
-	
-	public long[][][] getZobristTable() {
-		return zobristTable;
+		return res;
 	}
 
 	/**
@@ -264,10 +242,13 @@ public class Board {
 	 */
 	public void updateHash(int x, int y, String pieceType) {
 		int pieceTypeNumber = piece_number_asso.get(pieceType);
-		hashValue ^= zobristTable[x][y][pieceTypeNumber];
+		hashValue ^= ZobristTable.getZobristTable()[x][y][pieceTypeNumber];
 	}
 
-	// Get the current hash value
+	/**
+	 * Get the current hash value
+	 * @return The board's hash value
+	 */
 	public long getHash() {
 		return hashValue;
 	}

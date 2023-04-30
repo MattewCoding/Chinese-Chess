@@ -467,7 +467,8 @@ public class MainMenu extends AbstractMenu  {
 					if(!player1name.equals("") && !player2name.equals("") && !time1Bad && !time2Bad) {
 						welcomeFrame.dispose();
 						GameUpdater chessBoard = new GameUpdater(mainScreen, player1name, player2name, time1, time2, theme);
-						mainScreen.setContentPane(chessBoard);
+						mainScreen.getContentPane().removeAll();
+						mainScreen.getContentPane().add(chessBoard);
 						mainScreen.revalidate();
 					} else {
 						if(player1name.equals("")) {
@@ -489,9 +490,6 @@ public class MainMenu extends AbstractMenu  {
 			}
 		}
 	}
-
-
-
 
 	public class TutorialButtonListener implements ActionListener{
 

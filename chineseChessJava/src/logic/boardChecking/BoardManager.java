@@ -145,14 +145,14 @@ public class BoardManager {
 							Board.setWinner(DRAW);
 						}
 					}
-	
-					// if (!checkMate) {   //LEGAL MOVE AND NOT IN CHECKMATE?
-					//System.out.println("Moved " + curr + " from (" + x + ", " + y + ") to (" + finalX + ", " + finalY + ")");
+
 					logDataBoard.info("Moved " + curr + " from (" + x + ", " + y + ") to (" + finalX + ", " + finalY + ")");
 					if (captured != null) {
 						player.addPieceCaptured(captured);
 						logDataBoard.info(captured + " Captured!");
 					}
+					board.updateHash(x, y, curr.getType());
+					board.updateHash(finalX, finalY, curr.getType());
 					return true;
 				}
 			} else {
