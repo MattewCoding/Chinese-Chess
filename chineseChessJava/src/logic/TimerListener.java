@@ -23,7 +23,7 @@ public class TimerListener extends JComponent{
 	private long pausedTime;
 	private long startTime;
 	private String elapsedTime;
-	
+
 	private int fullMinutes, fullSeconds;
 
 	public void setElapsedTime(String elapsedTime) {
@@ -32,14 +32,14 @@ public class TimerListener extends JComponent{
 
 	public TimerListener(Boolean isRed,String time){
 		String overwriteTime = time + ":00";
-		ScreenParam.setBlackTime(overwriteTime);
 		ScreenParam.setRedTime(overwriteTime);
-		
+		ScreenParam.setBlackTime(overwriteTime);
+
 		startTime = System.currentTimeMillis();
 
 		timer = new Timer(1, new TimerActionListener());
 		timer.start();
-		
+
 		// In case the players have different times
 		elapsedTime = isRed? ScreenParam.getRedTime() : ScreenParam.getBlackTime();
 		fullMinutes = Integer.parseInt(elapsedTime.substring(0, 2));

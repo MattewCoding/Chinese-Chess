@@ -28,10 +28,10 @@ public class GameUpdater extends JPanel implements Runnable{
 	private JFrame mainScreen;
 	private EndGame endScreen;
 	
-	public GameUpdater(JFrame gameScreen, String player1name, String player2name, String time, String theme){
+	public GameUpdater(JFrame gameScreen, String player1name, String player2name, String time1, String time2, String theme){
 		mainScreen = gameScreen;
 		
-		gui = new GUI(player1name, player2name, time, theme);
+		gui = new GUI(player1name, player2name, time1, time2, theme);
 		setLayout(new BorderLayout());
 		add(BorderLayout.CENTER, gui);
 		gui.repaint();

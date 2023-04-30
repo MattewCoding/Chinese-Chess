@@ -123,7 +123,7 @@ public class GUI extends JPanel implements MouseListener{
 
 	private String theme; 
 	 
-	public GUI(String player1name, String player2name, String time, String theme) {
+	public GUI(String player1name, String player2name, String time1, String time2, String theme) {
 		board = new Board();
 		this.theme=theme;
 
@@ -133,8 +133,8 @@ public class GUI extends JPanel implements MouseListener{
 		capturedPieceRed = new ArrayList<Piece>();
 		capturedPieceBlack = new ArrayList<Piece>();
 
-		player1 = new Profile(player1name, 0, false, time);
-		player2 = new Profile(player2name, 0, true, time);
+		player1 = new Profile(player1name, 0, false, time1);
+		player2 = new Profile(player2name, 0, true, time2);
 		player2.getTimer().stop();
 
 		bot = new Bot(player2, true, 4);
@@ -162,7 +162,7 @@ public class GUI extends JPanel implements MouseListener{
 	 */
 	public void checkPieces() {
 		// Player1's turn (or the not-computer)
-		if(redTurn || !player2.getId().equals("Computer")) {
+		if(redTurn || !player2.getId().equals("Computer Enemy")) {
 			if(mouseClickedPiece && mouseMovingPiece) {
 
 				// Check if move is legal

@@ -24,15 +24,14 @@ public class Profile {
 	
 	
 
-	public Profile(String id, int score, boolean place,String time) {
+	public Profile(String id, int score, boolean place, String time) {
 		this.id = id;
 		this.score = score;
 		this.piecesCaptured = new ArrayList<Piece>();
 		this.checkmateStatus = false;
 		this.place = place;
 		
-
-		timer = new TimerListener(place,time);
+		timer = new TimerListener(place, time);
 	}
 
 	public void addPieceCaptured(Piece pieceCaptured) {
