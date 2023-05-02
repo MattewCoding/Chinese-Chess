@@ -47,7 +47,7 @@ import outOfGameScreens.menus.SubMenu;
 /**
  * This class is the panel in which the chess pieces are printed
  * 
- * @author Yang Mattew, Nasro Rona
+ * @author Yang Mattew, Nasro Rona, Abdelbassir Imane
  */
 public class GUI extends JPanel implements MouseListener{
 
