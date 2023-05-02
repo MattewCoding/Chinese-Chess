@@ -30,7 +30,7 @@ import outOfGameScreens.buttons.OptionsBackButton;
 
 /**
  * The main menu of the program, where the user can access the submenus
- * @author Yang Mattew
+ * @author Yang Mattew, Nasro Rona, Abdelbassir Imane
  *
  */
 public class MainMenu extends AbstractMenu  {
