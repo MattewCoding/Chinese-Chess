@@ -12,7 +12,7 @@ import outOfGameScreens.menus.MainMenu;
 /**
  * The game's main game updater, where the updates happen
  * 
- * @author YANG Mattew, Nasro Rona
+ * @author YANG Mattew, Nasro Rona, Abdelbassir Imane
  *
  */
 public class GameUpdater extends JPanel implements Runnable{
